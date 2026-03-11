@@ -9,7 +9,6 @@ if (mobileMenuBtn) {
     mobileMenuBtn.addEventListener('click', () => {
         navMenu.classList.toggle('hidden');
         
-        // Hapus hint jika menu diklik
         if (mobileHint && !mobileHint.classList.contains('hidden')) {
             mobileHint.classList.remove('opacity-100', 'animate-bounce');
             mobileHint.classList.add('opacity-0');
@@ -30,18 +29,15 @@ function openTab(tabId, btnElement) {
     if (!targetSection || targetSection.classList.contains('block')) return;
 
     isAnimating = true;
-    
-    // Otomatis Gulir ke Atas saat pindah tab
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Tutup menu mobile jika sedang terbuka
     if(navMenu && !navMenu.classList.contains('hidden') && window.innerWidth < 768) {
         navMenu.classList.add('hidden');
     }
 
     const currentSection = document.querySelector('.section-content.block');
-    
     const navButtons = document.querySelectorAll('.nav-btn');
+    
     navButtons.forEach(btn => {
         btn.classList.remove('active', 'text-darkbg');
         btn.classList.add('text-slate-400', 'hover:text-white');
@@ -198,14 +194,12 @@ function setupPagination(page) {
 }
 
 /* ==============================================
-   3. RENDER KONTEN DINAMIS & LIGHTBOX (LOCAL IMAGES)
+   3. RENDER KONTEN DINAMIS & LIGHTBOX
    ============================================== */
 function renderGallery() {
     const container = document.getElementById('gallery-container');
-    container.innerHTML = ''; // Pastikan kosong sebelum dirender ulang
+    container.innerHTML = ''; 
 
-    // CONTOH: Array nama file foto yang ada di folder 'images' Anda.
-    // Silakan tambah/kurangi dan ganti namanya sesuai foto asli Anda.
     const galleryImages = [
         'pemenang_ip.jpeg', 'pemenang_p1.jpeg', 'pemenang_p3.jpeg', 'pemenang_2nd.jpeg', 'pemenang_p2.jpeg',
         'pemenang_p4.jpeg', 'pemenang_rubber.jpeg', 'pemenang_p1..jpeg', 'pemenang_rubber2.jpeg', 'pemenang_rubber1.jpeg'
@@ -213,7 +207,6 @@ function renderGallery() {
 
     galleryImages.forEach((imgName, index) => {
         const delay = (index + 1) * 0.05;
-        // Arahkan sumber gambar ke folder 'images' lokal
         const imgSrc = `images/${imgName}`; 
         
         container.insertAdjacentHTML('beforeend', `
@@ -236,14 +229,13 @@ function renderGallery() {
     });
 }
 
-// FIX: Menambahkan class 'flex' secara manual lewat JS agar tidak bentrok
 function openLightbox(src) {
     const lightbox = document.getElementById('lightbox');
     const img = document.getElementById('lightbox-img');
     img.src = src;
     
     lightbox.classList.remove('hidden');
-    lightbox.classList.add('flex'); // Add flex here
+    lightbox.classList.add('flex'); 
     
     setTimeout(() => {
         lightbox.classList.remove('opacity-0');
@@ -260,50 +252,61 @@ function closeLightbox() {
     
     setTimeout(() => {
         lightbox.classList.add('hidden');
-        lightbox.classList.remove('flex'); // Remove flex here
+        lightbox.classList.remove('flex'); 
         img.src = ''; 
     }, 300);
 }
 
 /* ==============================================
-   1. RENDER TEAM ENERGY (LUXURY STO + HEXAGON NEON)
+   4. RENDER TEAM ENERGY (LUXURY STO + GITHUB LINK)
    ============================================= */
 function renderTeam() {
     const container = document.getElementById('team-container');
     if (!container) return; 
     
-    // Fungsi pembantu untuk mencetak kartu Heksagon
     const createCard = (person, delay) => {
-        // PERBAIKAN: Jika nama file ada, ambil dari folder images. Jika kosong, pakai default.jpg
         const imagePath = person.img ? `images/${person.img}` : `images/default.jpg`;
+        const isClickable = !!person.link; 
+        
+        const wrapperTag = isClickable ? 'a' : 'div';
+        const linkAttr = isClickable ? `href="${person.link}" target="_blank" rel="noopener noreferrer"` : '';
+        const cursorClass = isClickable ? 'cursor-pointer hover:-translate-y-2' : '';
+        
+        // HINT BARU: Selalu terlihat, tidak menghalangi gambar, ada efek melayang (bounce)
+        const hintHTML = isClickable ? `
+            <div class="mt-4 flex justify-center w-full">
+                <div class="animate-bounce flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-energi-cyan/10 to-energi-gold/10 border border-energi-gold/40 shadow-[0_0_15px_rgba(212,175,55,0.2)] backdrop-blur-sm">
+                    <span class="text-[10px] md:text-xs text-energi-gold">✨</span>
+                    <span class="text-[9px] md:text-[10px] text-white font-medium tracking-wide drop-shadow-md">Klik disini untuk melihat portofolio</span>
+                </div>
+            </div>
+        ` : '';
 
         return `
-        <div class="luxury-card group w-[220px] md:w-[240px] p-6 text-center z-10" style="animation: fadeInUpTeam 0.6s ease backwards ${delay}s;">
-            <div class="absolute inset-0 bg-gradient-to-br from-energi-cyan/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+        <${wrapperTag} ${linkAttr} class="block luxury-card group w-[220px] md:w-[240px] p-6 text-center z-10 relative transition-transform duration-500 ${cursorClass}" style="animation: fadeInUpTeam 0.6s ease backwards ${delay}s;">
+            <div class="absolute inset-0 bg-gradient-to-br from-energi-cyan/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-xl"></div>
             
-            <div class="hex-container relative z-10">
+            <div class="hex-container relative z-10 mx-auto">
                 <div class="hex-border"></div>
                 <div class="hex-photo-wrap">
                     <img src="${imagePath}" 
-     alt="${person.name}" 
-     class="hex-photo object-cover w-full h-full transition-transform duration-500">
+                         alt="${person.name}" 
+                         class="hex-photo object-cover w-full h-full transition-transform duration-500">
                 </div>
             </div>
 
-            <div class="relative z-10">
+            <div class="relative z-10 mt-4 flex flex-col items-center">
                 <h3 class="text-base md:text-lg font-bold text-white tracking-wide group-hover:text-energi-gold transition-colors duration-300">${person.name}</h3>
-                <div class="inline-block px-3 py-1.5 mt-3 rounded-full bg-[#050508]/80 border border-white/10 group-hover:border-energi-cyan/40 group-hover:bg-energi-cyan/10 transition-all duration-300 shadow-inner">
+                <div class="inline-block px-3 py-1.5 mt-2 rounded-full bg-[#050508]/80 border border-white/10 group-hover:border-energi-cyan/40 group-hover:bg-energi-cyan/10 transition-all duration-300 shadow-inner">
                     <p class="text-energi-cyan text-[10px] md:text-[11px] font-bold uppercase tracking-widest group-hover:text-white transition-colors">${person.role}</p>
                 </div>
-            </div>
-        </div>
+                
+                ${hintHTML} </div>
+            
+        </${wrapperTag}>
         `;
     };
-    
-    // ... sisa fungsi renderTeam ...
 
-
-    // Komponen Garis Khusus Mobile
     const mobileLine = `
         <div class="md:hidden flex justify-center w-full my-2">
             <div class="w-[2px] h-8 relative overflow-hidden line-glow">
@@ -312,11 +315,10 @@ function renderTeam() {
         </div>
     `;
 
-    // STRUKTUR HTML POHON STO
     container.innerHTML = `
         <div class="flex flex-col items-center w-full relative py-6 max-w-5xl mx-auto overflow-x-hidden">
             
-            ${createCard({ name: 'Bapak Susanto', role: 'EC Manager', img: 'susanto.jpg' }, '0.1')}
+            ${createCard({ name: 'Goldy Raymond PPS', role: 'EC Manager', img: 'susanto.jpg' }, '0.1')}
             
             <div class="flex justify-center w-full my-2 md:my-0">
                 <div class="w-[2px] h-10 md:h-12 relative overflow-hidden line-glow">
@@ -324,7 +326,7 @@ function renderTeam() {
                 </div>
             </div>
 
-            ${createCard({ name: 'Ibu Sarah', role: 'EC Supervisor', img: 'sarah.jpg' }, '0.3')}
+            ${createCard({ name: 'M Priyo Pambudi', role: 'EC Supervisor', img: 'sarah.jpg' }, '0.3')}
 
             <div class="flex justify-center w-full my-2 md:my-0">
                 <div class="w-[2px] h-8 md:h-10 relative overflow-hidden line-glow">
@@ -344,11 +346,16 @@ function renderTeam() {
                 </div>
             </div>
 
-            <div class="flex flex-col items-center md:grid md:grid-cols-3 w-full max-w-[800px] gap-0 md:gap-4 justify-items-center relative z-10">
+            <div class="flex flex-col items-center md:grid md:grid-cols-3 w-full max-w-[800px] gap-0 md:gap-4 justify-items-center relative z-10 pb-10">
                 ${createCard({ name: 'Marini', role: 'EC Document Control', img: 'marini.jpg' }, '0.5')}
                 ${mobileLine}
                 
-                ${createCard({ name: 'Indra Nurul Kusuma', role: 'EC Staff', img: 'indra.png' }, '0.7')}
+                ${createCard({ 
+                    name: 'Indra Nurul Kusuma', 
+                    role: 'EC Staff', 
+                    img: 'indra.png', 
+                    link: 'https://indra1nkuss.github.io/mycv/'
+                }, '0.7')}
                 
                 ${mobileLine}
                 ${createCard({ name: 'Juliansyah', role: 'EC Patrol & Control', img: 'juliansyah.jpg' }, '0.9')}
@@ -357,8 +364,9 @@ function renderTeam() {
         </div>
     `;
 }
+
 /* ==============================================
-   4. LOGIKA LIVE RADIO PLAYER
+   5. LOGIKA LIVE RADIO PLAYER
    ============================================== */
 let isRadioPlaying = false;
 
@@ -371,29 +379,81 @@ function toggleRadio(e) {
     const eq = document.getElementById('radio-eq');
     const radioBtn = document.getElementById('radio-btn');
 
+    if(!audio) return;
+
     if (isRadioPlaying) {
         audio.pause();
-        iconPlay.classList.remove('hidden');
-        iconPause.classList.add('hidden');
-        eq.classList.remove('flex');
-        eq.classList.add('hidden');
-        radioBtn.classList.remove('animate-pulse');
+        if(iconPlay) iconPlay.classList.remove('hidden');
+        if(iconPause) iconPause.classList.add('hidden');
+        if(eq) {
+            eq.classList.remove('flex');
+            eq.classList.add('hidden');
+        }
+        if(radioBtn) radioBtn.classList.remove('animate-pulse');
     } else {
         audio.play();
-        iconPlay.classList.add('hidden');
-        iconPause.classList.remove('hidden');
-        eq.classList.remove('hidden');
-        eq.classList.add('flex');
-        radioBtn.classList.add('animate-pulse');
+        if(iconPlay) iconPlay.classList.add('hidden');
+        if(iconPause) iconPause.classList.remove('hidden');
+        if(eq) {
+            eq.classList.remove('hidden');
+            eq.classList.add('flex');
+        }
+        if(radioBtn) radioBtn.classList.add('animate-pulse');
     }
     isRadioPlaying = !isRadioPlaying;
 }
 
-// Init Website
+/* ==============================================
+   6. EFEK MENGETIK (TYPEWRITER) DI BERANDA
+   ============================================== */
+const textArray = [
+    "Selamat kepada 100 para pemenang training online energi.",
+    "Kerja keras dan dedikasi Anda telah membuahkan hasil yang luar biasa.",
+    "Anda adalah standar emas bagi masa depan Team Energi.",
+    "Kemenangan ini adalah awal dari pencapaian yang lebih besar!"
+];
+
+let textIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+
+function typeWriter() {
+    const typingElement = document.getElementById("typing-text");
+    if (!typingElement) return;
+
+    const currentText = textArray[textIndex];
+    
+    if (isDeleting) {
+        typingElement.textContent = currentText.substring(0, charIndex - 1);
+        charIndex--;
+    } else {
+        typingElement.textContent = currentText.substring(0, charIndex + 1);
+        charIndex++;
+    }
+
+    let typeSpeed = isDeleting ? 25 : 50; 
+
+    if (!isDeleting && charIndex === currentText.length) {
+        typeSpeed = 2500; 
+        isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        textIndex = (textIndex + 1) % textArray.length;
+        typeSpeed = 500; 
+    }
+
+    setTimeout(typeWriter, typeSpeed);
+}
+
+/* ==============================================
+   7. INISIALISASI UTAMA (Semua digabung di sini agar bersih)
+   ============================================== */
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- 1. RENDER DATA PEMENANG ---
     displayWinners(1);
 
-    // Fitur Hint Mobile yang Aman
+    // --- 2. FITUR HINT MOBILE ---
     if (window.innerWidth < 768 && mobileHint) {
         setTimeout(() => {
             mobileHint.classList.remove('hidden');
@@ -411,76 +471,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 7000);
     }
-});
 
-/* ==============================================
-   EFEK MENGETIK (TYPEWRITER) DI BERANDA
-   ============================================== */
-const textArray = [
-    "Selamat kepada 100 para pemenang training online energi.",
-    "Kerja keras dan dedikasi Anda telah membuahkan hasil yang luar biasa.",
-    "Anda adalah standar emas bagi masa depan Team Energi.",
-    "Kemenangan ini adalah awal dari pencapaian yang lebih besar!"
-];
-
-let textIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-const typingElement = document.getElementById("typing-text");
-
-function typeWriter() {
-    if (!typingElement) return;
-
-    const currentText = textArray[textIndex];
-    
-    if (isDeleting) {
-        typingElement.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-    } else {
-        typingElement.textContent = currentText.substring(0, charIndex + 1);
-        charIndex++;
-    }
-
-    // Kecepatan ngetik (50ms) dan kecepatan hapus (25ms)
-    let typeSpeed = isDeleting ? 25 : 50; 
-
-    if (!isDeleting && charIndex === currentText.length) {
-        // Jeda santai agar kalimat bisa dibaca tuntas (2.5 detik)
-        typeSpeed = 2500; 
-        isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        textIndex = (textIndex + 1) % textArray.length;
-        // Jeda ambil napas sebelum mengetik kalimat berikutnya (0.5 detik)
-        typeSpeed = 500; 
-    }
-
-    setTimeout(typeWriter, typeSpeed);
-}
-
-// (Penting: Jika Anda sudah memakai efek "Burn Loading" sebelumnya, 
-// baris setTimeout di bawah ini BISA DIHAPUS karena pemanggilannya 
-// sudah diatur otomatis menyala setelah layar loading meledak).
-// Jika tidak memakai loading, biarkan saja:
-// setTimeout(typeWriter, 1500);
-
-/* ==============================================
-   FITUR SAKELAR TEMA (DARK / LIGHT MODE)
-   ============================================== */
-document.addEventListener('DOMContentLoaded', () => {
+    // --- 3. FITUR DARK/LIGHT MODE ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const body = document.body;
 
-    // 1. Cek apakah user sebelumnya sudah memilih Light Mode (di Local Storage)
     if (localStorage.getItem('theme') === 'light') {
         body.classList.add('light-mode');
-        themeToggleBtn.textContent = '🌙'; // Ganti ikon ke Bulan
+        if (themeToggleBtn) themeToggleBtn.textContent = '🌙'; 
     }
 
-    // 2. Fungsi saat tombol ditekan
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            // Animasi putar pada tombol saat diklik
             themeToggleBtn.style.transform = 'scale(0.5) rotate(180deg)';
             themeToggleBtn.style.opacity = '0';
             
@@ -488,72 +490,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 body.classList.toggle('light-mode');
                 
                 if (body.classList.contains('light-mode')) {
-                    // Jika pindah ke Terang
                     localStorage.setItem('theme', 'light');
                     themeToggleBtn.textContent = '🌙';
                 } else {
-                    // Jika pindah ke Gelap
                     localStorage.setItem('theme', 'dark');
                     themeToggleBtn.textContent = '☀️';
                 }
 
-                // Kembalikan tombol ke ukuran normal
                 themeToggleBtn.style.transform = 'scale(1) rotate(0deg)';
                 themeToggleBtn.style.opacity = '1';
-            }, 200); // Jeda animasi 0.2 detik agar terlihat mulus
+            }, 200); 
         });
     }
-});
 
-/* ==============================================
-   7. INISIALISASI UTAMA (APP INIT & BURN LOADING)
-   ============================================== */
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- LOGIKA LOADING SCREEN (BURN EFFECT) ---
+    // --- 4. LOGIKA LOADING SCREEN (BURN EFFECT) ---
     const loadingScreen = document.getElementById('loading-screen');
     const loadingContent = document.getElementById('loading-content');
     const burnEffect = document.getElementById('burn-effect');
     
-    // Kunci scroll saat loading
-    document.body.style.overflow = 'hidden';
+    if (loadingScreen) {
+        document.body.style.overflow = 'hidden';
 
-    // Biarkan pengguna menikmati animasi loading selama 2.5 detik
-    setTimeout(() => {
-        
-        // 1. Hisap/Kecilkan logo dan teks sebelum meledak
-        if(loadingContent) {
-            loadingContent.style.opacity = '0';
-            loadingContent.style.transform = 'scale(0.5)';
-        }
-
-        // 2. Memicu Efek "Burn" (Kilatan Cahaya Meluas)
-        if(burnEffect) {
-            burnEffect.style.opacity = '1';
-            // Perbesar cahaya hingga menutupi seluruh layar (300% dari lebar layar)
-            burnEffect.style.width = '300vw'; 
-            burnEffect.style.height = '300vw';
-        }
-
-        // 3. Setelah layar putih menyilaukan, perlahan hilangkan tirai hitamnya
         setTimeout(() => {
-            loadingScreen.classList.add('opacity-0');
-            
-            // 4. Hapus elemen loading dari sistem dan buka scroll
+            if(loadingContent) {
+                loadingContent.style.opacity = '0';
+                loadingContent.style.transform = 'scale(0.5)';
+            }
+
+            if(burnEffect) {
+                burnEffect.style.opacity = '1';
+                burnEffect.style.width = '300vw'; 
+                burnEffect.style.height = '300vw';
+            }
+
             setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Buka kunci scroll
+                loadingScreen.classList.add('opacity-0');
                 
-                // Mulai efek Typewriter di Beranda setelah burn selesai
-                setTimeout(typeWriter, 200); 
-            }, 1000); // Jeda fade out transisi layar
-            
-        }, 600); // Waktu yang dibutuhkan cahaya untuk membesar
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    document.body.style.overflow = 'auto'; 
+                    setTimeout(typeWriter, 200); 
+                }, 1000); 
+                
+            }, 600); 
 
-    }, 2500); // 2.5 Detik durasi loading awal
-
-    // --- RENDER DATA ---
-    displayWinners(1);
-
-    // ... (Sisa kode seperti Hint Mobile & Theme Toggle biarkan tetap di bawah sini) ...
+        }, 2500); 
+    } else {
+        // Jika tidak ada loading screen di HTML, langsung jalankan Typewriter
+        setTimeout(typeWriter, 1500);
+    }
 });
