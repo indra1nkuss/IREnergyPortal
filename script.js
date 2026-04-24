@@ -143,9 +143,6 @@ function displayWinners(page) {
                 </div>
                 <div class="flex-grow min-w-0">
                     <h3 class="text-sm md:text-base font-700 text-white truncate group-hover:text-energi-goldlight transition-colors">${winner.name}</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400 uppercase tracking-wider truncate mt-0.5">
-                        <span class="text-energi-cyan font-semibold">NIK: ${winner.nik}</span> <span class="mx-1 text-slate-600">|</span> ${winner.dept}
-                    </p>
                 </div>
                 <div class="hidden md:block">
                     <span class="px-4 py-1.5 bg-white/5 text-slate-300 border border-white/10 rounded-full text-xs font-semibold tracking-widest group-hover:bg-energi-gold/10 group-hover:text-energi-gold group-hover:border-energi-gold/30 transition-all">TERBAIK</span>
@@ -530,13 +527,220 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadingScreen.style.display = 'none';
                     document.body.style.overflow = 'auto'; 
                     setTimeout(typeWriter, 200); 
+                    initInteractiveElements();
+                    initTerminal(); 
+                    initChatbot(); // Initialize AI Chatbot
                 }, 1000); 
                 
             }, 600); 
-
+ 
         }, 2500); 
     } else {
         // Jika tidak ada loading screen di HTML, langsung jalankan Typewriter
-        setTimeout(typeWriter, 1500);
+        setTimeout(() => {
+            typeWriter();
+            initInteractiveElements();
+        }, 1500);
     }
 });
+
+/* ==============================================
+   8. FITUR BARU: INTERACTIVE ELEMENTS
+   ============================================== */
+function initInteractiveElements() {
+    // A. SCROLL REVEAL (Intersection Observer)
+    const observerOptions = { threshold: 0.1 };
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                if (entry.target.querySelectorAll('.counter').length > 0) {
+                    entry.target.querySelectorAll('.counter').forEach(count => startCounter(count));
+                }
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // B. MAGNETIC EFFECTS
+    document.querySelectorAll('.magnetic').forEach(el => {
+        el.addEventListener('mousemove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+        });
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = `translate(0px, 0px)`;
+        });
+    });
+
+    // C. FLOATING BAR VISIBILITY
+    const floatingBar = document.getElementById('floating-bar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            floatingBar.classList.add('active');
+        } else {
+            floatingBar.classList.remove('active');
+        }
+    });
+}
+
+// D. STATS COUNTER ANIMATION
+function startCounter(el) {
+    if (el.classList.contains('counted')) return;
+    el.classList.add('counted');
+    
+    const target = parseInt(el.getAttribute('data-target'));
+    let count = 0;
+    const speed = 20; 
+
+    const updateCount = () => {
+        const increment = Math.ceil(target / 100);
+        if (count < target) {
+            count += increment;
+            if (count > target) count = target;
+            el.innerText = count;
+            setTimeout(updateCount, speed);
+        } else {
+            el.innerText = target;
+        }
+    };
+    updateCount();
+}
+
+// E. DIGITAL ENERGY TERMINAL LOGS
+function initTerminal() {
+    const terminal = document.getElementById('terminal-content');
+    if (!terminal) return;
+
+    const logs = [
+        "System initialization sequence started...",
+        "Establishing secure connection to Energy Grid...",
+        "Grid sync: SUCCESS (Latency 4ms)",
+        "Monitoring 1,500 active participants...",
+        "Insight: Solar PV output optimized by 12%",
+        "Thermal management active: 24.5°C",
+        "Weekly training data backup completed.",
+        "Security protocol Alpha-9 engaged.",
+        "Core energy output stable at 100%.",
+        "New milestone reached: 10,000+ total hours.",
+        "Optimization complete. Standing by..."
+    ];
+
+    let logIndex = 0;
+    
+    const addLog = () => {
+        const time = new THREE.Clock().getElapsedTime().toFixed(2);
+        const log = logs[logIndex % logs.length];
+        const line = document.createElement('div');
+        line.className = 'mb-1 opacity-0 transition-opacity duration-500';
+        line.innerHTML = `<span class="text-energi-gold">[${time}s]</span> <span class="text-white">></span> ${log}`;
+        
+        terminal.appendChild(line);
+        void line.offsetWidth; // Force reflow
+        line.classList.remove('opacity-0');
+        
+        if (terminal.children.length > 8) {
+            terminal.removeChild(terminal.children[0]);
+        }
+        
+        logIndex++;
+        setTimeout(addLog, 3000 + Math.random() * 2000);
+    };
+
+    setTimeout(addLog, 1000);
+}
+// F. AI CHATBOT LOGIC
+function initChatbot() {
+    const toggleBtn = document.getElementById('toggle-chat');
+    const closeBtn = document.getElementById('close-chat');
+    const chatWindow = document.getElementById('chat-window');
+    const sendBtn = document.getElementById('send-ai');
+    const input = document.getElementById('ai-input');
+    const messages = document.getElementById('chat-messages');
+
+    if (!toggleBtn || !chatWindow) return;
+
+    toggleBtn.addEventListener('click', () => {
+        chatWindow.classList.toggle('hidden');
+        input.focus();
+    });
+
+    closeBtn.addEventListener('click', () => {
+        chatWindow.classList.add('hidden');
+    });
+
+    const addMessage = (text, isAi = false) => {
+        const msg = document.createElement('div');
+        msg.className = isAi 
+            ? 'bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-sm max-w-[85%] text-slate-300 leading-relaxed self-start animate-fade-in'
+            : 'bg-energi-cyan/20 border border-energi-cyan/30 p-3 rounded-2xl rounded-tr-sm max-w-[85%] text-white leading-relaxed self-end animate-fade-in';
+        msg.innerHTML = text.replace(/\n/g, '<br>');
+        messages.appendChild(msg);
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    const getAiResponse = async (userText) => {
+        // GANTI DENGAN API KEY GOOGLE ANDA (Pastikan salin pake tombol 'Copy')
+        const API_KEY = "AIzaSyBzQ5X21f54r7TJ-rIecc5DUwZTVgzfaqU".trim(); 
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        const fallbackLocal = (msg = "") => {
+            const lowerText = userText.toLowerCase();
+            if (lowerText.includes('siapa') || lowerText.includes('pemenang')) return "Daftar pemenang training ada di tab 'Pemenang'. Ada 100 orang hebat di sana!";
+            if (lowerText.includes('halo') || lowerText.includes('hi')) return "Halo! Saya asisten AI Portal Energi. Senang bisa membantu Anda.";
+            return msg || "Maaf, AI sedang beristirahat sejenak. Silakan coba lagi nanti.";
+        };
+
+        if (!API_KEY) return fallbackLocal();
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: `Anda adalah Energy AI, asisten virtual profesional untuk website 'Portal Energi'. Jawablah pertanyaan pengunjung dengan ramah, ringkas, dan profesional dalam Bahasa Indonesia. Pertanyaan: ${userText}` }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                console.error("Detail Error Google:", data);
+                const errorMsg = data.error?.message || "Kunci API tidak valid atau model tidak tersedia.";
+                return fallbackLocal(`Error: ${errorMsg}`);
+            }
+        } catch (error) {
+            console.error("Koneksi Google Gagal:", error);
+            return fallbackLocal("Gagal terhubung ke server AI Google.");
+        }
+    };
+
+    const handleSend = async () => {
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        addMessage(text, false);
+
+        // Indikator mengetik
+        addMessage("...", true);
+        const typing = messages.lastChild;
+
+        const response = await getAiResponse(text);
+        
+        if (typing) typing.remove();
+        addMessage(response, true);
+    };
+
+    sendBtn.addEventListener('click', handleSend);
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSend();
+    });
+}
