@@ -414,19 +414,22 @@
         <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="magnetic text-slate-400 hover:text-white" title="Ke Atas">↑</button>
     </div>
 
-    <div class="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50">
-        <div class="bg-white/5 backdrop-blur-xl border border-white/10 p-2 md:p-3 rounded-full shadow-2xl flex items-center gap-3 md:gap-4 transition-all hover:bg-white/10 group cursor-pointer" onclick="toggleRadio(event)">
-            <button id="radio-btn" class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-tr from-energi-cyan to-energi-blue rounded-full flex items-center justify-center text-white shadow-[0_0_15px_rgba(0,255,255,0.3)] group-hover:scale-105 transition-transform">
-                <svg id="icon-play" class="w-4 h-4 md:w-5 md:h-5 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg id="icon-pause" class="w-4 h-4 md:w-5 md:h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    <!-- RADIO WIDGET (Redesigned & Compact) -->
+    <div class="fixed bottom-4 left-4 md:bottom-8 md:left-8 z-50">
+        <div class="bg-[#050508]/80 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:bg-white/10 hover:border-energi-cyan/50 cursor-pointer group" onclick="toggleRadio(event)">
+            <button id="radio-btn" class="w-10 h-10 md:w-11 md:h-11 bg-gradient-to-tr from-energi-cyan to-energi-blue rounded-full flex items-center justify-center text-darkbg shadow-[0_0_15px_rgba(0,255,255,0.4)] group-hover:scale-105 transition-transform">
+                <svg id="icon-play" class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="icon-pause" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             </button>
-            <div class="pr-2 md:pr-4 flex flex-col justify-center">
-                <div class="flex items-end gap-2 mb-0.5">
-                    <p class="text-xs md:text-sm font-bold text-white leading-none">Global Hits</p>
-                    <div id="radio-eq" class="hidden items-end gap-[2px] h-3 mb-[2px]">
-                        <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+            <div class="pr-4 flex flex-col justify-center">
+                <div class="flex items-center gap-2">
+                    <p class="text-[10px] md:text-xs font-bold text-white tracking-widest uppercase">Live Radio</p>
+                    <div id="radio-eq" class="hidden items-end gap-[2px] h-3">
+                        <div class="w-[2px] bg-energi-cyan h-[40%] animate-[bounce_0.8s_infinite_alternate]"></div>
+                        <div class="w-[2px] bg-energi-gold h-[100%] animate-[bounce_1.2s_infinite_alternate_0.1s]"></div>
+                        <div class="w-[2px] bg-energi-cyan h-[70%] animate-[bounce_0.9s_infinite_alternate_0.2s]"></div>
                     </div>
-                <p class="text-[9px] md:text-[10px] text-slate-400 leading-none">Live Streaming Radio</p>
+                </div>
             </div>
             <audio id="radio-stream" src="https://icecast.omroep.nl/3fm-bb-mp3" preload="none"></audio>
         </div>
@@ -435,6 +438,12 @@
     <!-- script.js sudah di-load di head dengan defer -->
 
     <script type="module">
+        // Paksa halaman selalu di atas saat di-refresh atau baru masuk
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
