@@ -1,4 +1,6 @@
-/* === GENERAL CUSTOMIZATION === */
+/* === GLOBAL RESET & OUTFIT FONT === */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif !important; }
+
 body {
     -webkit-font-smoothing: antialiased;
 }

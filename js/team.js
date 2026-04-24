@@ -34,7 +34,8 @@ export function renderTeam() {
                 <div class="hex-photo-wrap">
                     <img src="${imagePath}" 
                          alt="${person.name}" 
-                         class="hex-photo object-cover w-full h-full transition-transform duration-500">
+                         class="hex-photo object-cover w-full h-full transition-transform duration-500"
+                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=0a0a0f&color=D4AF37&bold=true';">
                 </div>
             </div>
 
