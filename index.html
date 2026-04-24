@@ -487,30 +487,22 @@
             }
         });
 
-        // Handle Redirect Result
-        getRedirectResult(auth).then(() => {
-            const savedTab = sessionStorage.getItem('activeTab');
-            if (savedTab) {
-                console.log("🔄 Restoring Tab:", savedTab);
-                // Cari tombol navigasi yang sesuai dan klik
-                const navBtns = document.querySelectorAll('.nav-btn');
-                navBtns.forEach(btn => {
-                    if (btn.getAttribute('onclick')?.includes(savedTab)) {
-                        btn.click();
-                    }
-                });
-                sessionStorage.removeItem('activeTab');
+        btnLogin.onclick = async () => {
+            try {
+                // Gunakan Popup karena Redirect gagal menyimpan sesi akibat Cookie Blocker browser
+                await signInWithPopup(auth, provider);
+                // Jika sukses, onAuthStateChanged otomatis mendeteksi dan menampilkan input
                 setTimeout(() => {
                     document.getElementById('chat-container')?.scrollIntoView({ behavior: 'smooth' });
-                }, 1200);
+                }, 500);
+            } catch (error) {
+                console.error("Popup Auth Error:", error);
+                if (error.code === 'auth/popup-blocked') {
+                    alert("⚠️ JENDELA LOGIN DIBLOKIR BROWSER!\n\nSilakan izinkan (Allow Pop-ups) untuk website ini. Biasanya ada ikon peringatan kecil di ujung kanan atas (kolom alamat website/URL). Klik ikon tersebut lalu pilih 'Always allow'.");
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    alert("Domain belum terdaftar di Firebase Console (Authorized Domains).");
+                }
             }
-        }).catch(err => console.error("Redirect Error:", err));
-
-        btnLogin.onclick = () => {
-            // Deteksi tab mana yang sedang aktif saat ini
-            const activeSection = document.querySelector('.section-content:not(.hidden)');
-            if (activeSection) sessionStorage.setItem('activeTab', activeSection.id);
-            signInWithRedirect(auth, provider);
         };
         btnLogout.onclick = () => signOut(auth);
 
