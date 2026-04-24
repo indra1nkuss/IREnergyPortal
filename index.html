@@ -491,15 +491,27 @@
         });
 
         // Handle Redirect Result
-        getRedirectResult(auth).catch((error) => {
-            if (error.code === 'auth/unauthorized-domain') {
-                alert("Domain belum didaftarkan di Firebase Console! Silakan tambahkan 'irenergyportal.vercel.app' di Authorized Domains.");
-            } else {
-                console.error("Auth Error:", error);
+        getRedirectResult(auth).then(() => {
+            // Jika ada simpanan tab sebelum login, kembalikan ke tab tersebut
+            const savedTab = sessionStorage.getItem('activeTab');
+            if (savedTab) {
+                const btn = document.querySelector(`[onclick*="${savedTab}"]`);
+                if (btn) btn.click();
+                sessionStorage.removeItem('activeTab');
+                // Scroll ke kotak masukan agar user tidak bingung
+                setTimeout(() => {
+                    document.getElementById('chat-container')?.scrollIntoView({ behavior: 'smooth' });
+                }, 1000);
             }
+        }).catch((error) => {
+            console.error("Auth Error:", error);
         });
 
-        btnLogin.onclick = () => signInWithRedirect(auth, provider);
+        btnLogin.onclick = () => {
+            // Simpan posisi tab saat ini sebelum pindah ke Google
+            sessionStorage.setItem('activeTab', 'beranda'); // Sesuaikan jika kotak masukan ada di tab lain
+            signInWithRedirect(auth, provider);
+        };
         btnLogout.onclick = () => signOut(auth);
 
         // Chat Logic (Realtime Database)
