@@ -1,6 +1,6 @@
 /**
- * Portal Energy - Ultra-Smooth HD Lanyard Card
- * Fokus pada keanggunan (Elegance) dan kualitas visual (HD)
+ * Portal Energy - Ultra-HD & Elegant Lanyard Card
+ * Gerakan sangat tenang (Subtle) & Kualitas Visual Maksimal
  */
 import * as THREE from 'three';
 
@@ -10,16 +10,16 @@ class LanyardCard {
         this.fallback = document.getElementById('lanyard-fallback');
         if (!this.container) return;
 
-        // RENDERER SETUP (HD & Color Correct)
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // RENDERER SETUP (Max HD)
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight || 320);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        this.renderer.outputColorSpace = THREE.SRGBColorSpace; // Membuat warna lebih HD
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.5)); // Extra Sharp
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.container.appendChild(this.renderer.domElement);
 
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(30, this.container.clientWidth / (this.container.clientHeight || 320), 0.1, 1000);
-        this.camera.position.z = 6;
+        this.camera = new THREE.PerspectiveCamera(28, this.container.clientWidth / (this.container.clientHeight || 320), 0.1, 1000);
+        this.camera.position.z = 6.5;
 
         this.mouse = { x: 0, y: 0 };
         this.lerpMouse = { x: 0, y: 0 };
@@ -30,36 +30,35 @@ class LanyardCard {
     }
 
     init() {
-        // LIGHTING (Studio Setup)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-        this.scene.add(ambientLight);
+        // LIGHTING (Soft Studio Setup)
+        this.scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+        
+        const topLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        topLight.position.set(0, 5, 5);
+        this.scene.add(topLight);
 
-        // Rim Light (Membuat tepi kartu bercahaya)
-        const rimLight = new THREE.SpotLight(0x00ffff, 2);
-        rimLight.position.set(5, 5, 5);
-        this.scene.add(rimLight);
+        // Moving Glow (Slow & Elegant)
+        this.glow = new THREE.PointLight(0x00ffff, 0.5, 15);
+        this.scene.add(this.glow);
 
-        // Moving Shine (Efek kilauan mewah)
-        this.shineLight = new THREE.PointLight(0xffffff, 1, 10);
-        this.scene.add(this.shineLight);
-
-        // TEXTURE LOADING (HD Optimization)
+        // TEXTURE (Highest Quality)
         const loader = new THREE.TextureLoader();
         const texture = loader.load('images/energiteam.png', (tex) => {
             tex.colorSpace = THREE.SRGBColorSpace;
             tex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+            tex.magFilter = THREE.LinearFilter;
+            tex.minFilter = THREE.LinearMipmapLinearFilter;
             if (this.fallback) this.fallback.style.opacity = '0';
         });
 
-        // CARD GEOMETRY (Lebih melengkung sedikit agar elegan)
-        const geometry = new THREE.PlaneGeometry(3.8, 2.4, 64, 64);
-        const material = new THREE.MeshPhongMaterial({
+        // GEOMETRY
+        const geometry = new THREE.PlaneGeometry(3.8, 2.4, 128, 128); // High segment for smoothness
+        const material = new THREE.MeshStandardMaterial({
             map: texture,
             side: THREE.DoubleSide,
             transparent: true,
-            shininess: 80,
-            specular: 0x222222,
-            reflectivity: 1
+            roughness: 0.3,
+            metalness: 0.2
         });
 
         this.card = new THREE.Mesh(geometry, material);
@@ -69,46 +68,42 @@ class LanyardCard {
     addEventListeners() {
         window.addEventListener('mousemove', (e) => {
             const rect = this.container.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            // Subtle influence (Diperkecil agar tidak terlalu interaktif)
-            this.mouse.x = (e.clientX - centerX) / (rect.width);
-            this.mouse.y = (e.clientY - centerY) / (rect.height);
+            // Sangat dikurangi sensivitasnya (Very Subtle)
+            this.mouse.x = (e.clientX - (rect.left + rect.width / 2)) / rect.width * 0.4;
+            this.mouse.y = (e.clientY - (rect.top + rect.height / 2)) / rect.height * 0.4;
         });
 
         window.addEventListener('resize', () => {
-            this.camera.aspect = this.container.clientWidth / (this.container.clientHeight || 320);
+            const w = this.container.clientWidth;
+            const h = this.container.clientHeight || 320;
+            this.camera.aspect = w / h;
             this.camera.updateProjectionMatrix();
-            this.renderer.setSize(this.container.clientWidth, this.container.clientHeight || 320);
+            this.renderer.setSize(w, h);
         });
     }
 
     animate() {
         requestAnimationFrame(() => this.animate());
+        const time = Date.now() * 0.0008;
 
-        const time = Date.now() * 0.001;
+        // LERP (Sangat lambat untuk efek elegan)
+        this.lerpMouse.x += (this.mouse.x - this.lerpMouse.x) * 0.02;
+        this.lerpMouse.y += (this.mouse.y - this.lerpMouse.y) * 0.02;
 
-        // ULTRA SMOOTH LERP (Pergerakan sangat lambat & elegan)
-        this.lerpMouse.x += (this.mouse.x - this.lerpMouse.x) * 0.03;
-        this.lerpMouse.y += (this.mouse.y - this.lerpMouse.y) * 0.03;
+        // Auto Movement (Calm Floating)
+        const autoX = Math.sin(time * 0.5) * 0.05;
+        const autoY = Math.cos(time * 0.4) * 0.08;
 
-        // Auto Floating (Gerakan mengambang natural)
-        const floatY = Math.sin(time * 0.4) * 0.05;
-        const floatX = Math.cos(time * 0.3) * 0.03;
-
-        // Combine Mouse Tilt + Auto Float
-        this.card.rotation.y = (this.lerpMouse.x * 0.3) + floatX;
-        this.card.rotation.x = (-this.lerpMouse.y * 0.2) + floatY;
+        this.card.rotation.y = this.lerpMouse.x + autoX;
+        this.card.rotation.x = -this.lerpMouse.y + autoY;
         
-        // Shine Position (Kilauan mengikuti gerakan)
-        this.shineLight.position.set(this.lerpMouse.x * 5, this.lerpMouse.y * 5, 2);
+        // Glow moves with card
+        this.glow.position.set(Math.sin(time) * 3, Math.cos(time) * 2, 2);
 
         this.renderer.render(this.scene, this.camera);
     }
 }
 
-// Inisialisasi dengan delay halus
 window.addEventListener('load', () => {
-    setTimeout(() => { new LanyardCard(); }, 1000);
+    setTimeout(() => { new LanyardCard(); }, 1200);
 });
