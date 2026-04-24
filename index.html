@@ -520,6 +520,11 @@
         btnSend.onclick = async () => {
             const text = chatInput.value.trim();
             if (text && currentUser) {
+                // Beri efek loading pada tombol
+                const originalContent = btnSend.innerHTML;
+                btnSend.innerHTML = `<span class="animate-spin">⏳</span>`;
+                btnSend.disabled = true;
+
                 try {
                     await push(messagesRef, {
                         text: text,
@@ -530,6 +535,11 @@
                     chatInput.value = '';
                 } catch (e) {
                     console.error("Error sending message: ", e);
+                    alert("GAGAL MENGIRIM PESAN!\nAlasan Firebase: " + e.message + "\n\nPastikan tab 'Rules' di Realtime Database sudah diset '.write': true dan di-Publish.");
+                } finally {
+                    // Kembalikan tombol seperti semula
+                    btnSend.innerHTML = originalContent;
+                    btnSend.disabled = false;
                 }
             }
         };
