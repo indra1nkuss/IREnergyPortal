@@ -14,7 +14,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="./js/main.js"></script>
     <script type="importmap">
         {
             "imports": {
@@ -219,15 +219,13 @@
     
     <div class="relative w-full rounded-2xl overflow-hidden bg-[#050508] border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-[1.01] pb-[70%] md:pb-[56.25%]">
         
-        <iframe 
-            src="https://drive.google.com/file/d/1ZxP_KxdulxW0xgWUW70FqpE-TVrqKRlh/preview" 
-            loading="lazy" 
-            class="absolute top-0 left-0 w-full h-full border-0" 
-            allow="autoplay; fullscreen; encrypted-media; picture-in-picture" 
-            allowfullscreen="true" 
-            webkitallowfullscreen="true" 
-            mozallowfullscreen="true">
-        </iframe>
+        <!-- VIDEO PLACEHOLDER (Google Drive blocks direct embedding on external domains) -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-darkcard/80 p-6 text-center">
+            <div class="w-20 h-20 bg-energi-gold/20 rounded-full flex items-center justify-center text-4xl mb-4 animate-pulse">🎬</div>
+            <h4 class="text-white font-bold mb-2">Video Dokumentasi Energi</h4>
+            <p class="text-xs text-slate-400 max-w-xs mb-6">Google Drive membatasi pemutaran langsung di domain luar. Klik tombol di bawah untuk menonton video.</p>
+            <a href="https://drive.google.com/file/d/1ZxP_KxdulxW0xgWUW70FqpE-TVrqKRlh/view?usp=sharing" target="_blank" class="px-6 py-2 bg-energi-gold text-darkbg font-bold rounded-full hover:scale-110 transition-transform shadow-lg">Tonton di Google Drive</a>
+        </div>
         
     </div>
 </div>
