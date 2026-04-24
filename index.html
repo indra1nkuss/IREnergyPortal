@@ -426,7 +426,6 @@
                     <div id="radio-eq" class="hidden items-end gap-[2px] h-3 mb-[2px]">
                         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
                     </div>
-                </div>
                 <p class="text-[9px] md:text-[10px] text-slate-400 leading-none">Live Streaming Radio</p>
             </div>
             <audio id="radio-stream" src="https://icecast.omroep.nl/3fm-bb-mp3" preload="none"></audio>
@@ -438,24 +437,22 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        /* =======================================================
-           !!! PENTING: GANTI KONFIGURASI INI DENGAN FIREBASE ANDA !!!
-           ======================================================= */
         const firebaseConfig = {
-  apiKey: "AIzaSyC1vnpi98cqTQDgSsz32yJ-pVmxKclnJiE",
-  authDomain: "portal-saya.firebaseapp.com",
-  projectId: "portal-saya",
-  storageBucket: "portal-saya.firebasestorage.app",
-  messagingSenderId: "185591839287",
-  appId: "1:185591839287:web:00f8eaf9f943c41b8addb2"
-};
+            apiKey: "AIzaSyC1vnpi98cqTQDgSsz32yJ-pVmxKclnJiE",
+            authDomain: "portal-saya.firebaseapp.com",
+            databaseURL: "https://portal-saya-default-rtdb.firebaseio.com",
+            projectId: "portal-saya",
+            storageBucket: "portal-saya.firebasestorage.app",
+            messagingSenderId: "185591839287",
+            appId: "1:185591839287:web:00f8eaf9f943c41b8addb2"
+        };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
         const provider = new GoogleAuthProvider();
 
         // UI Elements
@@ -463,102 +460,82 @@
         const inputSection = document.getElementById('input-section');
         const btnLogin = document.getElementById('btn-login');
         const btnLogout = document.getElementById('btn-logout');
-        const btnSend = document.getElementById('btn-send');
-        const chatInput = document.getElementById('chat-input');
         const chatContainer = document.getElementById('chat-container');
-        const userAvatar = document.getElementById('user-avatar');
-        const userName = document.getElementById('user-name');
+        const chatInput = document.getElementById('chat-input');
+        const btnSend = document.getElementById('btn-send');
+        const userNameDisp = document.getElementById('user-name');
+        const userAvatarDisp = document.getElementById('user-avatar');
 
-        // Auth State Observer
+        let currentUser = null;
+
+        // Auth Logic
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is logged in
+                currentUser = user;
                 loginSection.classList.add('hidden');
                 inputSection.classList.remove('hidden');
                 inputSection.classList.add('flex');
-                userAvatar.src = user.photoURL;
-                userName.textContent = user.displayName;
+                userNameDisp.innerText = user.displayName;
+                userAvatarDisp.src = user.photoURL;
             } else {
-                // User is signed out
+                currentUser = null;
                 loginSection.classList.remove('hidden');
                 inputSection.classList.add('hidden');
                 inputSection.classList.remove('flex');
             }
         });
 
-        // Login
-        btnLogin.addEventListener('click', () => {
-            signInWithPopup(auth, provider).catch(error => alert("Login gagal: " + error.message));
-        });
+        btnLogin.onclick = () => signInWithPopup(auth, provider);
+        btnLogout.onclick = () => signOut(auth);
 
-        // Logout
-        btnLogout.addEventListener('click', () => {
-            signOut(auth);
-        });
+        // Chat Logic (Realtime Database)
+        const messagesRef = ref(db, 'messages');
 
-        // Send Message
-        const sendMessage = async () => {
+        btnSend.onclick = async () => {
             const text = chatInput.value.trim();
-            if (text && auth.currentUser) {
-                const user = auth.currentUser;
-                chatInput.value = ''; // Kosongkan input
+            if (text && currentUser) {
                 try {
-                    await addDoc(collection(db, "comments"), {
+                    await push(messagesRef, {
                         text: text,
-                        uid: user.uid,
-                        name: user.displayName,
-                        photo: user.photoURL,
+                        name: currentUser.displayName,
+                        avatar: currentUser.photoURL,
                         timestamp: serverTimestamp()
                     });
+                    chatInput.value = '';
                 } catch (e) {
-                    alert("Gagal mengirim pesan. Pastikan aturan database Firestore mengizinkan write.");
+                    console.error("Error sending message: ", e);
                 }
             }
         };
 
-        btnSend.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // Listen for Messages Real-time
-        const q = query(collection(db, "comments"), orderBy("timestamp", "asc"));
-        onSnapshot(q, (snapshot) => {
-            chatContainer.innerHTML = ''; // Clear loading text
-            if (snapshot.empty) {
-                chatContainer.innerHTML = '<div class="text-center text-slate-500 py-10 text-sm">Belum ada masukan. Jadilah yang pertama!</div>';
-                return;
-            }
-
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const isMe = auth.currentUser && auth.currentUser.uid === data.uid;
-                
-                // Format Waktu (Jam:Menit)
-                let timeStr = '';
-                if(data.timestamp) {
-                    const date = data.timestamp.toDate();
-                    timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                }
-
-                const msgHTML = `
-                    <div class="flex gap-3 ${isMe ? 'flex-row-reverse' : ''} animate-fade-in">
-                        <img src="${data.photo || 'https://via.placeholder.com/40'}" class="w-8 h-8 md:w-10 md:h-10 rounded-full border border-white/10 flex-shrink-0" alt="Avatar">
+        onValue(messagesRef, (snapshot) => {
+            chatContainer.innerHTML = '';
+            const data = snapshot.val();
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    const msg = data[key];
+                    const isMe = currentUser && currentUser.displayName === msg.name;
+                    const div = document.createElement('div');
+                    div.className = `flex gap-3 ${isMe ? 'flex-row-reverse' : ''} animate-fade-in mb-4`;
+                    div.innerHTML = `
+                        <img src="${msg.avatar || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full border border-white/10 flex-shrink-0" alt="Avatar">
                         <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]">
-                            <span class="text-[10px] md:text-xs text-slate-400 mb-1 ml-1 mr-1">${data.name} • ${timeStr}</span>
-                            <div class="px-4 py-2.5 rounded-2xl ${isMe ? 'bg-energi-cyan/20 text-white rounded-tr-sm border border-energi-cyan/30' : 'bg-white/5 text-slate-200 rounded-tl-sm border border-white/10'} text-sm md:text-base leading-relaxed">
-                                ${data.text}
+                            <span class="text-[10px] text-slate-400 mb-1">${msg.name}</span>
+                            <div class="px-4 py-2 rounded-2xl ${isMe ? 'bg-energi-cyan/20 text-white rounded-tr-sm border border-energi-cyan/30' : 'bg-white/5 text-slate-200 rounded-tl-sm border border-white/10'} text-xs leading-relaxed">
+                                ${msg.text}
                             </div>
                         </div>
-                    </div>
-                `;
-                chatContainer.insertAdjacentHTML('beforeend', msgHTML);
-            });
-            
-            // Auto scroll ke bawah setiap ada pesan baru
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }, (error) => {
-            chatContainer.innerHTML = '<div class="text-center text-red-400 py-10 text-sm">Gagal memuat pesan. Pastikan konfigurasi Firebase benar.</div>';
+                    `;
+                    chatContainer.appendChild(div);
+                });
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } else {
+                chatContainer.innerHTML = '<div class="text-center text-slate-500 py-10 text-sm italic">Belum ada masukan. Jadilah yang pertama!</div>';
+            }
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') btnSend.click();
         });
     </script>
 
