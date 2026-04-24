@@ -470,48 +470,46 @@
 
         // Auth Logic
         onAuthStateChanged(auth, (user) => {
-            console.log("🔥 Firebase Auth Update:", user ? "Logged In: " + user.displayName : "Logged Out");
-            
+            console.log("🔥 Auth Update:", user ? user.displayName : "None");
             if (user) {
                 currentUser = user;
-                // Sembunyikan tombol login, tampilkan input chat
-                if (loginSection) loginSection.classList.add('hidden');
+                if (loginSection) loginSection.style.display = 'none';
                 if (inputSection) {
+                    inputSection.style.display = 'flex';
                     inputSection.classList.remove('hidden');
-                    inputSection.classList.add('flex');
                 }
                 if (userNameDisp) userNameDisp.innerText = user.displayName;
                 if (userAvatarDisp) userAvatarDisp.src = user.photoURL || 'https://via.placeholder.com/40';
             } else {
                 currentUser = null;
-                if (loginSection) loginSection.classList.remove('hidden');
-                if (inputSection) {
-                    inputSection.classList.add('hidden');
-                    inputSection.classList.remove('flex');
-                }
+                if (loginSection) loginSection.style.display = 'flex';
+                if (inputSection) inputSection.style.display = 'none';
             }
         });
 
         // Handle Redirect Result
         getRedirectResult(auth).then(() => {
-            // Jika ada simpanan tab sebelum login, kembalikan ke tab tersebut
             const savedTab = sessionStorage.getItem('activeTab');
             if (savedTab) {
-                const btn = document.querySelector(`[onclick*="${savedTab}"]`);
-                if (btn) btn.click();
+                console.log("🔄 Restoring Tab:", savedTab);
+                // Cari tombol navigasi yang sesuai dan klik
+                const navBtns = document.querySelectorAll('.nav-btn');
+                navBtns.forEach(btn => {
+                    if (btn.getAttribute('onclick')?.includes(savedTab)) {
+                        btn.click();
+                    }
+                });
                 sessionStorage.removeItem('activeTab');
-                // Scroll ke kotak masukan agar user tidak bingung
                 setTimeout(() => {
                     document.getElementById('chat-container')?.scrollIntoView({ behavior: 'smooth' });
-                }, 1000);
+                }, 1200);
             }
-        }).catch((error) => {
-            console.error("Auth Error:", error);
-        });
+        }).catch(err => console.error("Redirect Error:", err));
 
         btnLogin.onclick = () => {
-            // Simpan posisi tab saat ini sebelum pindah ke Google
-            sessionStorage.setItem('activeTab', 'beranda'); // Sesuaikan jika kotak masukan ada di tab lain
+            // Deteksi tab mana yang sedang aktif saat ini
+            const activeSection = document.querySelector('.section-content:not(.hidden)');
+            if (activeSection) sessionStorage.setItem('activeTab', activeSection.id);
             signInWithRedirect(auth, provider);
         };
         btnLogout.onclick = () => signOut(auth);
