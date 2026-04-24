@@ -1,6 +1,6 @@
 /**
  * WINNERS LIST
- * Menangani tampilan daftar pemenang dan pagination
+ * Menangani tampilan daftar pemenang dengan NIK, Dept, dan animasi premium
  */
 import { winnersData } from './data.js';
 
@@ -8,7 +8,10 @@ let filteredWinners = [...winnersData];
 const itemsPerPage = 10;
 
 export function initSearch() {
-    document.getElementById('search-input').addEventListener('input', function(e) {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase();
         filteredWinners = winnersData.filter(winner => 
             winner.name.toLowerCase().includes(searchTerm) || 
@@ -42,18 +45,35 @@ export function displayWinners(page) {
     paginatedItems.forEach((winner, index) => {
         const actualNumber = start + index + 1;
         const formatNo = actualNumber.toString().padStart(2, '0');
-        const delay = index * 0.05; 
+        const delay = index * 0.1; // Staggered reveal delay
         
         const itemHTML = `
-            <div class="stagger-item flex items-center gap-3 md:gap-5 p-3 md:p-4 bg-white/5 backdrop-blur-md rounded-xl border border-white/10 hover:border-energi-gold/40 hover:bg-white/10 transition-all group" style="animation-delay: ${delay}s">
-                <div class="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 bg-darkbg rounded-lg flex items-center justify-center font-800 text-slate-400 group-hover:text-energi-gold transition-colors border border-white/10 shadow-inner">
-                    ${formatNo}
+            <div class="stagger-item group flex items-center gap-4 p-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-energi-gold/50 hover:bg-energi-gold/5 transition-all duration-500 opacity-0 transform translate-y-8" 
+                 style="animation: fadeInUpWinner 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s">
+                
+                <!-- BADGE NOMOR -->
+                <div class="w-12 h-12 flex-shrink-0 bg-darkbg rounded-xl flex items-center justify-center font-black text-slate-400 group-hover:text-energi-gold group-hover:scale-110 transition-all border border-white/10 shadow-inner overflow-hidden relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-energi-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span class="relative z-10">${formatNo}</span>
                 </div>
+
+                <!-- INFO PEMENANG -->
                 <div class="flex-grow min-w-0">
-                    <h3 class="text-sm md:text-base font-700 text-white truncate group-hover:text-energi-goldlight transition-colors">${winner.name}</h3>
+                    <h3 class="text-base md:text-lg font-bold text-white group-hover:text-energi-gold transition-colors truncate">${winner.name}</h3>
+                    <div class="flex flex-wrap gap-2 mt-1">
+                        <span class="text-[10px] md:text-xs font-mono text-energi-cyan bg-energi-cyan/10 px-2 py-0.5 rounded border border-energi-cyan/20">ID: ${winner.nik}</span>
+                        <span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                            <span class="w-1 h-1 rounded-full bg-slate-600"></span> ${winner.dept}
+                        </span>
+                    </div>
                 </div>
-                <div class="hidden md:block">
-                    <span class="px-4 py-1.5 bg-white/5 text-slate-300 border border-white/10 rounded-full text-xs font-semibold tracking-widest group-hover:bg-energi-gold/10 group-hover:text-energi-gold group-hover:border-energi-gold/30 transition-all">TERBAIK</span>
+
+                <!-- STATUS BADGE -->
+                <div class="hidden sm:flex flex-col items-end gap-1">
+                    <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+                        TERBAIK
+                    </div>
+                    <div class="text-[9px] text-slate-500 font-mono italic">Validated ✓</div>
                 </div>
             </div>
         `;
@@ -75,17 +95,17 @@ function setupPagination(page) {
         btn.innerHTML = text;
         btn.disabled = isDisabled;
         if (isActive) {
-            btn.className = 'px-3 md:px-4 py-2 rounded-lg font-bold bg-gradient-to-r from-energi-gold to-yellow-200 text-darkbg shadow-[0_0_15px_rgba(212,175,55,0.4)]';
+            btn.className = 'w-10 h-10 rounded-xl font-bold bg-energi-gold text-darkbg shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all scale-110 z-10';
         } else if (isDisabled) {
-            btn.className = 'px-3 md:px-4 py-2 rounded-lg font-bold bg-white/5 text-slate-600 cursor-not-allowed border border-white/5';
+            btn.className = 'w-10 h-10 rounded-xl font-bold bg-white/5 text-slate-600 cursor-not-allowed border border-white/5';
         } else {
-            btn.className = 'px-3 md:px-4 py-2 rounded-lg font-bold bg-white/5 text-slate-400 hover:text-white hover:border-white/30 border border-white/5 transition-all';
+            btn.className = 'w-10 h-10 rounded-xl font-bold bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10 transition-all';
             btn.onclick = onClick;
         }
         paginationContainer.appendChild(btn);
     };
 
-    createBtn('←', () => { window.scrollTo({top: 0, behavior: 'smooth'}); displayWinners(page - 1); }, false, page === 1);
+    createBtn('←', () => { displayWinners(page - 1); }, false, page === 1);
     
     let startPage = Math.max(1, page - 1);
     let endPage = Math.min(pageCount, startPage + 2);
@@ -93,8 +113,8 @@ function setupPagination(page) {
     if (page === pageCount) startPage = Math.max(1, pageCount - 2);
 
     for (let i = startPage; i <= endPage; i++) {
-        createBtn(i, () => { window.scrollTo({top: 0, behavior: 'smooth'}); displayWinners(i); }, i === page, false);
+        createBtn(i, () => { displayWinners(i); }, i === page, false);
     }
 
-    createBtn('→', () => { window.scrollTo({top: 0, behavior: 'smooth'}); displayWinners(page + 1); }, false, page === pageCount);
+    createBtn('→', () => { displayWinners(page + 1); }, false, page === pageCount);
 }
