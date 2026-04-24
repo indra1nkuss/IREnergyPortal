@@ -436,7 +436,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const firebaseConfig = {
@@ -485,7 +485,16 @@
             }
         });
 
-        btnLogin.onclick = () => signInWithPopup(auth, provider);
+        // Handle Redirect Result
+        getRedirectResult(auth).catch((error) => {
+            if (error.code === 'auth/unauthorized-domain') {
+                alert("Domain belum didaftarkan di Firebase Console! Silakan tambahkan 'irenergyportal.vercel.app' di Authorized Domains.");
+            } else {
+                console.error("Auth Error:", error);
+            }
+        });
+
+        btnLogin.onclick = () => signInWithRedirect(auth, provider);
         btnLogout.onclick = () => signOut(auth);
 
         // Chat Logic (Realtime Database)
