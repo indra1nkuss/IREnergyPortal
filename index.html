@@ -470,18 +470,23 @@
 
         // Auth Logic
         onAuthStateChanged(auth, (user) => {
+            console.log("Auth State Changed:", user ? "Logged In" : "Logged Out");
             if (user) {
                 currentUser = user;
-                loginSection.classList.add('hidden');
-                inputSection.classList.remove('hidden');
-                inputSection.classList.add('flex');
-                userNameDisp.innerText = user.displayName;
-                userAvatarDisp.src = user.photoURL;
+                if (loginSection) loginSection.classList.add('hidden');
+                if (inputSection) {
+                    inputSection.classList.remove('hidden');
+                    inputSection.classList.add('flex');
+                }
+                if (userNameDisp) userNameDisp.innerText = user.displayName;
+                if (userAvatarDisp) userAvatarDisp.src = user.photoURL;
             } else {
                 currentUser = null;
-                loginSection.classList.remove('hidden');
-                inputSection.classList.add('hidden');
-                inputSection.classList.remove('flex');
+                if (loginSection) loginSection.classList.remove('hidden');
+                if (inputSection) {
+                    inputSection.classList.add('hidden');
+                    inputSection.classList.remove('flex');
+                }
             }
         });
 
