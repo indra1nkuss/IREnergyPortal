@@ -440,13 +440,14 @@
         import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const firebaseConfig = {
-  apiKey: "AIzaSyC1vnpi98cqTQDgSsz32yJ-pVmxKclnJiE",
-  authDomain: "portal-saya.firebaseapp.com",
-  projectId: "portal-saya",
-  storageBucket: "portal-saya.firebasestorage.app",
-  messagingSenderId: "185591839287",
-  appId: "1:185591839287:web:00f8eaf9f943c41b8addb2"
-};
+            apiKey: "AIzaSyC1vnpi98cqTQDgSsz32yJ-pVmxKclnJiE",
+            authDomain: "portal-saya.firebaseapp.com",
+            databaseURL: "https://portal-saya-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "portal-saya",
+            storageBucket: "portal-saya.firebasestorage.app",
+            messagingSenderId: "185591839287",
+            appId: "1:185591839287:web:00f8eaf9f943c41b8addb2"
+        };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
