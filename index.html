@@ -197,9 +197,8 @@
                             <span class="text-[10px] text-slate-500 uppercase tracking-widest font-mono">Energy_System_v2.0.log</span>
                             <div class="w-10"></div>
                         </div>
-                        <div id="terminal-content" class="p-4 font-mono text-[11px] md:text-xs h-40 overflow-hidden text-energi-cyan/80 leading-relaxed">
-                            <div class="text-slate-500 opacity-50">Initializing system...</div>
-                        </div>
+                        <div id="terminal-content" class="p-4 font-mono text-[11px] md:text-xs h-40 overflow-y-auto scrollbar-hide text-energi-cyan/80 leading-relaxed"></div>
+                    </div>
                         <div class="absolute inset-0 bg-gradient-to-t from-[#08080c] via-transparent to-transparent pointer-events-none"></div>
                     </div>
                 </div>
@@ -211,29 +210,22 @@
         <p class="text-slate-400 text-xs md:text-sm proppercase tracking-[0.3em]">Play Video Dibawah ini untuk mengetahui lebih detail terkait solar pv</p>
     </div>
 
-    <div class="video-premium-frame relative group reveal">
-        
-       <div class="w-full max-w-4xl mx-auto mt-8 md:mt-12 relative group z-10 px-4 md:px-0">
-    
-    <div class="absolute -inset-2 bg-gradient-to-r from-energi-cyan via-energi-gold to-energi-cyan rounded-2xl blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-700 pointer-events-none"></div>
-    
-    <div class="relative w-full rounded-2xl overflow-hidden bg-[#050508] border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-[1.01] pb-[70%] md:pb-[56.25%]">
-        
-        <!-- VIDEO PLACEHOLDER (Google Drive blocks direct embedding on external domains) -->
-        <div class="absolute inset-0 flex flex-col items-center justify-center bg-darkcard/80 p-6 text-center">
-            <div class="w-20 h-20 bg-energi-gold/20 rounded-full flex items-center justify-center text-4xl mb-4 animate-pulse">🎬</div>
-            <h4 class="text-white font-bold mb-2">Video Dokumentasi Energi</h4>
-            <p class="text-xs text-slate-400 max-w-xs mb-6">Google Drive membatasi pemutaran langsung di domain luar. Klik tombol di bawah untuk menonton video.</p>
-            <a href="https://drive.google.com/file/d/1ZxP_KxdulxW0xgWUW70FqpE-TVrqKRlh/view?usp=sharing" target="_blank" class="px-6 py-2 bg-energi-gold text-darkbg font-bold rounded-full hover:scale-110 transition-transform shadow-lg">Tonton di Google Drive</a>
-        </div>
-        
-    </div>
-</div>
+    <div class="max-w-4xl mx-auto px-4 mt-8 md:mt-12 reveal">
+        <div class="relative group p-1 rounded-3xl bg-gradient-to-br from-energi-cyan/20 via-white/5 to-energi-gold/20 shadow-[0_0_50px_rgba(0,255,255,0.1)]">
+            <!-- Glow Corners -->
+            <div class="absolute -top-1 -left-1 w-10 h-10 border-t-2 border-l-2 border-energi-cyan rounded-tl-xl z-20 opacity-50"></div>
+            <div class="absolute -bottom-1 -right-1 w-10 h-10 border-b-2 border-r-2 border-energi-gold rounded-br-xl z-20 opacity-50"></div>
 
-            <div class="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-energi-gold opacity-50 pointer-events-none"></div>
-            <div class="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-energi-cyan opacity-50 pointer-events-none"></div>
-            <div class="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-energi-cyan opacity-50 pointer-events-none"></div>
-            <div class="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-energi-gold opacity-50 pointer-events-none"></div>
+            <div class="relative w-full rounded-2xl overflow-hidden bg-black aspect-video border border-white/10 shadow-2xl">
+                <iframe 
+                    src="https://drive.google.com/file/d/1ZxP_KxdulxW0xgWUW70FqpE-TVrqKRlh/preview" 
+                    class="absolute top-0 left-0 w-full h-full border-0 opacity-90 group-hover:opacity-100 transition-opacity duration-700" 
+                    allow="autoplay; fullscreen" 
+                    allowfullscreen>
+                </iframe>
+                <!-- HUD Effect -->
+                <div class="absolute inset-0 pointer-events-none border-[15px] border-black/10 z-10 shadow-inner"></div>
+            </div>
         </div>
     </div>
 </div>
