@@ -470,16 +470,18 @@
 
         // Auth Logic
         onAuthStateChanged(auth, (user) => {
-            console.log("Auth State Changed:", user ? "Logged In" : "Logged Out");
+            console.log("🔥 Firebase Auth Update:", user ? "Logged In: " + user.displayName : "Logged Out");
+            
             if (user) {
                 currentUser = user;
+                // Sembunyikan tombol login, tampilkan input chat
                 if (loginSection) loginSection.classList.add('hidden');
                 if (inputSection) {
                     inputSection.classList.remove('hidden');
                     inputSection.classList.add('flex');
                 }
                 if (userNameDisp) userNameDisp.innerText = user.displayName;
-                if (userAvatarDisp) userAvatarDisp.src = user.photoURL;
+                if (userAvatarDisp) userAvatarDisp.src = user.photoURL || 'https://via.placeholder.com/40';
             } else {
                 currentUser = null;
                 if (loginSection) loginSection.classList.remove('hidden');
