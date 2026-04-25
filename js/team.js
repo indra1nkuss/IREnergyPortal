@@ -85,7 +85,7 @@ export function renderTeam() {
             <div class="flex flex-col items-center md:grid md:grid-cols-3 w-full max-w-[800px] gap-0 md:gap-4 justify-items-center relative z-10 pb-10">
                 ${createCard(teamData[3], '0.5')}
                 ${mobileLine}
-                ${createCard({ ...teamData[2], link: 'https://indra1nkuss.github.io/mycv/' }, '0.7')}
+                ${createCard({ ...teamData[2], link: 'https://indra1nkuss.github.io/cv1nkus/' }, '0.7')}
                 ${mobileLine}
                 ${createCard(teamData[4], '0.9')}
             </div>
