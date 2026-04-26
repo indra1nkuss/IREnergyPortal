@@ -478,9 +478,23 @@ body.light-mode nav {
     .section-content { padding-left: 1rem; padding-right: 1rem; }
     .luxury-card { width: 100% !important; max-width: 280px; margin: 0 auto; }
     #lanyard-container { height: 260px !important; }
-    #ai-chat-widget { right: 1rem; bottom: 5rem; }
-    #chat-window { width: calc(100vw - 2rem); right: 0; }
-    
+    /* === AI CHATBOT MOBILE FIX === */
+    #ai-chat-widget { right: 0.75rem; bottom: 5rem; }
+    #chat-window {
+        /* Lebar penuh layar dengan margin kanan-kiri yang aman */
+        width: calc(100vw - 1.5rem);
+        /* Posisi dari kanan mengikuti parent */
+        right: 0;
+        /* Batas tinggi maksimal aman untuk layar kecil */
+        max-height: 75dvh;
+        max-height: 75vh; /* fallback untuk browser lama */
+    }
+    #chat-messages {
+        /* Kurangi tinggi chat messages agar tidak terlalu memenuhi layar */
+        height: 55vmax;
+        max-height: 45vh;
+    }
+
     /* Tim Structure Mobile Fix */
     #team-container > div { padding: 2rem 0 !important; }
     .hex-container { width: 140px !important; height: 160px !important; }
@@ -499,3 +513,70 @@ body.light-mode nav {
 
 /* Smooth Scrolling */
 html { scroll-behavior: smooth; }
+
+/* ============================================================
+   ANIMASI SMOOTH CHATBOT (SLIDE UP / SLIDE DOWN)
+   ============================================================ */
+
+/* State awal: tersembunyi di bawah layar */
+#chat-window {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: bottom right;
+    display: flex !important; /* Selalu flex agar transisi bisa jalan */
+    flex-direction: column;
+    /* State default: tersembunyi */
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.96);
+    visibility: hidden;
+}
+
+/* State terbuka */
+#chat-window.chat-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+}
+
+/* Override class hidden dari tailwind agar tidak konflik */
+#chat-window.hidden {
+    display: flex !important;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.96);
+    visibility: hidden;
+}
+
+/* ============================================================
+   VIDEO SECTION — MOBILE FIX
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Wrapper video: padding lebih besar agar tidak mepet ke tepi */
+    .video-mobile-wrapper {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    /* Border radius video dikurangi di layar kecil */
+    .video-frame-outer {
+        border-radius: 1rem !important;
+    }
+    .video-frame-inner {
+        border-radius: 0.9rem !important;
+    }
+
+    /* Tombol Putar Video — full width di mobile */
+    .video-play-btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 0.65rem 1.25rem;
+    }
+
+    /* Gradient border video dikurangi ketebalan di mobile */
+    .video-gradient-border {
+        padding: 1.5px !important;
+    }
+}

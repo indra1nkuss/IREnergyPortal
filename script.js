@@ -652,7 +652,7 @@ function initTerminal() {
 
     setTimeout(addLog, 1000);
 }
-// F. AI CHATBOT LOGIC
+// F. AI CHATBOT LOGIC (Inline fallback — logika utama ada di js/chat.js)
 function initChatbot() {
     const toggleBtn = document.getElementById('toggle-chat');
     const closeBtn = document.getElementById('close-chat');
@@ -660,30 +660,76 @@ function initChatbot() {
     const sendBtn = document.getElementById('send-ai');
     const input = document.getElementById('ai-input');
     const messages = document.getElementById('chat-messages');
+    const hintBox = document.getElementById('chatbot-hint');
 
     if (!toggleBtn || !chatWindow) return;
 
+    let isChatOpen = false;
+
+    /* -------------------------------------------------------
+       SMOOTH OPEN / CLOSE dengan CSS class .chat-visible
+       Menggantikan toggle 'hidden' agar transisi bisa smooth
+       ------------------------------------------------------- */
+    function openChat() {
+        isChatOpen = true;
+        chatWindow.classList.add('chat-visible');
+        if (hintBox) {
+            hintBox.style.opacity = '0';
+            hintBox.style.pointerEvents = 'none';
+        }
+        setTimeout(() => {
+            if (input) input.focus();
+        }, 350);
+    }
+
+    function closeChat() {
+        isChatOpen = false;
+        chatWindow.classList.remove('chat-visible');
+    }
+
     toggleBtn.addEventListener('click', () => {
-        chatWindow.classList.toggle('hidden');
-        input.focus();
+        isChatOpen ? closeChat() : openChat();
     });
 
-    closeBtn.addEventListener('click', () => {
-        chatWindow.classList.add('hidden');
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeChat);
+    }
 
+    /* -------------------------------------------------------
+       MOBILE KEYBOARD SAFE AREA (visualViewport API)
+       Angkat widget saat keyboard virtual muncul di HP
+       ------------------------------------------------------- */
+    if (window.visualViewport) {
+        const widget = document.getElementById('ai-chat-widget');
+        const baseBottom = 96; // bottom-24 = 96px
+
+        window.visualViewport.addEventListener('resize', () => {
+            if (!isChatOpen || !widget) return;
+            const keyboardHeight = window.innerHeight - window.visualViewport.height;
+            if (keyboardHeight > 100) {
+                widget.style.bottom = `${baseBottom + keyboardHeight}px`;
+                widget.style.transition = 'bottom 0.2s ease';
+            } else {
+                widget.style.bottom = '';
+                widget.style.transition = 'bottom 0.3s ease';
+            }
+        });
+    }
+
+    /* -------------------------------------------------------
+       PESAN & RESPONSE AI
+       ------------------------------------------------------- */
     const addMessage = (text, isAi = false) => {
         const msg = document.createElement('div');
         msg.className = isAi 
             ? 'bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-sm max-w-[85%] text-slate-300 leading-relaxed self-start animate-fade-in'
-            : 'bg-energi-cyan/20 border border-energi-cyan/30 p-3 rounded-2xl rounded-tr-sm max-w-[85%] text-white leading-relaxed self-end animate-fade-in';
+            : 'bg-energi-cyan/20 border border-energi-cyan/30 p-3 rounded-2xl rounded-tr-sm max-w-[85%] text-white leading-relaxed self-end animate-fade-in ml-auto';
         msg.innerHTML = text.replace(/\n/g, '<br>');
         messages.appendChild(msg);
         messages.scrollTop = messages.scrollHeight;
     };
 
     const getAiResponse = async (userText) => {
-        // GANTI DENGAN API KEY GOOGLE ANDA (Pastikan salin pake tombol 'Copy')
         const API_KEY = "AIzaSyBzQ5X21f54r7TJ-rIecc5DUwZTVgzfaqU".trim(); 
         const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
@@ -693,8 +739,6 @@ function initChatbot() {
             if (lowerText.includes('halo') || lowerText.includes('hi')) return "Halo! Saya asisten AI Portal Energi. Senang bisa membantu Anda.";
             return msg || "Maaf, AI sedang beristirahat sejenak. Silakan coba lagi nanti.";
         };
-
-        if (!API_KEY) return fallbackLocal();
 
         try {
             const response = await fetch(API_URL, {
@@ -712,13 +756,11 @@ function initChatbot() {
             if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
                 return data.candidates[0].content.parts[0].text;
             } else {
-                console.error("Detail Error Google:", data);
                 const errorMsg = data.error?.message || "Kunci API tidak valid atau model tidak tersedia.";
                 return fallbackLocal(`Error: ${errorMsg}`);
             }
         } catch (error) {
-            console.error("Koneksi Google Gagal:", error);
-            return fallbackLocal("Gagal terhubung ke server AI Google.");
+            return fallbackLocal("Gagal terhubung ke server AI.");
         }
     };
 
@@ -729,7 +771,6 @@ function initChatbot() {
         input.value = '';
         addMessage(text, false);
 
-        // Indikator mengetik
         addMessage("...", true);
         const typing = messages.lastChild;
 
@@ -744,3 +785,5 @@ function initChatbot() {
         if (e.key === 'Enter') handleSend();
     });
 }
+
+

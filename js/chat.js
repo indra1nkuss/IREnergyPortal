@@ -61,17 +61,69 @@ export function initChatbot(addMessageCallback) {
     const sendBtn = document.getElementById('send-ai');
     const input = document.getElementById('ai-input');
     const messages = document.getElementById('chat-messages');
+    const hintBox = document.getElementById('chatbot-hint');
 
     if (!toggleBtn || !chatWindow) return;
 
+    let isChatOpen = false;
+
+    /**
+     * Membuka/menutup chat window dengan animasi CSS yang smooth.
+     * Menggunakan class .chat-visible alih-alih toggle 'hidden'
+     * agar transisi opacity + transform bisa dijalankan dengan mulus.
+     */
+    function openChat() {
+        isChatOpen = true;
+        chatWindow.classList.add('chat-visible');
+        // Sembunyikan hint saat chat dibuka
+        if (hintBox) {
+            hintBox.style.opacity = '0';
+            hintBox.style.pointerEvents = 'none';
+        }
+        // Fokus ke input setelah transisi selesai (hindari layout jump)
+        setTimeout(() => input.focus(), 350);
+    }
+
+    function closeChat() {
+        isChatOpen = false;
+        chatWindow.classList.remove('chat-visible');
+    }
+
     toggleBtn.addEventListener('click', () => {
-        chatWindow.classList.toggle('hidden');
-        input.focus();
+        isChatOpen ? closeChat() : openChat();
     });
 
     closeBtn.addEventListener('click', () => {
-        chatWindow.classList.add('hidden');
+        closeChat();
     });
+
+    /**
+     * MOBILE KEYBOARD SAFE AREA:
+     * Saat keyboard virtual muncul di HP, viewport mengecil.
+     * Kita gunakan visualViewport API untuk geser widget ke atas
+     * agar input field tidak tertutup keyboard.
+     */
+    if (window.visualViewport) {
+        const widget = document.getElementById('ai-chat-widget');
+        const baseBottom = 96; // 6rem = 96px (Tailwind bottom-24)
+
+        window.visualViewport.addEventListener('resize', () => {
+            if (!isChatOpen || !widget) return;
+            const viewportHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const keyboardHeight = windowHeight - viewportHeight;
+
+            if (keyboardHeight > 100) {
+                // Keyboard muncul — angkat widget
+                widget.style.bottom = `${baseBottom + keyboardHeight}px`;
+                widget.style.transition = 'bottom 0.2s ease';
+            } else {
+                // Keyboard hilang — kembalikan ke posisi asal
+                widget.style.bottom = '';
+                widget.style.transition = 'bottom 0.3s ease';
+            }
+        });
+    }
 
     const handleSend = async () => {
         const text = input.value.trim();

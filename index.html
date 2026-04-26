@@ -206,9 +206,9 @@
                     <div class="w-24 h-1 bg-gradient-to-r from-transparent via-energi-cyan to-transparent mx-auto"></div>
                 </div>
 
-                <div class="max-w-4xl mx-auto px-2 md:px-4 mt-4 reveal">
-                    <div class="relative group p-0.5 md:p-1 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-energi-cyan/20 via-white/5 to-energi-gold/20 shadow-2xl">
-                        <div class="relative w-full rounded-[1.4rem] md:rounded-[1.8rem] overflow-hidden bg-black aspect-video border border-white/10">
+                <div class="max-w-4xl mx-auto video-mobile-wrapper mt-4 reveal">
+                    <div class="relative group video-gradient-border p-0.5 md:p-1 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-energi-cyan/20 via-white/5 to-energi-gold/20 shadow-2xl video-frame-outer">
+                        <div class="relative w-full rounded-[1.4rem] md:rounded-[1.8rem] overflow-hidden bg-black aspect-video border border-white/10 video-frame-inner">
                             <iframe 
                                 src="https://drive.google.com/file/d/1ZxP_KxdulxW0xgWUW70FqpE-TVrqKRlh/preview" 
                                 class="absolute top-0 left-0 w-full h-full border-0" 
@@ -217,10 +217,10 @@
                         </div>
                     </div>
                     
-                    <div class="mt-6 flex justify-center">
+                    <div class="mt-5 flex justify-center px-2">
                         <a href="https://drive.google.com/file/d/1ZxP_KxdulxW0xgWUW70FqpE-TVrqKRlh/view?usp=sharing" 
                            target="_blank" 
-                           class="flex items-center gap-3 px-8 py-3 bg-white/5 border border-white/10 rounded-full text-white font-bold hover:bg-energi-gold hover:text-darkbg transition-all shadow-lg text-sm">
+                           class="video-play-btn flex items-center gap-3 px-8 py-3 bg-white/5 border border-white/10 rounded-full text-white font-bold hover:bg-energi-gold hover:text-darkbg transition-all shadow-lg text-sm">
                             <span>▶</span> Putar Video di Google Drive
                         </a>
                     </div>
@@ -438,8 +438,9 @@
 
     <!-- AI CHATBOT WIDGET -->
     <div id="ai-chat-widget" class="fixed bottom-24 right-6 z-[99] flex flex-col items-end">
-        <div id="chat-window" class="hidden w-80 md:w-96 bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden mb-4 animate-fade-in flex flex-col">
-            <div class="bg-gradient-to-r from-energi-cyan/20 to-energi-gold/20 p-4 border-b border-white/10 flex justify-between items-center">
+        <!-- Chat Window: class 'hidden' dihapus, animasi dikontrol CSS via class .chat-visible -->
+        <div id="chat-window" class="w-80 md:w-96 bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden mb-4 flex flex-col">
+            <div class="bg-gradient-to-r from-energi-cyan/20 to-energi-gold/20 p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-energi-cyan to-energi-blue flex items-center justify-center text-darkbg font-bold shadow-lg">AI</div>
                     <div>
@@ -447,16 +448,16 @@
                         <p class="text-[8px] text-energi-cyan animate-pulse uppercase">AI Powered • Online</p>
                     </div>
                 </div>
-                <button id="close-chat" class="text-slate-400 hover:text-white transition-colors">✕</button>
+                <button id="close-chat" class="text-slate-400 hover:text-white transition-colors w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10">✕</button>
             </div>
-            <div id="chat-messages" class="h-80 overflow-y-auto p-4 flex flex-col gap-3 font-mono text-[11px] scrollbar-thin">
+            <div id="chat-messages" class="h-80 overflow-y-auto p-4 flex flex-col gap-3 font-mono text-[11px] scrollbar-thin custom-scrollbar flex-grow">
                 <div class="bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-sm max-w-[85%] text-slate-300 leading-relaxed">
-                    Halo! Saya **Energy AI**. Saya siap membantu Anda dengan informasi seputar Portal Energi. Apa yang ingin Anda ketahui?
+                    Halo! Saya <strong>Energy AI</strong>. Saya siap membantu Anda dengan informasi seputar Portal Energi. Apa yang ingin Anda ketahui?
                 </div>
             </div>
-            <div class="p-4 bg-white/5 border-t border-white/10 flex gap-2">
+            <div class="p-3 bg-white/5 border-t border-white/10 flex gap-2 flex-shrink-0">
                 <input type="text" id="ai-input" placeholder="Tanyakan tentang training..." class="flex-grow bg-darkbg border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:border-energi-cyan transition-all">
-                <button id="send-ai" class="w-8 h-8 rounded-full bg-energi-cyan text-darkbg flex items-center justify-center hover:scale-110 transition-all shadow-lg">➤</button>
+                <button id="send-ai" class="w-8 h-8 rounded-full bg-energi-cyan text-darkbg flex items-center justify-center hover:scale-110 transition-all shadow-lg flex-shrink-0">➤</button>
             </div>
         </div>
         <div class="relative flex items-center justify-end">
@@ -466,7 +467,7 @@
                 <span class="text-[10px] md:text-xs text-energi-gold">✨</span>
             </div>
             
-            <button id="toggle-chat" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-energi-cyan to-energi-gold shadow-[0_0_30px_rgba(0,255,255,0.2)] flex items-center justify-center text-xl md:text-2xl hover:scale-110 active:scale-95 transition-all group relative" onclick="document.getElementById('chatbot-hint').style.opacity='0'; document.getElementById('chatbot-hint').style.display='none';">
+            <button id="toggle-chat" class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-energi-cyan to-energi-gold shadow-[0_0_30px_rgba(0,255,255,0.2)] flex items-center justify-center text-xl md:text-2xl hover:scale-110 active:scale-95 transition-all group relative">
                 <div class="absolute inset-0 rounded-full bg-energi-cyan animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] opacity-30 group-hover:opacity-50"></div>
                 <span class="group-hover:rotate-12 transition-transform relative z-10">🤖</span>
             </button>
