@@ -66,64 +66,52 @@ export function initChatbot(addMessageCallback) {
     if (!toggleBtn || !chatWindow) return;
 
     let isChatOpen = false;
+    let closeTimer = null;
 
     /**
-     * Membuka/menutup chat window dengan animasi CSS yang smooth.
-     * Menggunakan class .chat-visible alih-alih toggle 'hidden'
-     * agar transisi opacity + transform bisa dijalankan dengan mulus.
+     * OPEN: Set display:flex dulu, force reflow, lalu tambah
+     * class .chat-visible untuk trigger animasi slide-up.
      */
     function openChat() {
+        if (closeTimer) clearTimeout(closeTimer); // batalkan timer tutup jika ada
         isChatOpen = true;
+
+        chatWindow.classList.remove('hidden', 'chat-closing');
+        chatWindow.classList.add('flex'); // tampilkan dulu
+        void chatWindow.offsetWidth;     // force reflow agar animasi terpicu
         chatWindow.classList.add('chat-visible');
-        // Sembunyikan hint saat chat dibuka
+
         if (hintBox) {
             hintBox.style.opacity = '0';
             hintBox.style.pointerEvents = 'none';
         }
-        // Fokus ke input setelah transisi selesai (hindari layout jump)
-        setTimeout(() => input.focus(), 350);
+        // Fokus input setelah animasi selesai
+        setTimeout(() => { if (input) input.focus(); }, 360);
     }
 
+    /**
+     * CLOSE: Tambah class .chat-closing untuk animasi slide-down,
+     * baru setelah animasi selesai set display:none via class 'hidden'.
+     * Ini kunci agar elemen TIDAK blocking klik saat tertutup.
+     */
     function closeChat() {
+        if (!isChatOpen) return;
         isChatOpen = false;
+
         chatWindow.classList.remove('chat-visible');
+        chatWindow.classList.add('chat-closing');
+
+        closeTimer = setTimeout(() => {
+            chatWindow.classList.remove('chat-closing', 'flex');
+            chatWindow.classList.add('hidden');
+        }, 290); // sedikit lebih pendek dari durasi animasi (280ms)
     }
 
     toggleBtn.addEventListener('click', () => {
         isChatOpen ? closeChat() : openChat();
     });
 
-    closeBtn.addEventListener('click', () => {
-        closeChat();
-    });
-
-    /**
-     * MOBILE KEYBOARD SAFE AREA:
-     * Saat keyboard virtual muncul di HP, viewport mengecil.
-     * Kita gunakan visualViewport API untuk geser widget ke atas
-     * agar input field tidak tertutup keyboard.
-     */
-    if (window.visualViewport) {
-        const widget = document.getElementById('ai-chat-widget');
-        const baseBottom = 96; // 6rem = 96px (Tailwind bottom-24)
-
-        window.visualViewport.addEventListener('resize', () => {
-            if (!isChatOpen || !widget) return;
-            const viewportHeight = window.visualViewport.height;
-            const windowHeight = window.innerHeight;
-            const keyboardHeight = windowHeight - viewportHeight;
-
-            if (keyboardHeight > 100) {
-                // Keyboard muncul — angkat widget
-                widget.style.bottom = `${baseBottom + keyboardHeight}px`;
-                widget.style.transition = 'bottom 0.2s ease';
-            } else {
-                // Keyboard hilang — kembalikan ke posisi asal
-                widget.style.bottom = '';
-                widget.style.transition = 'bottom 0.3s ease';
-            }
-        });
-    }
+    closeBtn.addEventListener('click', closeChat);
 
     const handleSend = async () => {
         const text = input.value.trim();

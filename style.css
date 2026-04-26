@@ -516,38 +516,36 @@ html { scroll-behavior: smooth; }
 
 /* ============================================================
    ANIMASI SMOOTH CHATBOT (SLIDE UP / SLIDE DOWN)
+   — Menggunakan keyframe animation agar display:none tetap
+     bekerja saat window tertutup (tidak blocking klik).
    ============================================================ */
 
-/* State awal: tersembunyi di bawah layar */
-#chat-window {
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: bottom right;
-    display: flex !important; /* Selalu flex agar transisi bisa jalan */
-    flex-direction: column;
-    /* State default: tersembunyi */
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(20px) scale(0.96);
-    visibility: hidden;
-}
-
-/* State terbuka */
+/* Saat dibuka: animasi slide-up + fade-in */
 #chat-window.chat-visible {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-    visibility: visible;
+    animation: chatSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* Override class hidden dari tailwind agar tidak konflik */
-#chat-window.hidden {
-    display: flex !important;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(20px) scale(0.96);
-    visibility: hidden;
+/* Saat ditutup: animasi slide-down + fade-out */
+#chat-window.chat-closing {
+    animation: chatSlideDown 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: none; /* Cegah klik selama animasi tutup */
 }
+
+@keyframes chatSlideUp {
+    from { opacity: 0; transform: translateY(18px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes chatSlideDown {
+    from { opacity: 1; transform: translateY(0)    scale(1);    }
+    to   { opacity: 0; transform: translateY(18px) scale(0.96); }
+}
+
+/* Mencegah auto-zoom iOS saat fokus input di chatbot */
+#ai-input {
+    font-size: 16px !important;
+}
+
 
 /* ============================================================
    VIDEO SECTION — MOBILE FIX

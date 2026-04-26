@@ -438,8 +438,8 @@
 
     <!-- AI CHATBOT WIDGET -->
     <div id="ai-chat-widget" class="fixed bottom-24 right-6 z-[99] flex flex-col items-end">
-        <!-- Chat Window: class 'hidden' dihapus, animasi dikontrol CSS via class .chat-visible -->
-        <div id="chat-window" class="w-80 md:w-96 bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden mb-4 flex flex-col">
+        <!-- Chat Window: default hidden (display:none), JS+CSS animasi mengontrol buka/tutup -->
+        <div id="chat-window" class="hidden w-80 md:w-96 bg-[#0a0a0f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden mb-4 flex-col">
             <div class="bg-gradient-to-r from-energi-cyan/20 to-energi-gold/20 p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-energi-cyan to-energi-blue flex items-center justify-center text-darkbg font-bold shadow-lg">AI</div>
@@ -456,7 +456,12 @@
                 </div>
             </div>
             <div class="p-3 bg-white/5 border-t border-white/10 flex gap-2 flex-shrink-0">
-                <input type="text" id="ai-input" placeholder="Tanyakan tentang training..." class="flex-grow bg-darkbg border border-white/10 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:border-energi-cyan transition-all">
+                <input type="text" id="ai-input" 
+                    placeholder="Tanyakan tentang training..." 
+                    autocomplete="off"
+                    inputmode="text"
+                    class="flex-grow bg-darkbg border border-white/10 rounded-full px-4 py-2 text-white focus:outline-none focus:border-energi-cyan transition-all" 
+                    style="font-size:16px">
                 <button id="send-ai" class="w-8 h-8 rounded-full bg-energi-cyan text-darkbg flex items-center justify-center hover:scale-110 transition-all shadow-lg flex-shrink-0">➤</button>
             </div>
         </div>

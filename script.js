@@ -665,26 +665,41 @@ function initChatbot() {
     if (!toggleBtn || !chatWindow) return;
 
     let isChatOpen = false;
+    let closeTimer = null;
 
     /* -------------------------------------------------------
-       SMOOTH OPEN / CLOSE dengan CSS class .chat-visible
-       Menggantikan toggle 'hidden' agar transisi bisa smooth
+       SMOOTH OPEN / CLOSE
+       - Buka: hapus hidden → tambah flex → force reflow → chat-visible
+       - Tutup: tambah chat-closing → tunggu animasi → set hidden
+         Ini memastikan display:none aktif saat tertutup (tidak blocking klik)
        ------------------------------------------------------- */
     function openChat() {
+        if (closeTimer) clearTimeout(closeTimer);
         isChatOpen = true;
+
+        chatWindow.classList.remove('hidden', 'chat-closing');
+        chatWindow.classList.add('flex');
+        void chatWindow.offsetWidth; // force reflow
         chatWindow.classList.add('chat-visible');
+
         if (hintBox) {
             hintBox.style.opacity = '0';
             hintBox.style.pointerEvents = 'none';
         }
-        setTimeout(() => {
-            if (input) input.focus();
-        }, 350);
+        setTimeout(() => { if (input) input.focus(); }, 360);
     }
 
     function closeChat() {
+        if (!isChatOpen) return;
         isChatOpen = false;
+
         chatWindow.classList.remove('chat-visible');
+        chatWindow.classList.add('chat-closing');
+
+        closeTimer = setTimeout(() => {
+            chatWindow.classList.remove('chat-closing', 'flex');
+            chatWindow.classList.add('hidden');
+        }, 290);
     }
 
     toggleBtn.addEventListener('click', () => {
@@ -695,26 +710,7 @@ function initChatbot() {
         closeBtn.addEventListener('click', closeChat);
     }
 
-    /* -------------------------------------------------------
-       MOBILE KEYBOARD SAFE AREA (visualViewport API)
-       Angkat widget saat keyboard virtual muncul di HP
-       ------------------------------------------------------- */
-    if (window.visualViewport) {
-        const widget = document.getElementById('ai-chat-widget');
-        const baseBottom = 96; // bottom-24 = 96px
 
-        window.visualViewport.addEventListener('resize', () => {
-            if (!isChatOpen || !widget) return;
-            const keyboardHeight = window.innerHeight - window.visualViewport.height;
-            if (keyboardHeight > 100) {
-                widget.style.bottom = `${baseBottom + keyboardHeight}px`;
-                widget.style.transition = 'bottom 0.2s ease';
-            } else {
-                widget.style.bottom = '';
-                widget.style.transition = 'bottom 0.3s ease';
-            }
-        });
-    }
 
     /* -------------------------------------------------------
        PESAN & RESPONSE AI
