@@ -1,0 +1,835 @@
+/* === GLOBAL RESET & OUTFIT FONT === */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif !important; }
+
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Premium Background Texture (Glowing Dots + Grain Overlay) */
+.bg-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+    background-size: 30px 30px;
+}
+
+.bg-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* === NAVIGASI ACTIVE STATE (Aurora + Gold Glass) === */
+.nav-btn.active {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(212, 175, 55, 0.2));
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    color: #D4AF37;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.15), inset 0 0 15px rgba(212, 175, 55, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+    .nav-btn.active {
+        background: rgba(212, 175, 55, 0.15);
+        color: #D4AF37;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        box-shadow: none;
+    }
+}
+
+/* ==============================================
+   DROPDOWN KINERJA — ELEGANT
+   ============================================== */
+
+/* Desktop: hover trigger */
+@media (min-width: 768px) {
+    .dropdown-nav:hover .dropdown-menu {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+    }
+
+    .dropdown-nav:hover .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+        transform-origin: top center;
+    }
+
+    /* Glow subtle di belakang dropdown */
+    .dropdown-nav:hover .dropdown-toggle-btn {
+        color: #fff;
+    }
+}
+
+/* Dropdown item efek hover premium */
+.dropdown-item-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-item-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dropdown-item-btn:hover::before {
+    opacity: 1;
+}
+
+/* Active state untuk parent toggle */
+#kinerja-nav-btn.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Subtle active indicator di sub-item via parent active state */
+.dropdown-nav:has(#kinerja-nav-btn.active) .dropdown-toggle-btn {
+    color: #D4AF37;
+}
+
+/* Active state untuk item dropdown */
+.dropdown-item-btn.active {
+    background: rgba(0, 255, 255, 0.08);
+    color: #00ffff !important;
+    border: 1px solid rgba(0, 255, 255, 0.15);
+}
+
+/* Mobile accordion style */
+@media (max-width: 767px) {
+    .dropdown-menu {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+        padding-left: 1rem;
+        border-left: 2px solid rgba(212, 175, 55, 0.2);
+        margin-left: 0.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 0 0.75rem 0.75rem 0;
+    }
+
+    .dropdown-menu.open {
+        display: flex !important;
+    }
+
+    .dropdown-arrow.rotated {
+        transform: rotate(180deg);
+    }
+
+    .dropdown-item-btn {
+        padding: 0.625rem 1rem !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Transisi arrow */
+.dropdown-arrow {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* === TRANSISI HALAMAN SPA === */
+.animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.animate-fade-out { animation: fadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px) scale(0.99); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    to { opacity: 0; transform: translateY(-10px) scale(0.99); filter: blur(4px); }
+}
+
+.stagger-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
+
+/* === SCROLL REVEAL ANIMATIONS === */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* === MAGNETIC EFFECT UTILS === */
+.magnetic {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+
+
+/* ========================================================
+   ANIMASI AURORA BACKGROUND
+   ======================================================== */
+.aurora-blob {
+    position: absolute;
+    filter: blur(120px);
+    opacity: 0.4;
+    border-radius: 50%;
+    animation: auroraMove 20s infinite alternate linear;
+    z-index: -1;
+}
+.aurora-1 { width: 50vw; height: 50vh; background: #00ffff; top: -10%; left: -10%; }
+.aurora-2 { width: 60vw; height: 60vh; background: #9900ff; bottom: -20%; right: -10%; animation-delay: -5s; animation-duration: 25s; }
+.aurora-3 { width: 40vw; height: 40vh; background: #0066ff; top: 40%; left: 30%; animation-delay: -10s; opacity: 0.2; }
+
+@keyframes auroraMove {
+    0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+    50% { transform: translate(10vw, 15vh) scale(1.2) rotate(45deg); }
+    100% { transform: translate(-10vw, 5vh) scale(0.9) rotate(-45deg); }
+}
+
+/* ========================================================
+   RADIO EQUALIZER ANIMATION
+   ======================================================== */
+.eq-bar {
+    width: 3px; background-color: #00ffff; border-radius: 2px;
+    animation: eqBounce 0.8s ease infinite alternate;
+}
+.eq-bar:nth-child(2) { animation-delay: 0.2s; background-color: #D4AF37; }
+.eq-bar:nth-child(3) { animation-delay: 0.4s; background-color: #9900ff; }
+@keyframes eqBounce { 0% { height: 4px; } 100% { height: 16px; } }
+
+/* ========================================================
+   CUSTOM SCROLLBAR (Untuk Kotak Masukan / Chat)
+   ======================================================== */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.3); /* Emas redup */
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.6);
+}
+ /* === ANIMASI TEKS GRADASI MENGALIR === */
+.animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 4s ease infinite;
+}
+
+@keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+/* ========================================================
+   RESTORASI & PENINGKATAN: STYLES TEAM ENERGY PREMIUM
+   ======================================================== */
+
+/* 1. ANIMASI GARIS ENERGI MENGALIR (Tetap Sama) */
+.line-glow {
+    background: rgba(255, 255, 255, 0.03); 
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+.energy-flow-y {
+    background: linear-gradient(to bottom, transparent, rgba(0, 255, 255, 0.8), rgba(212, 175, 55, 1), transparent);
+    background-size: 100% 200%;
+    animation: flowY 2s linear infinite;
+}
+@keyframes flowY {
+    0% { background-position: 0 -100%; }
+    100% { background-position: 0 100%; }
+}
+.energy-flow-x {
+    background: linear-gradient(to right, transparent, rgba(0, 255, 255, 0.8), rgba(212, 175, 55, 1), rgba(0, 255, 255, 0.8), transparent);
+    background-size: 200% 100%;
+    animation: flowX 3s linear infinite;
+}
+@keyframes flowX {
+    0% { background-position: -100% 0; }
+    100% { background-position: 100% 0; }
+}
+
+/* ==============================================
+   2. KARTU LUXURY (CAHAYA PERMANEN ON)
+   ============================================== */
+.luxury-card {
+    position: relative;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(2, 6, 15, 0.95));
+    backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    
+    /* --- PERBAIKAN: CAHAYA MENYALA PERMANEN --- */
+    /* Ganti border tipis putih menjadi Emas redup, dan tambahkan Cyan Glow halus */
+    box-shadow: 
+        inset 0 0 0 1px rgba(212, 175, 55, 0.2), /* Border Emas redup */
+        0 0 20px rgba(0, 255, 255, 0.1);          /* Cyan Glow luar halus permanen */
+        
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Efek saat disentuh (Hover) - Cahaya Diperkuat */
+.luxury-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    /* Border Emas menebal, Cyan Glow Luar menjadi sangat terang */
+    box-shadow: 
+        inset 0 0 0 2px rgba(212, 175, 55, 0.7), /* Border Emas Terang */
+        0 10px 40px rgba(0, 255, 255, 0.3);       /* Cyan Glow Luar Terang */
+}
+
+/* ==============================================
+   3. BINGKAI FOTO HEKSAGON NEON (MENYALA PERMANEN)
+   ============================================== */
+.hex-container {
+    position: relative;
+    /* PERBAIKAN: Perbesar Wadah (Width & Height harus proporsional untuk Heksagon) */
+    width: 120px;
+    height: 139px; /* Perhitungan proporsional: 120 * 1.1547 */
+    margin: 0 auto 1.5rem; /* Tambahkan margin bawah sedikit */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease; /* Jeda transisi untuk zoom */
+}
+
+/* Bingkai Neon Heksagon */
+.hex-border {
+    position: absolute;
+    inset: 0;
+    /* Gradasi Cyan-Gold permanen */
+    background: linear-gradient(45deg, #00FFFF, #D4AF37, #00FFFF);
+    background-size: 200% 200%;
+    animation: gradient-x 3s linear infinite;
+    
+    /* Bentuk Segi Enam */
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    
+    /* Neon Glow Menampilkan Kembali */
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.7));
+}
+
+/*wadah foto*/
+.hex-photo-wrap {
+    position: absolute;
+    inset: 5px; /* Sedikit menebalkan border neon agar mewah */
+    background: #0a0f18; /* Warna background jika foto gagal muat */
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    z-index: 1;
+    overflow: hidden; /* Tambahkan overflow-hidden agar zoom foto rapi */
+}
+
+.hex-photo {
+    width: 100%;
+    height: 100%;
+    /* PERBAIKAN BUG: Sebelumnya tertulis 'object-cover: cover;' yang mana itu salah */
+    object-fit: cover; 
+    object-position: top center;
+    transition: all 0.5s ease;
+}
+
+/* ==============================================
+   EFEK ZOOM FOTO STO SAAT KARTU DIHOVER
+   ============================================= */
+/* Warna foto saat kartu di-hover */
+.luxury-card:hover .hex-photo {
+    filter: grayscale(0);
+    transform: scale(1.15); /* PERBAIKAN: Efek Zoom diperbesar */
+}
+
+/* Hapus class team-avatar-ring yang lama karena sudah tidak dipakai */
+.team-avatar-ring { display: none; }
+
+/* ==============================================
+   DIAMOND ACCENT
+   ============================================== */
+.diamond-accent {
+    /* Bentuk ketupat/berlian kecil untuk aksen garis */
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* ==============================================
+   CINEMATIC VIDEO FRAME STYLES
+   ============================================== */
+.video-premium-frame {
+    /* Memberikan efek bayangan dalam agar video terlihat seperti tertanam */
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    transition: transform 0.5s ease;
+}
+
+.video-premium-frame:hover {
+    transform: scale(1.01); /* Efek zoom sangat halus saat di-hover */
+}
+
+/* Animasi Pulse untuk cahaya di belakang video */
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.5; }
+}
+.animate-pulse {
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ==============================================
+   GOOGLE TRANSLATE WIDGET CLEANER (MOBILE FIX)
+   ============================================== */
+/* Sembunyikan teks "Powered by Google" */
+.goog-te-gadget {
+    font-size: 0px !important; 
+    color: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Sembunyikan Logo Google */
+.goog-te-gadget .goog-logo-link {
+    display: none !important;
+}
+
+/* Rapikan kotak dropdown-nya */
+.goog-te-combo {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 12px !important;
+    color: #fff !important;
+    background-color: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+    border-radius: 6px !important;
+    padding: 4px 8px !important;
+    outline: none !important;
+    margin: 0 !important;
+}
+
+/* Sembunyikan banner atas Google Translate yang kadang muncul */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+body {
+    top: 0px !important; 
+}
+
+/* ==============================================
+   OPTIMASI PERFORMA (GPU ACCELERATION)
+   ============================================== */
+.luxury-card, .aurora-blob, nav, .video-premium-frame, .stagger-item {
+    will-change: transform, opacity;
+    transform: translateZ(0); /* Memaksa browser pakai GPU */
+}
+
+/* ==============================================
+   SOPHISTICATED PLATINUM LIGHT MODE (ANTI-SILAU)
+   ============================================== */
+body.light-mode {
+    background-color: #f1f5f9 !important; /* Abu-abu platinum lembut */
+    color: #334155 !important; /* Deep Slate (Nyaman dibaca) */
+}
+
+body.light-mode .bg-dots { opacity: 0.1; }
+
+body.light-mode .text-white { color: #0f172a !important; }
+body.light-mode .text-slate-300, 
+body.light-mode .text-slate-400 { color: #475569 !important; }
+
+/* Kartu & Container Mode Terang */
+body.light-mode .bg-darkcard\/40, 
+body.light-mode .luxury-card {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Penyesuaian Warna Energi (Matte Finish) */
+body.light-mode .text-energi-cyan { color: #0891b2 !important; }
+body.light-mode .text-energi-gold, 
+body.light-mode .text-glow-premium {
+    color: #92400e !important;
+    text-shadow: none !important;
+}
+
+/* Garis Energi Disamarkan di Mode Terang */
+body.light-mode .energy-flow-y, 
+body.light-mode .energy-flow-x {
+    opacity: 0.2;
+    background: linear-gradient(to bottom, transparent, #0891b2, #92400e, transparent) !important;
+}
+
+/* Navbar Mode Terang */
+body.light-mode nav {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Optimasi Mobile Blur agar tidak berat */
+@media (max-width: 768px) {
+    .backdrop-blur-xl, .backdrop-blur-md {
+        backdrop-filter: blur(8px) !important; /* Blur dikurangi di HP */
+    }
+}
+
+#typing-text::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+/* ==============================================
+   9. ANIMASI REVEAL & INTERACTIVE
+   ============================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.magnetic {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* --- PREMIUM DECORATIONS --- */
+.logo-float {
+    animation: floatLogo 4s ease-in-out infinite;
+}
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-12px) scale(1.02); }
+}
+
+.text-glow-premium {
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.4), 0 0 30px rgba(212, 175, 55, 0.1);
+}
+
+/* --- FINAL RESPONSIVE OPTIMIZATIONS --- */
+@media (max-width: 768px) {
+    h1 { font-size: 2.25rem !important; line-height: 1.2 !important; }
+    .section-content { padding-left: 1rem; padding-right: 1rem; }
+    /* Card tim: gunakan fluid width agar tidak overflow di mobile */
+    .luxury-card { width: 100% !important; max-width: 260px; margin: 0 auto; }
+
+    /* === AI CHATBOT MOBILE FIX === */
+    #ai-chat-widget { right: 0.75rem; bottom: 5rem; }
+    #chat-window {
+        /* Lebar penuh layar dengan margin kanan-kiri yang aman */
+        width: calc(100vw - 1.5rem);
+        /* Posisi dari kanan mengikuti parent */
+        right: 0;
+        /* Batas tinggi maksimal aman untuk layar kecil */
+        max-height: 75dvh;
+        max-height: 75vh; /* fallback untuk browser lama */
+    }
+    #chat-messages {
+        /* Kurangi tinggi chat messages agar tidak terlalu memenuhi layar */
+        height: 55vmax;
+        max-height: 45vh;
+    }
+
+    /* Tim Structure Mobile Fix */
+    #team-container > div { padding: 1.5rem 0 !important; }
+    .hex-container { width: 130px !important; height: 150px !important; }
+    
+    /* Layout Adjustments */
+    .grid { gap: 1.5rem !important; }
+}
+
+@keyframes fadeInUpWinner {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Smooth Scrolling */
+html { scroll-behavior: smooth; }
+
+/* ============================================================
+   ANIMASI SMOOTH CHATBOT (SLIDE UP / SLIDE DOWN)
+   — Menggunakan keyframe animation agar display:none tetap
+     bekerja saat window tertutup (tidak blocking klik).
+   ============================================================ */
+
+/* Saat dibuka: animasi slide-up + fade-in */
+#chat-window.chat-visible, #music-window.chat-visible {
+    animation: chatSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Saat ditutup: animasi slide-down + fade-out */
+#chat-window.chat-closing, #music-window.chat-closing {
+    animation: chatSlideDown 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: none; /* Cegah klik selama animasi tutup */
+}
+
+@keyframes chatSlideUp {
+    from { opacity: 0; transform: translateY(18px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes chatSlideDown {
+    from { opacity: 1; transform: translateY(0)    scale(1);    }
+    to   { opacity: 0; transform: translateY(18px) scale(0.96); }
+}
+
+/* ============================================================
+   iOS & MOBILE OPTIMIZATIONS
+   ============================================================ */
+
+/* Fix border-radius on iOS for iframes and cards */
+.video-premium-frame, 
+.section-content, 
+.bg-darkcard {
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+    mask-image: radial-gradient(white, black);
+}
+
+/* Smooth scrolling on mobile */
+.custom-scrollbar {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix video aspect ratio on small devices */
+@media (max-width: 640px) {
+    .video-mobile-wrapper {
+        width: 100%;
+        padding: 0 10px;
+    }
+}
+
+/* Station Presets Active Style */
+.station-preset.text-energi-cyan {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.2), 0 0 10px rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.5) !important;
+    color: #00ffff !important;
+}
+
+/* Radio LED Display Text */
+#player-freq {
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+/* Music Widget Button Glow */
+#toggle-music {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+#toggle-music:hover {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 255, 255, 0.3);
+    border-color: #00ffff;
+}
+
+
+/* ============================================================
+   VIDEO SECTION — DESKTOP OPTIMIZATION
+   ============================================================ */
+.video-premium-frame {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    max-width: 800px; /* Batasi lebar di desktop agar tidak makan tempat */
+    margin: 0 auto;
+}
+
+/* ============================================================
+   NEWS SECTION STYLES
+   ============================================================ */
+.news-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--color-cyan);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1);
+}
+
+.video-premium-frame:hover {
+    transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+    /* Section Content Spacing */
+    .section-content {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    /* Hero Card Mobile Padding */
+    #beranda > div {
+        padding: 1.5rem 1rem !important;
+        border-radius: 2rem !important;
+    }
+
+    /* Video Section Mobile Optimization */
+    .video-mobile-wrapper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important; /* Pastikan menumpuk ke bawah, bukan ke samping */
+        align-items: center !important;
+        gap: 1.5rem !important;
+    }
+
+    .video-premium-frame {
+        border-radius: 1.25rem !important;
+        padding: 0px !important; 
+        border-width: 2px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .video-premium-frame .aspect-video {
+        border-radius: 1.15rem !important;
+        background: #000;
+    }
+
+    .video-premium-frame iframe {
+        border-radius: 1.15rem !important;
+    }
+
+    /* Video Button Mobile */
+    .video-mobile-wrapper a {
+        width: 100% !important;
+        max-width: 280px;
+        padding: 1rem !important;
+        font-size: 0.8rem !important;
+        letter-spacing: 0.1em;
+        margin: 0 auto;
+    }
+}
+
+/* ============================================================
+   ANTI-SAMAR TEXT OPTIMIZATIONS (Dark & Light Mode)
+   ============================================================ */
+
+/* Text shadows untuk memastikan teks tidak nyaru dengan background di Dark Mode */
+.text-white, .text-slate-200, .text-slate-300, .text-slate-400 {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8), 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* FIX BUG: Hapus text-shadow pada teks bergradasi agar warnanya tidak kotor/menjadi hitam */
+.text-transparent {
+    text-shadow: none !important;
+}
+
+/* Background overlay handling di Light Mode agar tidak terlalu gelap dan teks terbaca */
+body.light-mode #bg-container { background-color: #f8fafc !important; }
+body.light-mode #bg-img { opacity: 0.15 !important; filter: brightness(1.3) grayscale(0.2) !important; }
+body.light-mode #bg-overlay { background: linear-gradient(to bottom, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.75), rgba(248, 250, 252, 0.98)) !important; }
+
+
+#mobile-hint {
+    filter: drop-shadow(0 10px 20px rgba(212, 175, 55, 0.3));
+    animation: slideInHint 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideInHint {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Fix for sticky nav on some mobile browsers */
+nav {
+    position: sticky;
+    top: 0;
+    will-change: transform;
+}
+
+/* Ensure sections have enough bottom space for floating bars */
+.section-content {
+    padding-bottom: 120px !important;
+}
+
+@media (max-width: 640px) {
+    .section-content {
+        padding-bottom: 140px !important;
+    }
+}
+
+/* Text glow for AI messages */
+.ai-message-glow {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+/* ==============================================
+   SEU CHART TABLE STYLES
+   ============================================== */
+/* Smooth row hover glow */
+#seu-ir table tbody tr {
+    transition: all 0.2s ease;
+}
+
+/* Monospace numbers alignment */
+#seu-ir table td.font-mono {
+    font-feature-settings: "tnum";
+}
+
+/* Chart canvas responsive */
+#seuChart {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 340px;
+}
+
+/* Stat card counter animation */
+#seu-ir .counter {
+    display: inline-block;
+}
+
+/* Light mode adjustments for SEU */
+body.light-mode #seu-ir .text-energi-cyan {
+    color: #0891b2 !important;
+}
+body.light-mode #seu-ir table td.text-white {
+    color: #0f172a !important;
+}
+
+@media (max-width: 768px) {
+    #seuChart {
+        max-height: 250px;
+    }
+    #seu-ir table {
+        font-size: 10px;
+    }
+    #seu-ir table td.py-3 {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+}

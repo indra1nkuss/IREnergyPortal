@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Portal Energi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: #050508; color: #e2e8f0; }
+
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link:hover { background: rgba(0, 255, 255, 0.08); color: #00ffff; }
+        .sidebar-link.active { background: rgba(212, 175, 55, 0.15); color: #D4AF37; border-left: 3px solid #D4AF37; }
+
+        .card-admin {
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        input, textarea, select {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            color: #fff !important;
+            border-radius: 0.75rem !important;
+            padding: 0.625rem 1rem !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.875rem !important;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: rgba(0, 255, 255, 0.4) !important;
+            box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.08) !important;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ffff, #0066ff);
+            color: #050508;
+            font-weight: 700;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.8rem;
+        }
+        .btn-primary:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #b8962e);
+            color: #050508;
+            font-weight: 700;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.8rem;
+        }
+        .btn-gold:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.4rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
+        .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.7rem; border-radius: 0.5rem; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #cbd5e1;
+            padding: 0.4rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+        }
+        .btn-outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+        .table-admin {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .table-admin th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-weight: 700;
+        }
+        .table-admin td {
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: #cbd5e1;
+        }
+        .table-admin tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .toast {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 400px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
+        .toast.error { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #0a0a0f;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .preview-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stats-tile {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+        .stats-tile:hover {
+            border-color: rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.03);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: #00ffff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state { text-align: center; padding: 3rem 1rem; color: rgba(255,255,255,0.2); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Grid for drag-n-drop feel */
+        .sort-handle { cursor: grab; color: rgba(255,255,255,0.2); }
+        .sort-handle:active { cursor: grabbing; }
+
+        @media (max-width: 768px) {
+            .admin-layout { flex-direction: column; }
+            .admin-sidebar { width: 100% !important; flex-direction: row !important; overflow-x: auto; padding: 0.5rem !important; }
+            .sidebar-link { white-space: nowrap; padding: 0.5rem 1rem !important; border-left: none !important; border-bottom: 2px solid transparent; }
+            .sidebar-link.active { border-left: none !important; border-bottom: 2px solid #D4AF37; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal-box" id="modal-box">
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#050508]">
+        <div class="text-center max-w-md px-6">
+            <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-tr from-energi-gold to-yellow-200 rounded-2xl flex items-center justify-center font-black text-darkbg text-2xl shadow-[0_0_30px_rgba(212,175,55,0.3)]">ENG</div>
+            <h1 class="text-3xl font-black text-white mb-2 tracking-tighter">Admin <span class="text-energi-gold font-serif italic">Portal</span></h1>
+            <p class="text-slate-500 text-sm mb-8">Masuk untuk mengelola konten Portal Energi IR</p>
+            <button id="admin-login-btn" class="flex items-center justify-center gap-3 bg-white text-darkbg px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition-all mx-auto shadow-lg text-sm">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                Login dengan Google
+            </button>
+            <p id="login-error" class="text-red-400 text-xs mt-4 hidden"></p>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN DASHBOARD ===== -->
+    <div id="admin-dashboard" class="hidden min-h-screen flex flex-col">
+
+        <!-- Top Bar -->
+        <header class="sticky top-0 z-40 bg-[#050508]/90 backdrop-blur-xl border-b border-white/10 px-4 md:px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-gradient-to-tr from-energi-gold to-yellow-200 rounded-lg flex items-center justify-center font-black text-darkbg text-xs shadow-md">ENG</div>
+                <span class="text-white font-bold text-sm tracking-tight">Admin <span class="text-energi-gold font-serif italic font-normal">Portal</span></span>
+                <span class="hidden md:inline text-[10px] text-slate-600 uppercase tracking-widest ml-2">Dashboard</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="index.html" target="_blank" class="btn-outline text-xs flex items-center gap-1.5">🔗 Lihat Portal</a>
+                <div class="flex items-center gap-2">
+                    <img id="admin-avatar" src="" class="w-7 h-7 rounded-full border border-white/10 hidden">
+                    <span id="admin-name" class="text-xs text-slate-400 hidden"></span>
+                </div>
+                <button id="admin-logout-btn" class="btn-danger btn-sm text-xs">Logout</button>
+            </div>
+        </header>
+
+        <div class="flex flex-1 admin-layout">
+
+            <!-- Sidebar -->
+            <aside class="admin-sidebar w-full md:w-56 bg-[#08080c] border-r border-white/5 p-3 flex md:flex-col gap-1 shrink-0">
+                <button class="sidebar-link active flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="dashboard-tab">
+                    <span>📊</span> <span>Dashboard</span>
+                </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="winners-tab">
+                    <span>🏆</span> <span>Pemenang</span>
+                </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="seu-tab">
+                    <span>⚡</span> <span>SEU IR</span>
+                </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="enpi-tab">
+                    <span>📋</span> <span>ENPI</span>
+                </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="project-tab">
+                    <span>🔧</span> <span>Project Efisiensi</span>
+                </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="team-tab">
+                    <span>👥</span> <span>Team</span>
+                </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="gallery-tab">
+                    <span>📸</span> <span>Dokumentasi</span>
+                </button>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-4 md:p-6 overflow-x-hidden">
+
+                <!-- DASHBOARD TAB -->
+                <div id="dashboard-tab" class="tab-content active">
+                    <div class="mb-6">
+                        <h2 class="text-xl md:text-2xl font-bold text-white">📊 Dashboard</h2>
+                        <p class="text-slate-500 text-xs mt-1">Ringkasan konten Portal Energi IR</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="stats-grid">
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-winners">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">🏆 Pemenang</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-seu">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">⚡ SEU Mesin</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-enpi">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">📋 ENPI Fitur</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-project">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">🔧 Projects</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-gallery">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">📸 Foto</p></div>
+                    <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-team">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">👥 Team</p></div>
+                    </div>
+                    <div class="mt-8 card-admin p-6 text-center">
+                        <p class="text-slate-400 text-sm">🔄 Semua data terhubung <strong class="text-energi-cyan">realtime</strong> dengan Firebase.</p>
+                        <p class="text-slate-600 text-xs mt-2">Edit data di sidebar → perubahan otomatis tampil di portal.</p>
+                    </div>
+                </div>
+
+                <!-- WINNERS TAB -->
+                <div id="winners-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">🏆 Pemenang</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola 100 data pemenang training online</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('winners')" class="btn-primary text-xs">+ Tambah</button>
+                            <button onclick="seedWinners()" class="btn-outline text-xs">📥 Seed 100</button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="winners-search" placeholder="Cari NIK, Nama, atau Departemen..." class="w-full max-w-md">
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="winners-table">
+                            <thead><tr><th>No</th><th>NIK</th><th>Nama</th><th>Departemen</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="winners-body"></tbody>
+                        </table>
+                        <div id="winners-empty" class="empty-state hidden">Belum ada data pemenang. Klik "Seed 100" untuk mengisi.</div>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 mt-4" id="winners-pagination"></div>
+                </div>
+
+                <!-- SEU TAB -->
+                <div id="seu-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">⚡ SEU IR — Mesin</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola data konsumsi energi 7 mesin</p>
+                        </div>
+                        <button onclick="openModal('seu')" class="btn-primary text-xs">+ Tambah Mesin</button>
+                            <button onclick="seedSEU()" class="btn-outline text-xs">📥 Seed 7 Mesin</button>
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="seu-table">
+                            <thead><tr><th>#</th><th>Nama Mesin</th><th>KWh / Year</th><th>Persentase (%)</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="seu-body"></tbody>
+                        </table>
+                        <div id="seu-empty" class="empty-state hidden">Belum ada data mesin.</div>
+                    </div>
+                </div>
+
+                <!-- ENPI TAB -->
+                <div id="enpi-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">📋 ENPI — Fitur</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola konten fitur ENPI</p>
+                        </div>
+                        <button onclick="openModal('enpi')" class="btn-primary text-xs">+ Tambah Fitur</button>
+                            <button onclick="seedENPI()" class="btn-outline text-xs">📥 Seed 3 Fitur</button>
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="enpi-table">
+                            <thead><tr><th>#</th><th>Ikon</th><th>Judul</th><th>Deskripsi</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="enpi-body"></tbody>
+                        </table>
+                        <div id="enpi-empty" class="empty-state hidden">Belum ada data ENPI.</div>
+                    </div>
+                </div>
+
+                <!-- PROJECT TAB -->
+                <div id="project-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">🔧 Project Efisiensi</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola program-project efisiensi</p>
+                        </div>
+                        <button onclick="openModal('project')" class="btn-primary text-xs">+ Tambah Project</button>
+                            <button onclick="seedProject()" class="btn-outline text-xs">📥 Seed 4 Project</button>
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="project-table">
+                            <thead><tr><th>#</th><th>Ikon</th><th>Judul</th><th>Deskripsi</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="project-body"></tbody>
+                        </table>
+                        <div id="project-empty" class="empty-state hidden">Belum ada data project.</div>
+                    </div>
+                </div>
+
+                <!-- GALLERY TAB -->
+                <div id="gallery-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">📸 Dokumentasi</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola foto dokumentasi pemenang</p>
+                        </div>
+                        <button onclick="openModal('gallery')" class="btn-primary text-xs">+ Upload Foto</button>
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="gallery-table">
+                            <thead><tr><th>#</th><th>Preview</th><th>Caption</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="gallery-body"></tbody>
+                        </table>
+                        <div id="gallery-empty" class="empty-state hidden">Belum ada dokumentasi.</div>
+                    </div>
+                </div>
+
+                <!-- TEAM TAB -->
+                <div id="team-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">👥 Team Energy IR</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola anggota tim</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('team')" class="btn-primary text-xs">+ Tambah Anggota</button>
+                            <button onclick="seedTeam()" class="btn-outline text-xs">📥 Seed 5 Anggota</button>
+                        </div>
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="team-table">
+                            <thead><tr><th>#</th><th>Nama</th><th>Role</th><th>Foto</th><th>Portfolio Link</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="team-body"></tbody>
+                        </table>
+                        <div id="team-empty" class="empty-state hidden">Belum ada anggota tim.</div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ===== FIREBASE + ADMIN MODULE ===== -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <!-- admin.js — loaded separately to keep things clean -->
+    <script type="module" src="./js/admin.js"></script>
+
+</body>
+</html>
