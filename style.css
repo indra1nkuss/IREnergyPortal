@@ -1,4 +1,4 @@
-/* === GLOBAL RESET & OUTFIT FONT === */
+﻿/* === GLOBAL RESET & OUTFIT FONT === */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif !important; }
 
 html, body {
@@ -49,7 +49,7 @@ body {
 }
 
 /* ==============================================
-   DROPDOWN KINERJA — ELEGANT
+   DROPDOWN KINERJA â€” ELEGANT
    ============================================== */
 
 /* Desktop: hover trigger */
@@ -370,19 +370,6 @@ body {
 }
 
 /* ==============================================
-   CINEMATIC VIDEO FRAME STYLES
-   ============================================== */
-.video-premium-frame {
-    /* Memberikan efek bayangan dalam agar video terlihat seperti tertanam */
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-    transition: transform 0.5s ease;
-}
-
-.video-premium-frame:hover {
-    transform: scale(1.01); /* Efek zoom sangat halus saat di-hover */
-}
-
-/* Animasi Pulse untuk cahaya di belakang video */
 @keyframes pulse-glow {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 0.5; }
@@ -431,7 +418,6 @@ body {
 /* ==============================================
    OPTIMASI PERFORMA (GPU ACCELERATION)
    ============================================== */
-.luxury-card, .aurora-blob, nav, .video-premium-frame, .stagger-item {
     will-change: transform, opacity;
     transform: translateZ(0); /* Memaksa browser pakai GPU */
 }
@@ -575,7 +561,7 @@ html { scroll-behavior: smooth; }
 
 /* ============================================================
    ANIMASI SMOOTH CHATBOT (SLIDE UP / SLIDE DOWN)
-   — Menggunakan keyframe animation agar display:none tetap
+   â€” Menggunakan keyframe animation agar display:none tetap
      bekerja saat window tertutup (tidak blocking klik).
    ============================================================ */
 
@@ -605,8 +591,7 @@ html { scroll-behavior: smooth; }
    ============================================================ */
 
 /* Fix border-radius on iOS for iframes and cards */
-.video-premium-frame, 
-.section-content, 
+.section-content,
 .bg-darkcard {
     -webkit-mask-image: -webkit-radial-gradient(white, black);
     mask-image: radial-gradient(white, black);
@@ -619,7 +604,6 @@ html { scroll-behavior: smooth; }
 
 /* Fix video aspect ratio on small devices */
 @media (max-width: 640px) {
-    .video-mobile-wrapper {
         width: 100%;
         padding: 0 10px;
     }
@@ -651,16 +635,6 @@ html { scroll-behavior: smooth; }
 
 
 /* ============================================================
-   VIDEO SECTION — DESKTOP OPTIMIZATION
-   ============================================================ */
-.video-premium-frame {
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    max-width: 800px; /* Batasi lebar di desktop agar tidak makan tempat */
-    margin: 0 auto;
-}
-
-/* ============================================================
    NEWS SECTION STYLES
    ============================================================ */
 .news-card {
@@ -677,159 +651,34 @@ html { scroll-behavior: smooth; }
     box-shadow: 0 10px 30px rgba(0, 255, 255, 0.1);
 }
 
-.video-premium-frame:hover {
-    transform: scale(1.02);
+
+        border-radius: 0 !important; overflow: hidden !important; transform: none !important; padding: 0 !important; }
+        background: #000 !important; position: relative !important; }
+        width: 100% !important; height: 100% !important; border: 0 !important; }
+        font-size: 0.8rem !important; margin: 0 auto; }
+}
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
+    animation: shine 3s ease-in-out infinite;
+}
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
 }
 
-@media (max-width: 768px) {
-    /* Section Content Spacing */
-    .section-content {
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-    }
-
-    /* Hero Card Mobile Padding */
-    #beranda > div {
-        padding: 1.5rem 1rem !important;
-        border-radius: 2rem !important;
-    }
-
-    /* Video Section Mobile Optimization */
-    .video-mobile-wrapper {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: column !important; /* Pastikan menumpuk ke bawah, bukan ke samping */
-        align-items: center !important;
-        gap: 1.5rem !important;
-    }
-
-    .video-premium-frame {
-        border-radius: 1.25rem !important;
-        padding: 0px !important; 
-        border-width: 2px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
-
-    .video-premium-frame .aspect-video {
-        border-radius: 1.15rem !important;
-        background: #000;
-    }
-
-    .video-premium-frame iframe {
-        border-radius: 1.15rem !important;
-    }
-
-    /* Video Button Mobile */
-    .video-mobile-wrapper a {
-        width: 100% !important;
-        max-width: 280px;
-        padding: 1rem !important;
-        font-size: 0.8rem !important;
-        letter-spacing: 0.1em;
-        margin: 0 auto;
-    }
-}
-
-/* ============================================================
-   ANTI-SAMAR TEXT OPTIMIZATIONS (Dark & Light Mode)
-   ============================================================ */
-
-/* Text shadows untuk memastikan teks tidak nyaru dengan background di Dark Mode */
-.text-white, .text-slate-200, .text-slate-300, .text-slate-400 {
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8), 0 2px 10px rgba(0, 0, 0, 0.6);
-}
-
-/* FIX BUG: Hapus text-shadow pada teks bergradasi agar warnanya tidak kotor/menjadi hitam */
-.text-transparent {
-    text-shadow: none !important;
-}
-
-/* Background overlay handling di Light Mode agar tidak terlalu gelap dan teks terbaca */
-body.light-mode #bg-container { background-color: #f8fafc !important; }
-body.light-mode #bg-img { opacity: 0.15 !important; filter: brightness(1.3) grayscale(0.2) !important; }
-body.light-mode #bg-overlay { background: linear-gradient(to bottom, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.75), rgba(248, 250, 252, 0.98)) !important; }
-
-
-#mobile-hint {
-    filter: drop-shadow(0 10px 20px rgba(212, 175, 55, 0.3));
-    animation: slideInHint 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-@keyframes slideInHint {
-    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+/* 12. TEAM CARD ENTRY ANIMATION */
+@keyframes fadeInUpTeam {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Fix for sticky nav on some mobile browsers */
-nav {
-    position: sticky;
-    top: 0;
-    will-change: transform;
-}
 
-/* Ensure sections have enough bottom space for floating bars */
-.section-content {
-    padding-bottom: 120px !important;
-}
 
-@media (max-width: 640px) {
-    .section-content {
-        padding-bottom: 140px !important;
-    }
-}
 
-/* Text glow for AI messages */
-.ai-message-glow {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
-}
 
-/* ==============================================
-   SEU CHART TABLE STYLES
-   ============================================== */
-/* Smooth row hover glow */
-#seu-ir table tbody tr {
-    transition: all 0.2s ease;
-}
 
-/* Monospace numbers alignment */
-#seu-ir table td.font-mono {
-    font-feature-settings: "tnum";
-}
-
-/* Chart canvas responsive */
-#seuChart {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 340px;
-}
-
-/* Stat card counter animation */
-#seu-ir .counter {
-    display: inline-block;
-}
-
-/* Light mode adjustments for SEU */
-body.light-mode #seu-ir .text-energi-cyan {
-    color: #0891b2 !important;
-}
-body.light-mode #seu-ir table td.text-white {
-    color: #0f172a !important;
-}
-
-@media (max-width: 768px) {
-    #seuChart {
-        max-height: 250px;
-    }
-    #seu-ir table {
-        font-size: 10px;
-    }
-    #seu-ir table td.py-3 {
-        padding-top: 0.6rem;
-        padding-bottom: 0.6rem;
-    }
-}
