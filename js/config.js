@@ -11,14 +11,6 @@ const CONFIG = {
     NEWS_API_URL: "/api/news",
     YOUTUBE_API_URL: "/api/youtube",
 
-    // ─── Google Gemini AI (GRATIS — tanpa kartu kredit) ───────────────────────
-    // 🔐 API key disimpan di Vercel Environment Variables (GEMINI_API_KEY)
-    // Frontend memanggil proxy /api/chat — key tidak pernah ke browser.
-    GEMINI: {
-        apiKey: "", // Kosong — via Vercel env aja
-        model: "gemini-2.0-flash"
-    },
-
     // ─── Cloudinary (Upload Gambar Gratis) ────────────────────────────────────
     CLOUDINARY: {
         cloudName: "r6ntfx6e",

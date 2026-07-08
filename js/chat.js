@@ -1,48 +1,64 @@
 /**
  * CHAT SERVICE — Energy AI
- * Hanya via proxy /api/chat (Vercel Serverless Function).
- * API key AMAN di Vercel Environment Variables.
+ * Menggunakan Groq API (Llama 3) via proxy Vercel.
+ * ✅ GRATIS — 30 request/menit, 14.400 request/hari
+ * ✅ API key aman di Vercel Environment Variables
+ * ✅ Jawab APA SAJA kayak ChatGPT
  */
 import CONFIG from './config.js';
 
 const fallbackLocal = (userText) => {
     const t = userText.toLowerCase();
     if (t.includes('pemenang') || t.includes('siapa') || t.includes('winner'))
-        return "🏆 Daftar pemenang training ada di tab <strong>Pemenang</strong>.";
+        return "🏆 Daftar 100 pemenang training ada di tab <strong>Pemenang</strong>.";
     if (t.includes('halo') || t.includes('hi') || t.includes('hai'))
         return "👋 Halo! Saya <strong>Energy AI</strong>. Ada yang bisa saya bantu?";
-    if (t.includes('training') || t.includes('pelatihan'))
-        return "📚 Training online diikuti 1.500+ trainee dari berbagai departemen.";
     if (t.includes('seu') || t.includes('mesin'))
         return "⚡ Data konsumsi energi ada di menu <strong>Kinerja > SEU IR</strong>.";
     if (t.includes('enpi'))
         return "📋 Informasi ENPI ada di menu <strong>Kinerja > ENPI</strong>.";
     if (t.includes('efisiensi') || t.includes('project'))
         return "🔧 Detail project efisiensi ada di menu <strong>Kinerja > Project Efisiensi</strong>.";
+    if (t.includes('tim') || t.includes('team'))
+        return "👥 Lihat struktur tim di tab <strong>Team</strong>.";
     return "💡 Coba tanya tentang pemenang, training, SEU, ENPI, atau project efisiensi!";
 };
 
+const systemPrompt = `Anda adalah Energy AI, asisten virtual profesional untuk website 'Portal Energi' milik Team Energi IR.
+
+INFORMASI PORTAL:
+- Portal berisi: daftar pemenang training online, data konsumsi energi (SEU IR), ENPI, project efisiensi, dokumentasi galeri, dan struktur tim Energy IR.
+- Tim Energy IR: Goldy Raymond PPS (EC Manager), M Priyo Pambudi (EC Supervisor), Indra Nurul Kusuma (EC Staff), Marini (EC Dokumen Control), Juliansyah (EC Patrol & Control).
+- 100 pemenang training dengan total 1.500+ trainee.
+- Menu: Beranda, Pemenang, Kinerja (SEU IR, ENPI, Project Efisiensi), Dokumentasi, Team.
+
+INSTRUKSI:
+- Jawab ramah, profesional, dan informatif dalam Bahasa Indonesia.
+- Maksimal 3-4 kalimat. Ringkas dan jelas.
+- Jika ada yang bisa diarahkan ke fitur portal, sebutkan.`;
+
 export const getAiResponse = async (userText) => {
-    // Hanya lewat proxy /api/chat (Vercel)
+    // Coba proxy Vercel (Groq API)
     try {
-        console.log("🤖 Energy AI: Proxy /api/chat...");
+        console.log("🤖 Energy AI: Menghubungi Groq...");
         const res = await fetch(CONFIG.CHAT_API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 messages: [
-                    { role: "system", content: "Anda adalah Energy AI, asisten virtual Portal Energi IR. Jawab ramah, profesional, Bahasa Indonesia. Maksimal 3 kalimat." },
+                    { role: "system", content: systemPrompt },
                     { role: "user", content: userText }
                 ]
             })
         });
+
         const data = await res.json();
         if (res.ok && data.choices?.[0]?.message?.content) {
             return data.choices[0].message.content.trim();
         }
-        console.warn("Proxy error:", data.error || res.status);
+        console.warn("Groq proxy error:", data.error || res.status);
     } catch (err) {
-        console.warn("Proxy network error:", err.message);
+        console.warn("Groq proxy error:", err.message);
     }
 
     return fallbackLocal(userText);
