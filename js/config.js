@@ -15,7 +15,7 @@ const CONFIG = {
     // 🔐 API key disimpan di Vercel Environment Variables (GEMINI_API_KEY)
     // Frontend memanggil proxy /api/chat — key tidak pernah ke browser.
     GEMINI: {
-        apiKey: "", // Kosong — dipakai sebagai fallback; utama via Vercel env
+        apiKey: "", // Kosong — via Vercel env aja
         model: "gemini-2.0-flash"
     },
 
