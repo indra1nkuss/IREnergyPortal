@@ -887,22 +887,21 @@
     </div>
 
     <script type="module">
+        // ─── SEMUA IMPORTS HARUS DI ATAS (Aturan ES Modules) ─────────────────
         import CONFIG from './js/config.js';
         import { initNews } from './js/news.js?v=1.1';
-
-        // Paksa halaman selalu di atas saat di-refresh atau baru masuk
-        if ('scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-        }
-        window.scrollTo(0, 0);
-
-        // ─── All Firebase imports via importmap (SATU instance!) ───────────────
         import { initializeApp, getApps } from "firebase/app";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
         import { getDatabase, ref, push, onValue, serverTimestamp } from "firebase/database";
         import { listenCollection } from './js/firebase-store.js';
         import { initSearch, displayWinners, refreshWinners } from './js/winners.js';
         import { renderTeam, refreshTeam } from './js/team.js';
+
+        // Paksa halaman selalu di atas saat di-refresh atau baru masuk
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
 
         // ─── Inisialisasi Berita ──────────────────────────────────────────────
         initNews();
