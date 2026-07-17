@@ -15,18 +15,30 @@ const db = getFirestore(app);
 
 /**
  * Realtime listener — callback dipanggil setiap ada perubahan.
+ * Fallback: jika orderBy gagal (index belum dibuat / field tidak ada),
+ * coba lagi tanpa ordering agar data tetap tampil.
  * Returns unsubscribe function untuk cleanup.
  */
 export function listenCollection(collectionName, callback, orderField = 'order') {
     const q = query(collection(db, collectionName), orderBy(orderField));
 
-    return onSnapshot(q, (snap) => {
+    const unsub = onSnapshot(q, (snap) => {
         const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         callback(items);
-    }, (error) => {
-        console.warn(`🔥 Firestore ${collectionName}:`, error.message);
-        callback(null);
+    }, async (error) => {
+        console.warn(`🔥 Firestore ${collectionName} (orderBy gagal, fallback tanpa order):`, error.message);
+        // Fallback: ambil tanpa orderBy
+        try {
+            const snap = await getDocs(collection(db, collectionName));
+            const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            callback(items.length > 0 ? items : []);
+        } catch (e2) {
+            console.error(`🔥 Firestore ${collectionName} fallback juga gagal:`, e2.message);
+            callback([]);
+        }
     });
+
+    return unsub;
 }
 
 /**

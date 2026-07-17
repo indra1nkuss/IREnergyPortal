@@ -20,7 +20,7 @@
         .font-serif { font-family: 'Outfit', sans-serif !important; }
     </style>
 
-    <script type="module" src="./js/main.js"></script>
+    <!-- importmap HARUS sebelum semua module script yang menggunakannya -->
     <script type="importmap">
         {
             "imports": {
@@ -33,6 +33,7 @@
             }
         }
     </script>
+    <script type="module" src="./js/main.js"></script>
     <script type="module" src="bg-animation.js"></script>
 
     <script>
