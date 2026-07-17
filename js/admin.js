@@ -682,3 +682,47 @@ window.seedENPIData = async () => {
     await batch.commit();
     toast('Data ENPI berhasil ditambahkan! (3 indikator x 6 tahun)');
 };
+
+// ─── Seed ENPI Data ─────────────────────────────────────────────────────────
+window.seedENPIData = async () => {
+    if (!confirm('Tambahkan data ENPI default untuk 3 indikator x 6 tahun?')) return;
+
+    const batch = writeBatch(db);
+    let order = 1;
+
+    // 1. KWHe/Pairs
+    const kwhe = [
+        { year: 2020, actual: 3.20, target: 3.20, nextTarget: 3.20 },
+        { year: 2021, actual: 2.69, target: 3.14, nextTarget: 3.14 },
+        { year: 2022, actual: 2.26, target: 3.08, nextTarget: 2.62 },
+        { year: 2023, actual: 1.86, target: 3.02, nextTarget: 2.19 },
+        { year: 2024, actual: 1.70, target: 2.95, nextTarget: 1.79 },
+        { year: 2025, actual: 1.67, target: 2.89, nextTarget: 1.69 }
+    ];
+    kwhe.forEach(d => { batch.set(doc(collection(db, 'enpiData')), { indicator: 'kwhe', ...d, order: order++ }); });
+
+    // 2. KgCO2/Pairs
+    const co2 = [
+        { year: 2020, actual: 1.81, target: 1.812, nextTarget: 1.81 },
+        { year: 2021, actual: 1.55, target: 1.78, nextTarget: 1.78 },
+        { year: 2022, actual: 0.77, target: 1.73, nextTarget: 1.37 },
+        { year: 2023, actual: 0.06, target: 1.68, nextTarget: 0.59 },
+        { year: 2024, actual: 0.05, target: 1.65, nextTarget: 0.05 },
+        { year: 2025, actual: 0.04, target: 1.63, nextTarget: 0.05 }
+    ];
+    co2.forEach(d => { batch.set(doc(collection(db, 'enpiData')), { indicator: 'co2', ...d, order: order++ }); });
+
+    // 3. USD/Pairs
+    const usd = [
+        { year: 2020, actual: 0.20, target: 0.20, nextTarget: 0.20 },
+        { year: 2021, actual: 0.17, target: 0.19, nextTarget: 0.19 },
+        { year: 2022, actual: 0.15, target: 0.19, nextTarget: 0.19 },
+        { year: 2023, actual: 0.14, target: 0.19, nextTarget: 0.17 },
+        { year: 2024, actual: 0.12, target: 0.18, nextTarget: 0.14 },
+        { year: 2025, actual: 0.11, target: 0.18, nextTarget: 0.13 }
+    ];
+    usd.forEach(d => { batch.set(doc(collection(db, 'enpiData')), { indicator: 'usd', ...d, order: order++ }); });
+
+    await batch.commit();
+    toast('Data ENPI berhasil ditambahkan! (3 indikator x 6 tahun)');
+};
