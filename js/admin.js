@@ -307,8 +307,9 @@ window.saveData = async (collType) => {
             if (d.data().nik === data.nik) {
                 toast(`NIK ${data.nik} sudah ada!`, 'error');
                 return;
-        }
-    }
+            }   // tutup: if (d.data().nik === data.nik)
+        }       // tutup: for (const d of existing.docs)
+    }           // tutup: if (collType === 'winners' ...) — INI YANG HILANG SEBELUMNYA
 
     try {
         if (currentEditId) {
@@ -682,3 +683,6 @@ window.seedENPIData = async () => {
     await batch.commit();
     toast('Data ENPI berhasil ditambahkan! (3 indikator x 6 tahun)');
 };
+
+// ─── Finalize ──────────────────────────────────────────────────────────────
+console.log('✅ Admin Portal Energi siap!');
