@@ -1314,6 +1314,7 @@
 
         // ─── ENPI COMBO CHARTS ────────────────────────────────────────────────
         let enpiChartsReady = false;
+        let enpiChartInstances = {};
 
         function initEnpiCharts() {
             if (enpiChartsReady) return;
@@ -1321,20 +1322,27 @@
 
             var YEARS = ['2020','2021','2022','2023','2024','2025'];
 
-            // Data persis dari tabel ENPI
-            var DATA = {
-                kwh: {
-                    actual:   [3.20, 2.69, 2.26, 1.86, 1.70, 1.67],
-                    target:   [3.20, 3.14, 3.08, 3.02, 2.95, 2.89],
-                    nextTarget:[3.20, 3.14, 2.62, 2.19, 1.79, 1.69],
-                    unit: 'KWh', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc']
-                },
-                co2: {
-                    actual:   [1.81, 1.55, 0.77, 0.06, 0.05, 0.04],
-                    target:   [1.812,1.78, 1.73, 1.68, 1.65, 1.63],
-                    nextTarget:[1.81, 1.78, 1.37, 0.59, 0.05, 0.05],
-                    unit: 'KgCO2', color: '#00FFFF', grad: ['#00FFFF','#00FFFFcc']
-                },
+            // Load data dari Firestore
+            import('./js/firebase-store.js').then(({ listenCollection }) => {
+                listenCollection('enpiData', (items) => {
+                    if (!items || items.length === 0) return;
+
+                    // Organize data by indicator
+                    var kwh = { actual: [], target: [], nextTarget: [] };
+                    var co2 = { actual: [], target: [], nextTarget: [] };
+                    var usd = { actual: [], target: [], nextTarget: [] };
+
+                    items.forEach(d => {
+                        if (d.indicator === 'kwhe') { kwh.actual.push(d.actual); kwh.target.push(d.target); kwh.nextTarget.push(d.nextTarget); }
+                        if (d.indicator === 'co2')  { co2.actual.push(d.actual); co2.target.push(d.target); co2.nextTarget.push(d.nextTarget); }
+                        if (d.indicator === 'usd')  { usd.actual.push(d.actual); usd.target.push(d.target); usd.nextTarget.push(d.nextTarget); }
+                    });
+
+                    var DATA = {
+                        kwh: { ...kwh, unit: 'KWh', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc'] },
+                        co2: { ...co2, unit: 'KgCO2', color: '#00FFFF', grad: ['#00FFFF','#00FFFFcc'] },
+                        usd: { ...usd, unit: 'USD', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc'] }
+                    };
                 usd: {
                     actual:   [0.20, 0.17, 0.15, 0.14, 0.12, 0.11],
                     target:   [0.20, 0.19, 0.19, 0.19, 0.18, 0.18],

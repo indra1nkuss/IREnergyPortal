@@ -437,6 +437,12 @@ function initRealtimeListeners() {
         renderTable('enpi', snap.docs.map(d => ({ id: d.id, ...d.data() })));
         updateStats();
     });
+    // ENPI Data (grafik)
+    unsubscribers.enpiData = onSnapshot(query(collection(db, 'enpiData'), orderBy('order')), (snap) => {
+        enpiDataAll = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderENPIDataTable();
+        updateStats();
+    });
     unsubscribers.project = onSnapshot(query(collection(db, 'projectItems'), orderBy('order')), (snap) => {
         renderTable('project', snap.docs.map(d => ({ id: d.id, ...d.data() })));
         updateStats();
@@ -578,12 +584,12 @@ async function updateStats() {
         const counts = await Promise.all(
             ['winners','seuMachines','enpiItems','projectItems','gallery','team'].map(c => getDocs(collection(db, c)).then(s => s.size))
         );
-        $('stat-winners').textContent = counts[0];
-        $('stat-seu').textContent = counts[1];
-        $('stat-enpi').textContent = counts[2];
-        $('stat-project').textContent = counts[3];
-        $('stat-gallery').textContent = counts[4];
-        $('stat-team').textContent = counts[5];
+        if ($('stat-winners')) $('stat-winners').textContent = counts[0];
+        if ($('stat-seu')) $('stat-seu').textContent = counts[1];
+        if ($('stat-enpi')) $('stat-enpi').textContent = counts[2];
+        if ($('stat-project')) $('stat-project').textContent = counts[3];
+        if ($('stat-gallery')) $('stat-gallery').textContent = counts[4];
+        if ($('stat-team')) $('stat-team').textContent = counts[5];
     } catch (e) { console.warn('Stats error:', e); }
 }
 
