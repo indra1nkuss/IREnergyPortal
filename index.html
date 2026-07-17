@@ -485,23 +485,77 @@
 
         <!-- ===== ENPI SECTION ===== -->
         <section id="enpi" class="section-content hidden">
-            <div class="max-w-4xl mx-auto reveal">
-                <div class="bg-darkcard/70 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-3xl shadow-[0_0_40px_rgba(212,175,55,0.05)] relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-64 h-64 bg-energi-gold/5 rounded-full blur-[80px]"></div>
-                    <div class="text-center mb-8">
-                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-white mb-4">
-                            📋 <span class="text-energi-gold">ENPI</span>
-                        </h2>
-                        <div class="flex items-center justify-center gap-3 opacity-60 mb-6">
-                            <div class="h-[1px] w-12 bg-energi-gold"></div>
-                            <span class="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-400">Energy & Performance Indicator</span>
-                            <div class="h-[1px] w-12 bg-energi-gold"></div>
+            <div class="max-w-6xl mx-auto space-y-8">
+                <!-- HEADER -->
+                <div class="reveal bg-darkcard/70 backdrop-blur-xl border border-white/10 p-8 md:p-10 rounded-3xl shadow-[0_0_40px_rgba(212,175,55,0.05)] relative overflow-hidden">
+                    <div class="absolute -top-32 -right-32 w-72 h-72 bg-energi-gold/10 rounded-full blur-[100px] pointer-events-none"></div>
+                    <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-energi-cyan/5 rounded-full blur-[80px] pointer-events-none"></div>
+                    <div class="relative z-10 text-center">
+                        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-energi-cyan/10 border border-energi-cyan/30 text-energi-cyan text-xs font-bold uppercase tracking-[0.2em] mb-5 shadow-[0_0_20px_rgba(0,255,255,0.1)]">
+                            <span>📊</span> ENPI — 2025
+                        </div>
+                        <h2 class="text-3xl md:text-5xl font-serif font-bold text-white mb-3">📋 <span class="text-energi-gold">Energy & Performance</span> <span class="text-energi-cyan">Indicator</span></h2>
+                        <div class="flex items-center justify-center gap-3 opacity-70 mb-4">
+                            <div class="h-[1px] w-16 bg-gradient-to-r from-transparent to-energi-gold"></div>
+                            <span class="text-xs uppercase tracking-[0.3em] font-bold text-slate-400">Efisiensi Energi IR — 2020 s.d 2025</span>
+                            <div class="h-[1px] w-16 bg-gradient-to-l from-transparent to-energi-cyan"></div>
+                        </div>
+                        <p class="text-slate-400 text-sm max-w-xl mx-auto font-light">Monitoring indikator kinerja energi: <strong class="text-white">KWHe/Pairs</strong>, <strong class="text-energi-cyan">KgCO2/Pairs</strong>, dan <strong class="text-energi-gold">USD/Pairs</strong>.</p>
+                    </div>
+                </div>
+                <!-- 3 STAT CARDS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 reveal">
+                    <div class="bg-darkcard/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl text-center hover:border-energi-gold/40 transition-all group">
+                        <p class="text-energi-gold text-[9px] uppercase tracking-[0.25em] font-black mb-3">⚡ KWHe/Pairs 2025</p>
+                        <p class="text-2xl md:text-3xl font-black text-white group-hover:text-energi-gold transition-colors">1.67</p>
+                        <p class="text-green-400 text-[10px] font-semibold mt-1">vs Target 2.89 — turun 47%</p>
+                    </div>
+                    <div class="bg-darkcard/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl text-center hover:border-energi-cyan/40 transition-all group">
+                        <p class="text-energi-cyan text-[9px] uppercase tracking-[0.25em] font-black mb-3">🌿 KgCO2/Pairs 2025</p>
+                        <p class="text-2xl md:text-3xl font-black text-white group-hover:text-energi-cyan transition-colors">0.04</p>
+                        <p class="text-green-400 text-[10px] font-semibold mt-1">vs Target 1.63 — turun 97%</p>
+                    </div>
+                    <div class="bg-darkcard/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl text-center hover:border-energi-gold/40 transition-all group">
+                        <p class="text-energi-gold text-[9px] uppercase tracking-[0.25em] font-black mb-3">💰 USD/Pairs 2025</p>
+                        <p class="text-2xl md:text-3xl font-black text-white group-hover:text-energi-gold transition-colors">0.11</p>
+                        <p class="text-green-400 text-[10px] font-semibold mt-1">vs Target 0.18 — turun 39%</p>
+                    </div>
+                </div>
+                <!-- 3 CHARTS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 reveal">
+                    <div class="bg-darkcard/70 backdrop-blur-xl border border-white/10 p-4 md:p-5 rounded-3xl shadow-[0_0_30px_rgba(212,175,55,0.03)] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-energi-gold/5 rounded-full blur-[60px]"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-1">⚡ KWHe / Pairs</h3>
+                            <p class="text-[9px] text-slate-500 mb-3">Indikator Intensitas Energi</p>
+                            <canvas id="enpiChart1"></canvas>
                         </div>
                     </div>
-                    <div class="space-y-6 text-slate-300 font-light leading-relaxed text-sm md:text-base">
-                        <p><strong class="text-white font-semibold">ENPI (Energy & Performance Indicator)</strong> adalah framework pemantauan dan evaluasi yang digunakan untuk mengukur efektivitas program-program energi dan kinerja operasional secara real-time.</p>
-                        <div class="mt-8 grid gap-4" id="enpi-content">
-                            <!-- isi dari Firestore -->
+                    <div class="bg-darkcard/70 backdrop-blur-xl border border-white/10 p-4 md:p-5 rounded-3xl shadow-[0_0_30px_rgba(0,255,255,0.03)] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-energi-cyan/5 rounded-full blur-[60px]"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-1">🌿 KgCO2 / Pairs</h3>
+                            <p class="text-[9px] text-slate-500 mb-3">Indikator Emisi Karbon</p>
+                            <canvas id="enpiChart2"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-darkcard/70 backdrop-blur-xl border border-white/10 p-4 md:p-5 rounded-3xl shadow-[0_0_30px_rgba(212,175,55,0.03)] relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-energi-gold/5 rounded-full blur-[60px]"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-white font-bold text-xs uppercase tracking-wider mb-1">💰 USD / Pairs</h3>
+                            <p class="text-[9px] text-slate-500 mb-3">Indikator Biaya Energi</p>
+                            <canvas id="enpiChart3"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- INSIGHT -->
+                <div class="reveal bg-gradient-to-r from-energi-cyan/5 via-energi-gold/5 to-energi-cyan/5 border border-white/10 p-6 md:p-8 rounded-3xl backdrop-blur-md">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center text-lg shrink-0 mt-1">📈</div>
+                        <div>
+                            <h4 class="text-white font-bold text-sm mb-2">Insight ENPI</h4>
+                            <p class="text-slate-400 text-xs md:text-sm leading-relaxed">Semua indikator aktual 2025 <strong class="text-energi-gold">di bawah target</strong>. KwHe/Pairs turun 47%, KgCO2/Pairs turun 97%, USD/Pairs turun 39%. Target Next (garis hijau) menetapkan ambisi lebih agresif untuk 2026.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1253,7 +1307,172 @@
                 renderSeuChart(window.__cachedSeu);
                 seuInitialized = true;
             }
+            if (e.detail === 'enpi') {
+                setTimeout(initEnpiCharts, 300);
+            }
         });
+
+        // ─── ENPI COMBO CHARTS ────────────────────────────────────────────────
+        let enpiChartsReady = false;
+
+        function initEnpiCharts() {
+            if (enpiChartsReady) return;
+            enpiChartsReady = true;
+
+            var YEARS = ['2020','2021','2022','2023','2024','2025'];
+
+            // Data persis dari tabel ENPI
+            var DATA = {
+                kwh: {
+                    actual:   [3.20, 2.69, 2.26, 1.86, 1.70, 1.67],
+                    target:   [3.20, 3.14, 3.08, 3.02, 2.95, 2.89],
+                    nextTarget:[3.20, 3.14, 2.62, 2.19, 1.79, 1.69],
+                    unit: 'KWh', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc']
+                },
+                co2: {
+                    actual:   [1.81, 1.55, 0.77, 0.06, 0.05, 0.04],
+                    target:   [1.812,1.78, 1.73, 1.68, 1.65, 1.63],
+                    nextTarget:[1.81, 1.78, 1.37, 0.59, 0.05, 0.05],
+                    unit: 'KgCO2', color: '#00FFFF', grad: ['#00FFFF','#00FFFFcc']
+                },
+                usd: {
+                    actual:   [0.20, 0.17, 0.15, 0.14, 0.12, 0.11],
+                    target:   [0.20, 0.19, 0.19, 0.19, 0.18, 0.18],
+                    nextTarget:[0.20, 0.19, 0.19, 0.17, 0.14, 0.13],
+                    unit: 'USD', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc']
+                }
+            };
+
+            var charts = [
+                { id: 'enpiChart1', data: DATA.kwh,  label: 'KWHe / Pairs' },
+                { id: 'enpiChart2', data: DATA.co2,  label: 'KgCO2 / Pairs' },
+                { id: 'enpiChart3', data: DATA.usd,  label: 'USD / Pairs' }
+            ];
+
+            charts.forEach(function(c) {
+                var canvas = document.getElementById(c.id);
+                if (!canvas) return;
+                var ctx = canvas.getContext('2d');
+
+                // Gradient untuk bar
+                var bgGrad = ctx.createLinearGradient(0, 0, 0, 300);
+                bgGrad.addColorStop(0, c.data.grad[0]);
+                bgGrad.addColorStop(1, c.data.grad[1]);
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: YEARS,
+                        datasets: [
+                            {
+                                label: 'Aktual',
+                                data: c.data.actual,
+                                backgroundColor: bgGrad,
+                                borderColor: c.data.color,
+                                borderWidth: 1.5,
+                                borderRadius: 4,
+                                borderSkipped: false,
+                                order: 3
+                            },
+                            {
+                                label: 'Target',
+                                data: c.data.target,
+                                type: 'line',
+                                borderColor: '#FF6B6B',
+                                backgroundColor: 'rgba(255,107,107,0.1)',
+                                borderWidth: 2.5,
+                                pointBackgroundColor: '#FF6B6B',
+                                pointBorderColor: '#050508',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                fill: false,
+                                tension: 0.3,
+                                order: 1
+                            },
+                            {
+                                label: 'Target Next',
+                                data: c.data.nextTarget,
+                                type: 'line',
+                                borderColor: '#4ADE80',
+                                backgroundColor: 'rgba(74,222,128,0.1)',
+                                borderWidth: 2,
+                                borderDash: [6, 3],
+                                pointBackgroundColor: '#4ADE80',
+                                pointBorderColor: '#050508',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                fill: false,
+                                tension: 0.3,
+                                order: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    color: 'rgba(255,255,255,0.7)',
+                                    font: { size: 9, family: 'Outfit', weight: '600' },
+                                    boxWidth: 10,
+                                    padding: 8,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(5,5,8,0.95)',
+                                titleColor: '#fff',
+                                bodyColor: c.data.color,
+                                borderColor: c.data.color + '40',
+                                borderWidth: 1.5,
+                                padding: 10,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        var v = ctx.raw;
+                                        if (typeof v === 'number') {
+                                            v = v < 10 ? v.toFixed(2) : v.toFixed(1);
+                                        }
+                                        return ' ' + ctx.dataset.label + ': ' + v + ' ' + c.data.unit;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+                                border: { display: false },
+                                ticks: {
+                                    color: 'rgba(255,255,255,0.4)',
+                                    font: { size: 9, family: 'Outfit' },
+                                    padding: 5
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: {
+                                    color: 'rgba(255,255,255,0.5)',
+                                    font: { size: 10, family: 'Outfit', weight: '600' }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1500,
+                            easing: 'easeOutQuart'
+                        }
+                    }
+                });
+            });
+        }
 
     </script>
 

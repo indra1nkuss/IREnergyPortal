@@ -146,11 +146,19 @@ window.openModal = (collection, editId = null) => {
                 </div>
             </div>`,
         enpi: `
-            <h3 class="text-lg font-bold text-white mb-6">${title} Fitur ENPI</h3>
+            <h3 class="text-lg font-bold text-white mb-6">${title} Data ENPI</h3>
             <div class="space-y-4">
-                <div><label class="text-xs text-slate-400 block mb-1">Ikon (emoji)</label><input type="text" id="m-icon" class="w-full" placeholder="📈"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">Judul</label><input type="text" id="m-title" class="w-full"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">Deskripsi</label><textarea id="m-desc" class="w-full"></textarea></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Indikator</label>
+                    <select id="m-indicator" class="w-full">
+                        <option value="kwhe">KWHe/Pairs (Energi)</option>
+                        <option value="co2">KgCO2/Pairs (Emisi)</option>
+                        <option value="usd">USD/Pairs (Biaya)</option>
+                    </select>
+                </div>
+                <div><label class="text-xs text-slate-400 block mb-1">Tahun</label><input type="number" id="m-year" class="w-full" min="2020" max="2030" placeholder="2025"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Aktual</label><input type="number" id="m-actual" step="0.001" class="w-full" placeholder="3.20"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Target</label><input type="number" id="m-target" step="0.001" class="w-full" placeholder="3.20"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Next Target</label><input type="number" id="m-nextTarget" step="0.001" class="w-full" placeholder="3.20"></div>
                 <div class="flex gap-3 mt-6 justify-end">
                     <button class="btn-outline" onclick="closeModal()">Batal</button>
                     <button class="btn-primary" onclick="saveData('enpi')">${editId ? 'Update' : 'Simpan'}</button>
@@ -277,6 +285,7 @@ window.saveData = async (collType) => {
     const fields = collType === 'winners' ? ['nik', 'name', 'dept'] :
                    collType === 'seu' ? ['name', 'kwh', 'percentage'] :
                    collType === 'team' ? ['name', 'role', 'image', 'portfolioLink'] :
+                   collType === 'enpi' ? ['indicator', 'year', 'actual', 'target', 'nextTarget'] :
                    ['icon', 'title', 'description'];
     const formFieldMap = { description: 'desc' };
 
@@ -285,7 +294,7 @@ window.saveData = async (collType) => {
     fields.forEach(f => {
         const formId = formFieldMap[f] || f;
         let val = getVal(`m-${formId}`);
-        if (f === 'kwh' || f === 'percentage') val = parseFloat(val) || 0;
+        if (f === 'kwh' || f === 'percentage' || f === 'actual' || f === 'target' || f === 'nextTarget' || f === 'year') val = parseFloat(val) || 0;
         data[f] = val;
         if (val) hasValue = true;
     });
@@ -298,7 +307,6 @@ window.saveData = async (collType) => {
             if (d.data().nik === data.nik) {
                 toast(`NIK ${data.nik} sudah ada!`, 'error');
                 return;
-            }
         }
     }
 
@@ -580,3 +588,91 @@ async function updateStats() {
 }
 
 console.log('✅ Admin Portal Energi siap!');
+
+// ─── ENPI DATA CRUD ─────────────────────────────────────────────────────────
+
+let enpiDataAll = []; // Semua data ENPI
+let enpiFilter = 'all';
+
+// Render table ENPI data
+function renderENPIDataTable() {
+    const body = $('enpi-data-body');
+    if (!body) return;
+    const filtered = enpiFilter === 'all' ? enpiDataAll : enpiDataAll.filter(d => d.indicator === enpiFilter);
+    if (filtered.length === 0) { body.innerHTML = ''; show($('enpi-data-empty')); return; }
+    hide($('enpi-data-empty'));
+
+    const indicatorNames = { kwhe: '⚡ KWHe/Pairs', co2: '🌿 KgCO2/Pairs', usd: '💰 USD/Pairs' };
+    body.innerHTML = filtered.map((d, i) => `
+        <tr>
+            <td class="text-slate-500 font-mono text-xs">${i + 1}</td>
+            <td class="text-xs font-semibold">${indicatorNames[d.indicator] || d.indicator}</td>
+            <td class="text-white font-bold text-xs">${d.year}</td>
+            <td class="text-energi-cyan font-mono text-xs">${d.actual}</td>
+            <td class="text-red-400 font-mono text-xs">${d.target}</td>
+            <td class="text-green-400 font-mono text-xs">${d.nextTarget}</td>
+            <td class="text-right">
+                <button onclick="openModal('enpi','${d.id}')" class="btn-outline btn-sm mr-1">✏️</button>
+                <button onclick="deleteData('enpi','${d.id}')" class="btn-danger btn-sm">🗑️</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Filter indikator
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('enpi-filter')) {
+        document.querySelectorAll('.enpi-filter').forEach(b => {
+            b.classList.remove('active', 'bg-energi-cyan/20', 'border-energi-cyan/40', 'text-energi-cyan');
+            b.classList.add('bg-white/5', 'border-white/10', 'text-slate-400');
+        });
+        e.target.classList.add('active', 'bg-energi-cyan/20', 'border-energi-cyan/40', 'text-energi-cyan');
+        e.target.classList.remove('bg-white/5', 'border-white/10', 'text-slate-400');
+        enpiFilter = e.target.dataset.filter;
+        renderENPIDataTable();
+    }
+});
+
+// Seed data ENPI dari gambar user
+window.seedENPIData = async () => {
+    if (!confirm('Tambahkan data ENPI default untuk 3 indikator x 6 tahun?')) return;
+
+    const batch = writeBatch(db);
+    let order = 1;
+
+    // 1. KWHe/Pairs
+    const kwhe = [
+        { year: 2020, actual: 3.20, target: 3.20, nextTarget: 3.20 },
+        { year: 2021, actual: 2.69, target: 3.14, nextTarget: 3.14 },
+        { year: 2022, actual: 2.26, target: 3.08, nextTarget: 2.62 },
+        { year: 2023, actual: 1.86, target: 3.02, nextTarget: 2.19 },
+        { year: 2024, actual: 1.70, target: 2.95, nextTarget: 1.79 },
+        { year: 2025, actual: 1.67, target: 2.89, nextTarget: 1.69 }
+    ];
+    kwhe.forEach(d => { batch.set(doc(collection(db, 'enpiData')), { indicator: 'kwhe', ...d, order: order++ }); });
+
+    // 2. KgCO2/Pairs
+    const co2 = [
+        { year: 2020, actual: 1.81, target: 1.812, nextTarget: 1.81 },
+        { year: 2021, actual: 1.55, target: 1.78, nextTarget: 1.78 },
+        { year: 2022, actual: 0.77, target: 1.73, nextTarget: 1.37 },
+        { year: 2023, actual: 0.06, target: 1.68, nextTarget: 0.59 },
+        { year: 2024, actual: 0.05, target: 1.65, nextTarget: 0.05 },
+        { year: 2025, actual: 0.04, target: 1.63, nextTarget: 0.05 }
+    ];
+    co2.forEach(d => { batch.set(doc(collection(db, 'enpiData')), { indicator: 'co2', ...d, order: order++ }); });
+
+    // 3. USD/Pairs
+    const usd = [
+        { year: 2020, actual: 0.20, target: 0.20, nextTarget: 0.20 },
+        { year: 2021, actual: 0.17, target: 0.19, nextTarget: 0.19 },
+        { year: 2022, actual: 0.15, target: 0.19, nextTarget: 0.19 },
+        { year: 2023, actual: 0.14, target: 0.19, nextTarget: 0.17 },
+        { year: 2024, actual: 0.12, target: 0.18, nextTarget: 0.14 },
+        { year: 2025, actual: 0.11, target: 0.18, nextTarget: 0.13 }
+    ];
+    usd.forEach(d => { batch.set(doc(collection(db, 'enpiData')), { indicator: 'usd', ...d, order: order++ }); });
+
+    await batch.commit();
+    toast('Data ENPI berhasil ditambahkan! (3 indikator x 6 tahun)');
+};

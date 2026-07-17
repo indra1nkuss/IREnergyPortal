@@ -350,18 +350,27 @@
                 <div id="enpi-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">📋 ENPI — Fitur</h2>
-                            <p class="text-slate-500 text-xs mt-1">Kelola konten fitur ENPI</p>
+                            <h2 class="text-xl md:text-2xl font-bold text-white">📋 ENPI — Data</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola data grafik ENPI (Aktual, Target, Next Target)</p>
                         </div>
-                        <button onclick="openModal('enpi')" class="btn-primary text-xs">+ Tambah Fitur</button>
-                            <button onclick="seedENPI()" class="btn-outline text-xs">📥 Seed 3 Fitur</button>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('enpi')" class="btn-primary text-xs">+ Tambah Data</button>
+                            <button onclick="seedENPIData()" class="btn-outline text-xs">📥 Seed Data ENPI</button>
+                        </div>
+                    </div>
+                    <!-- Filter indikator -->
+                    <div class="flex gap-2 mb-4">
+                        <button class="enpi-filter active text-xs px-3 py-1.5 rounded-lg bg-energi-cyan/20 border border-energi-cyan/40 text-energi-cyan font-bold" data-filter="all">Semua</button>
+                        <button class="enpi-filter text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400" data-filter="kwhe">KWHe/Pairs</button>
+                        <button class="enpi-filter text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400" data-filter="co2">KgCO2/Pairs</button>
+                        <button class="enpi-filter text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400" data-filter="usd">USD/Pairs</button>
                     </div>
                     <div class="card-admin overflow-x-auto">
-                        <table class="table-admin" id="enpi-table">
-                            <thead><tr><th>#</th><th>Ikon</th><th>Judul</th><th>Deskripsi</th><th class="text-right">Aksi</th></tr></thead>
-                            <tbody id="enpi-body"></tbody>
+                        <table class="table-admin" id="enpi-data-table">
+                            <thead><tr><th>#</th><th>Indikator</th><th>Tahun</th><th>Aktual</th><th>Target</th><th>Next Target</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="enpi-data-body"></tbody>
                         </table>
-                        <div id="enpi-empty" class="empty-state hidden">Belum ada data ENPI.</div>
+                        <div id="enpi-data-empty" class="empty-state hidden">Belum ada data ENPI. Klik "Seed Data ENPI" untuk mengisi data default.</div>
                     </div>
                 </div>
 
