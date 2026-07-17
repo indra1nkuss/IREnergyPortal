@@ -1343,13 +1343,6 @@
                         co2: { ...co2, unit: 'KgCO2', color: '#00FFFF', grad: ['#00FFFF','#00FFFFcc'] },
                         usd: { ...usd, unit: 'USD', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc'] }
                     };
-                usd: {
-                    actual:   [0.20, 0.17, 0.15, 0.14, 0.12, 0.11],
-                    target:   [0.20, 0.19, 0.19, 0.19, 0.18, 0.18],
-                    nextTarget:[0.20, 0.19, 0.19, 0.17, 0.14, 0.13],
-                    unit: 'USD', color: '#D4AF37', grad: ['#D4AF37','#D4AF37cc']
-                }
-            };
 
             var charts = [
                 { id: 'enpiChart1', data: DATA.kwh,  label: 'KWHe / Pairs' },
@@ -1480,6 +1473,8 @@
                     }
                 });
             });
+                }); // end listenCollection
+            }); // end import().then
         }
 
     </script>
