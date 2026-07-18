@@ -10,26 +10,37 @@ class EnergyNetwork {
         this.container = document.getElementById('three-bg');
         if (!this.container) return;
 
+        // Performance: skip Three.js entirely on very low-end devices
+        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) {
+            this.container.style.display = 'none';
+            return;
+        }
+
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
         this.camera.position.z = 1000;
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // cap pixel ratio
         this.container.appendChild(this.renderer.domElement);
 
-        // Optimasi Mobile: Kurangi jumlah partikel agar tidak berat
+        // Performance: Kurangi partikel agresif di mobile
         const isMobile = window.innerWidth < 768;
-        this.particleCount = isMobile ? 60 : 120;
-        this.maxDistance = isMobile ? 180 : 250;
-        
+        this.particleCount = isMobile ? 30 : 100;
+        this.maxDistance = isMobile ? 150 : 250;
+        this.maxConnectionsPerParticle = isMobile ? 4 : 8; // limit garis per partikel
+
         this.particles = [];
         this.group = new THREE.Group();
         this.scene.add(this.group);
 
         this.mouse = new THREE.Vector2(0, 0);
         this.targetMouse = new THREE.Vector2(0, 0);
+
+        // Performance: pause saat tab tidak aktif
+        this.isRunning = true;
+        this.animationId = null;
 
         this.init();
         this.animate();
@@ -105,6 +116,20 @@ class EnergyNetwork {
     addEventListeners() {
         window.addEventListener('resize', () => this.onWindowResize());
         window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+
+        // Performance: pause saat tab tidak aktif, resume saat kembali
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.isRunning = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+            } else {
+                this.isRunning = true;
+                if (!this.animationId) this.animate();
+            }
+        });
     }
 
     onWindowResize() {
@@ -119,7 +144,8 @@ class EnergyNetwork {
     }
 
     animate() {
-        requestAnimationFrame(() => this.animate());
+        if (!this.isRunning) return;
+        this.animationId = requestAnimationFrame(() => this.animate());
 
         // Smooth mouse movement
         this.mouse.x += (this.targetMouse.x - this.mouse.x) * 0.05;
@@ -133,7 +159,7 @@ class EnergyNetwork {
 
         for (let i = 0; i < this.particleCount; i++) {
             const p = this.particles[i];
-            
+
             p.pos.add(p.velocity);
 
             // Bounce back
@@ -145,12 +171,19 @@ class EnergyNetwork {
             positions[i * 3 + 1] = p.pos.y;
             positions[i * 3 + 2] = p.pos.z;
 
-            // Connect lines
+            // Connect lines with connection limit
+            let connectionCount = 0;
             for (let j = i + 1; j < this.particleCount; j++) {
+                if (connectionCount >= this.maxConnectionsPerParticle) break;
                 const p2 = this.particles[j];
-                const dist = p.pos.distanceTo(p2.pos);
+                const dx = p.pos.x - p2.pos.x;
+                const dy = p.pos.y - p2.pos.y;
+                const dz = p.pos.z - p2.pos.z;
+                const distSq = dx * dx + dy * dy + dz * dz;
+                const maxDistSq = this.maxDistance * this.maxDistance;
 
-                if (dist < this.maxDistance) {
+                if (distSq < maxDistSq) {
+                    const dist = Math.sqrt(distSq);
                     const alpha = 1.0 - (dist / this.maxDistance);
 
                     this.linePositions[lineIdx * 3] = p.pos.x;
@@ -171,6 +204,7 @@ class EnergyNetwork {
                     this.lineColors[(lineIdx + 1) * 3 + 2] = 0x37 / 255 * alpha;
 
                     lineIdx += 2;
+                    connectionCount++;
                 }
             }
         }

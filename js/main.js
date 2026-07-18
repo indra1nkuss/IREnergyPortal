@@ -44,13 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. Loading Screen
+    // 4. Loading Screen — Optimized: minimal delay, tied to actual load
     const loadingScreen = document.getElementById('loading-screen');
     const loadingContent = document.getElementById('loading-content');
     const burnEffect = document.getElementById('burn-effect');
 
-    if (loadingScreen) {
+    function dismissLoading() {
+        if (!loadingScreen) { setTimeout(typeWriter, 300); return; }
         document.body.style.overflow = 'hidden';
+        // Minimal delay: just enough for user to see the animation
         setTimeout(() => {
             if (loadingContent) {
                 loadingContent.style.opacity = '0';
@@ -66,12 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     document.body.style.overflow = 'auto';
-                    setTimeout(typeWriter, 200);
-                }, 1000);
-            }, 600);
-        }, 2500);
+                    typeWriter();
+                }, 500);
+            }, 400);
+        }, 800); // reduced from 2500ms to 800ms
+    }
+
+    // Wait for window.onload (all assets ready) OR timeout fallback
+    if (document.readyState === 'complete') {
+        dismissLoading();
     } else {
-        setTimeout(typeWriter, 1500);
+        window.addEventListener('load', dismissLoading);
+        // Fallback: never block user longer than 4 seconds
+        setTimeout(dismissLoading, 4000);
     }
 
     // 5. Mobile Hint

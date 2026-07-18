@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Energi Winners Portal | Team Energi</title>
     
+    <!-- Performance: preconnect ke CDN kritis sebelum render -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://www.gstatic.com">
     <link rel="preconnect" href="https://drive.google.com">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <!-- Performance: Tailwind CSS static build (bukan CDN runtime 380KB) -->
+    <link rel="stylesheet" href="tailwind-output.css">
+    <!-- Performance: Chart.js dimuat deferred, bukan blocking -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -33,22 +39,9 @@
             }
         }
     </script>
+    <!-- Performance: main.js di-load setelah DOM + assets siap -->
     <script type="module" src="./js/main.js"></script>
-    <script type="module" src="bg-animation.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Poppins', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
-                    colors: {
-                        darkbg: '#050508', darkcard: '#0a0a0f',
-                        energi: { cyan: '#00ffff', blue: '#0066ff', purple: '#9900ff', gold: '#D4AF37', goldlight: '#F3E5AB' }
-                    }
-                }
-            }
-        }
-    </script>
+    <script type="module" src="bg-animation.js" defer></script>
 </head>
 <body class="bg-darkbg text-slate-200 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-energi-gold/40 selection:text-white transition-colors duration-500">
     
@@ -1204,11 +1197,30 @@
         }
 
         // ─── REALTIME LISTENERS (onSnapshot — auto update dari admin) ──────
+        // Performance: lazy-load listeners — hanya load saat tab terkait dibuka
         let unsubscribers = {};
         let seuInitialized = false;
 
-        function startRealtimeListeners() {
-            // SEU — pure Firestore
+        // === Essential listeners (load segera) ===
+        function startEssentialListeners() {
+            // Winners — needed di tab default
+            unsubscribers.winners = listenCollection('winners', (items) => {
+                window.__fireWinners = (items && items.length > 0) ? items : [];
+                refreshWinners();
+            });
+
+            // Team — needed saat tab Team dibuka
+            unsubscribers.team = listenCollection('team', (items) => {
+                window.__teamData = (items && items.length > 0) ? items : [];
+                if (document.getElementById('tentang')?.classList.contains('block')) {
+                    renderTeam();
+                }
+            });
+        }
+
+        // === Lazy listeners (load saat tab pertama kali dibuka) ===
+        function startSeuListener() {
+            if (unsubscribers.seu) return; // sudah aktif
             unsubscribers.seu = listenCollection('seuMachines', (machines) => {
                 const data = machines || [];
                 window.__cachedSeu = data;
@@ -1219,29 +1231,10 @@
                     seuInitialized = true;
                 }
             });
+        }
 
-            // ENPI — pure Firestore
-            unsubscribers.enpi = listenCollection('enpiItems', (items) => {
-                const container = document.getElementById('enpi-content');
-                const data = items || [];
-                if (container) {
-                    if (data.length === 0) {
-                        container.innerHTML = '<div class="text-center text-slate-500 py-8 text-sm italic">Belum ada data ENPI.</div>';
-                    } else {
-                        container.innerHTML = data.map(item => `
-                            <div class="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-start gap-4 hover:border-energi-gold/40 transition-all">
-                                <span class="text-2xl mt-1">${item.icon || '📋'}</span>
-                                <div>
-                                    <h4 class="text-white font-bold text-sm">${item.title}</h4>
-                                    <p class="text-xs text-slate-400 mt-1">${item.description}</p>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-                }
-            });
-
-            // Project — pure Firestore
+        function startProjectListener() {
+            if (unsubscribers.project) return;
             unsubscribers.project = listenCollection('projectItems', (items) => {
                 const container = document.getElementById('project-content');
                 const data = items || [];
@@ -1260,8 +1253,10 @@
                     }
                 }
             });
+        }
 
-            // Gallery
+        function startGalleryListener() {
+            if (unsubscribers.gallery) return;
             unsubscribers.gallery = listenCollection('gallery', (items) => {
                 const container = document.getElementById('gallery-container');
                 if (container && items && items.length > 0) {
@@ -1279,34 +1274,34 @@
                     `).join('');
                 }
             });
-
-            // Winners — realtime
-            unsubscribers.winners = listenCollection('winners', (items) => {
-                window.__fireWinners = (items && items.length > 0) ? items : [];
-                refreshWinners();
-            });
-
-            // Team — realtime (collection: 'team')
-            unsubscribers.team = listenCollection('team', (items) => {
-                window.__teamData = (items && items.length > 0) ? items : [];
-                if (document.getElementById('tentang')?.classList.contains('block')) {
-                    renderTeam();
-                }
-            });
         }
 
-        // Start listeners IMMEDIATELY
-        startRealtimeListeners();
+        // Start essential listeners SAJA — tab lain lazy load
+        startEssentialListeners();
         displayWinners(1);
 
-        // Re-render SEU chart saat tab dibuka
+        // Lazy-load listeners saat tab pertama kali dibuka
         window.addEventListener('sectionShown', (e) => {
-            if (e.detail === 'seu-ir' && window.__cachedSeu) {
-                renderSeuChart(window.__cachedSeu);
-                seuInitialized = true;
+            const tab = e.detail;
+
+            if (tab === 'seu-ir') {
+                startSeuListener();
+                if (window.__cachedSeu) {
+                    renderSeuChart(window.__cachedSeu);
+                    seuInitialized = true;
+                }
             }
-            if (e.detail === 'enpi') {
+
+            if (tab === 'enpi') {
                 setTimeout(initEnpiCharts, 300);
+            }
+
+            if (tab === 'project-efisiensi') {
+                startProjectListener();
+            }
+
+            if (tab === 'dokumentasi') {
+                startGalleryListener();
             }
         });
 
