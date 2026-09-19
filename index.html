@@ -1032,6 +1032,7 @@
         import CONFIG from './js/config.js';
         import { initNews } from './js/news.js?v=1.1';
         import { initializeApp, getApps } from "firebase/app";
+        import { getFirestore, collection, onSnapshot } from "firebase/firestore";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
         import { getDatabase, ref, push, onValue, serverTimestamp } from "firebase/database";
         import { listenCollection } from './js/firebase-store.js';
@@ -1891,100 +1892,108 @@
             grad.addColorStop(0, 'rgba(212,175,55,0.3)');
             grad.addColorStop(1, 'rgba(212,175,55,0.0)');
 
-            wcChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: weekLabels,
-                    datasets: [{
-                        label: 'KWh/Pairs',
-                        data: ratioData,
-                        borderColor: '#D4AF37',
-                        backgroundColor: grad,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#D4AF37',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 8,
-                        fill: true,
-                        tension: 0.4,
-                        spanGaps: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(5,5,8,0.95)',
-                            borderColor: '#D4AF37',
-                            borderWidth: 1,
-                            titleColor: '#D4AF37',
-                            bodyColor: '#fff',
-                            padding: 12,
-                            callbacks: {
-                                label: ctx => ' KWh/Pairs: ' + (ctx.raw != null ? ctx.raw.toFixed(4) : '\u2014')
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
-                            border: { display: false },
-                            ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10, family: 'Outfit' }, padding: 8 }
+            if (typeof Chart !== 'undefined') {
+                try {
+                    wcChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: weekLabels,
+                            datasets: [{
+                                label: 'KWh/Pairs',
+                                data: ratioData,
+                                borderColor: '#D4AF37',
+                                backgroundColor: grad,
+                                borderWidth: 2.5,
+                                pointBackgroundColor: '#D4AF37',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 5,
+                                pointHoverRadius: 8,
+                                fill: true,
+                                tension: 0.4,
+                                spanGaps: true
+                            }]
                         },
-                        x: {
-                            grid: { display: false },
-                            border: { display: false },
-                            ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11, family: 'Outfit', weight: '600' } }
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(5,5,8,0.95)',
+                                    borderColor: '#D4AF37',
+                                    borderWidth: 1,
+                                    titleColor: '#D4AF37',
+                                    bodyColor: '#fff',
+                                    padding: 12,
+                                    callbacks: {
+                                        label: ctx => ' KWh/Pairs: ' + (ctx.raw != null ? ctx.raw.toFixed(4) : '\u2014')
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
+                                    border: { display: false },
+                                    ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10, family: 'Outfit' }, padding: 8 }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    border: { display: false },
+                                    ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11, family: 'Outfit', weight: '600' } }
+                                }
+                            },
+                            animation: { duration: 1200, easing: 'easeOutQuart' }
                         }
-                    },
-                    animation: { duration: 1200, easing: 'easeOutQuart' }
+                    });
+                } catch(e) {
+                    console.warn("Chart rendering failed:", e);
                 }
-            });
+            } else {
+                console.warn("Chart.js is not loaded.");
+            }
         }
 
         // ── Listen to Firestore: weeklyConsumption collection ───────────────
         // Document ID format: {monthKey}   e.g. "2025-09"
         // Field: weeks = { "1": { "plant-ir-a": { kwh, prod, ratio }, ... }, ... }
         function wcStartListener() {
-            import('https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js').then(({ getFirestore, collection, onSnapshot }) => {
-                import('https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js').then(({ getApps }) => {
-                    const db = getFirestore(getApps()[0]);
-                    if (wcUnsubscribers.main) wcUnsubscribers.main();
-                    wcUnsubscribers.main = onSnapshot(collection(db, 'weeklyConsumption'), (snap) => {
-                        wcAllData = {};
-                        wcMonths  = [];
-                        snap.docs.forEach(doc => {
-                            const mk   = doc.id; // "2025-09"
-                            const data = doc.data();
-                            wcAllData[mk] = {};
-                            // weeks stored as map: { "1": { areaId: {kwh, prod, ratio} } }
-                            for (let w = 1; w <= 5; w++) {
-                                wcAllData[mk][w] = data['week' + w] || {};
-                            }
-                            wcMonths.push(mk);
-                        });
-                        // Sort months descending (newest first)
-                        wcMonths.sort((a, b) => b.localeCompare(a));
-
-                        // Auto-select most recent month if none selected
-                        if (!wcCurrentMonth && wcMonths.length > 0) {
-                            wcCurrentMonth = wcMonths[0];
+            try {
+                const db = getFirestore(app);
+                if (wcUnsubscribers.main) wcUnsubscribers.main();
+                wcUnsubscribers.main = onSnapshot(collection(db, 'weeklyConsumption'), (snap) => {
+                    wcAllData = {};
+                    wcMonths  = [];
+                    snap.docs.forEach(doc => {
+                        const mk   = doc.id; // "2025-09"
+                        const data = doc.data();
+                        wcAllData[mk] = {};
+                        // weeks stored as map: { "1": { areaId: {kwh, prod, ratio} } }
+                        for (let w = 1; w <= 5; w++) {
+                            wcAllData[mk][w] = data['week' + w] || {};
                         }
-
-                        wcRenderMonthSelector();
-                        wcRenderWeekButtons();
-                        wcRenderTable();
-                        wcRenderTrendChart();
-                        wcUpdateStats();
-                    }, err => {
-                        console.warn('Weekly Consumption Firestore error:', err.message);
+                        wcMonths.push(mk);
                     });
+                    // Sort months descending (newest first)
+                    wcMonths.sort((a, b) => b.localeCompare(a));
+
+                    // Auto-select most recent month if none selected
+                    if (!wcCurrentMonth && wcMonths.length > 0) {
+                        wcCurrentMonth = wcMonths[0];
+                    }
+
+                    wcRenderMonthSelector();
+                    wcRenderWeekButtons();
+                    wcRenderTable();
+                    wcRenderTrendChart();
+                    wcUpdateStats();
+                }, err => {
+                    console.warn('Weekly Consumption Firestore error:', err.message);
                 });
-            });
+            } catch(e) {
+                console.warn('Error starting Weekly Consumption listener:', e);
+            }
         }
 
         // ── Init when tab is opened ──────────────────────────────────────────
