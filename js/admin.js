@@ -6,7 +6,7 @@ import CONFIG from './config.js';
 
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, orderBy, getDocs, writeBatch } from "firebase/firestore";
+import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, onSnapshot, query, orderBy, getDocs, writeBatch, deleteField } from "firebase/firestore";
 
 // ─── Firebase Init ──────────────────────────────────────────────────────────
 const app = initializeApp(CONFIG.FIREBASE);
@@ -797,61 +797,61 @@ function wcRenderAdminWeekForm() {
         const d = weekData[area.id] || {};
         return `
         <tr class="${i % 2 === 0 ? 'bg-white/2' : ''} hover:bg-white/4 transition-colors">
-            <td class="py-1.5 px-3 text-xs text-slate-500 font-mono w-6">${String(i+1).padStart(2,'0')}</td>
-            <td class="py-1.5 px-3 text-xs text-slate-200">${area.name}</td>
-            <td class="py-1.5 px-2">
+            <td class="py-2 px-3 text-xs text-slate-500 font-mono w-8">${String(i+1).padStart(2,'0')}</td>
+            <td class="py-2 px-3 text-xs text-slate-200 min-w-[200px]">${area.name}</td>
+            <td class="py-2 px-3">
                 <input type="number" step="0.01" placeholder="0"
                     id="wca-kwh-${area.id}"
                     value="${d.kwh !== undefined ? d.kwh : ''}"
                     oninput="wcAutoCalcRatio('${area.id}')"
-                    class="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-energi-gold font-mono focus:outline-none focus:border-energi-gold/50">
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-gold font-mono focus:outline-none focus:border-energi-gold/50">
             </td>
-            <td class="py-1.5 px-2">
+            <td class="py-2 px-3">
                 <input type="number" step="1" placeholder="0"
                     id="wca-prod-${area.id}"
                     value="${d.prod !== undefined ? d.prod : ''}"
                     oninput="wcAutoCalcRatio('${area.id}')"
-                    class="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50">
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50">
             </td>
-            <td class="py-1.5 px-2">
+            <td class="py-2 px-3">
                 <input type="number" step="0.0001" placeholder="auto"
                     id="wca-ratio-${area.id}"
                     value="${d.ratio !== undefined ? d.ratio : ''}"
-                    class="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-white/30" readonly>
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-white/30" readonly>
             </td>
         </tr>`;
     }).join('');
 
     container.innerHTML = `
-        <div class="flex items-center justify-between mb-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-5 gap-4">
             <div>
-                <h3 class="text-white font-bold text-base">${monthLabel}</h3>
-                <p class="text-slate-500 text-xs mt-0.5">Edit data konsumsi minggu ke-${wcAdminCurrentWeek}</p>
+                <h3 class="text-white font-bold text-lg">${monthLabel}</h3>
+                <p class="text-slate-500 text-sm mt-0.5">Edit data konsumsi minggu ke-${wcAdminCurrentWeek}</p>
             </div>
-            <div class="flex gap-2">${weekTabs}</div>
+            <div class="flex flex-wrap gap-2">${weekTabs}</div>
         </div>
 
         <div class="overflow-x-auto rounded-2xl border border-white/10">
-            <table class="w-full">
+            <table class="w-full min-w-[700px]">
                 <thead>
                     <tr class="bg-white/5 border-b border-white/10">
-                        <th class="py-2 px-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 text-left w-6">#</th>
-                        <th class="py-2 px-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 text-left min-w-[160px]">Area / Departemen</th>
-                        <th class="py-2 px-2 text-[9px] uppercase tracking-[0.2em] text-energi-gold text-left w-28">KWh</th>
-                        <th class="py-2 px-2 text-[9px] uppercase tracking-[0.2em] text-energi-cyan text-left w-28">Produksi (Pairs)</th>
-                        <th class="py-2 px-2 text-[9px] uppercase tracking-[0.2em] text-slate-400 text-left w-28">KWh/Pairs (auto)</th>
+                        <th class="py-3 px-3 text-[10px] uppercase tracking-[0.2em] text-slate-500 text-left w-8">#</th>
+                        <th class="py-3 px-3 text-[10px] uppercase tracking-[0.2em] text-slate-500 text-left min-w-[200px]">Area / Departemen</th>
+                        <th class="py-3 px-3 text-[10px] uppercase tracking-[0.2em] text-energi-gold text-left min-w-[140px] w-1/4">KWh</th>
+                        <th class="py-3 px-3 text-[10px] uppercase tracking-[0.2em] text-energi-cyan text-left min-w-[140px] w-1/4">Produksi (Pairs)</th>
+                        <th class="py-3 px-3 text-[10px] uppercase tracking-[0.2em] text-slate-400 text-left min-w-[140px] w-1/4">KWh/Pairs (auto)</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
             </table>
         </div>
 
-        <div class="flex items-center gap-3 mt-5">
-            <button onclick="wcAdminSaveWeek()" class="btn-primary flex-1 flex items-center justify-center gap-2">
-                <span>💾</span> Simpan Week ${wcAdminCurrentWeek}
+        <div class="flex flex-col md:flex-row items-center gap-4 mt-6">
+            <button onclick="wcAdminSaveWeek()" class="btn-primary flex-1 w-full py-3 text-sm flex items-center justify-center gap-2">
+                <span>💾</span> Simpan & Update Week ${wcAdminCurrentWeek}
             </button>
-            <button onclick="wcAdminClearWeek()" class="btn-outline flex items-center gap-2">
-                <span>🗑️</span> Reset
+            <button onclick="wcAdminClearWeek()" class="btn-outline w-full md:w-auto py-3 px-6 text-sm flex items-center gap-2 border-red-500/30 text-red-400 hover:bg-red-500/10">
+                <span>🗑️</span> Hapus Data Week ${wcAdminCurrentWeek}
             </button>
         </div>
     `;
@@ -903,9 +903,11 @@ window.wcAdminSaveWeek = async () => {
     }
 };
 
-// ─── Reset week ──────────────────────────────────────────────────────────────
-window.wcAdminClearWeek = () => {
-    if (!confirm(`Reset semua data Week ${wcAdminCurrentWeek}?`)) return;
+// ─── Delete / Reset week ──────────────────────────────────────────────────────────
+window.wcAdminClearWeek = async () => {
+    if (!confirm(`Hapus seluruh data Week ${wcAdminCurrentWeek} pada bulan ${wcAdminCurrentMonth}?`)) return;
+    
+    // Clear inputs in DOM
     WC_AREAS_ADMIN.forEach(area => {
         const kwh   = $(`wca-kwh-${area.id}`);
         const prod  = $(`wca-prod-${area.id}`);
@@ -914,6 +916,21 @@ window.wcAdminClearWeek = () => {
         if (prod)  prod.value  = '';
         if (ratio) ratio.value = '';
     });
+
+    // Delete from Firestore
+    try {
+        const weekKey = 'week' + wcAdminCurrentWeek;
+        const docRef = doc(db, 'weeklyConsumption', wcAdminCurrentMonth);
+        await setDoc(docRef, { [weekKey]: deleteField(), updatedAt: Date.now() }, { merge: true });
+        toast(`✅ Data Week ${wcAdminCurrentWeek} berhasil dihapus!`);
+        
+        if (wcAdminData[wcAdminCurrentMonth]) {
+            delete wcAdminData[wcAdminCurrentMonth][weekKey];
+        }
+    } catch (e) {
+        toast('❌ Gagal menghapus: ' + e.message, 'error');
+        console.error('WC Delete error:', e);
+    }
 };
 
 // ─── Create new month ────────────────────────────────────────────────────────
