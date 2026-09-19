@@ -686,3 +686,287 @@ window.seedENPIData = async () => {
 
 // ─── Finalize ──────────────────────────────────────────────────────────────
 console.log('✅ Admin Portal Energi siap!');
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 📅 WEEKLY CONSUMPTION ADMIN MODULE
+// Firestore: weeklyConsumption/{monthKey}
+//   Fields: week1..week5 (map of areaId → {kwh, prod, ratio})
+// ══════════════════════════════════════════════════════════════════════════════
+
+const WC_AREAS_ADMIN = [
+    { id: 'plant-ir-a',          name: 'Plant IR A' },
+    { id: 'plant-ir-b',          name: 'Plant IR B' },
+    { id: 'plant-ir-c',          name: 'Plant IR C' },
+    { id: 'plant-ir-d',          name: 'Plant IR D' },
+    { id: 'plant-ir-e-rubber',   name: 'Plant IR E (Rubber)' },
+    { id: 'plant-ir-e-mixing',   name: 'Plant IR E (Mixing)' },
+    { id: 'plant-ir-e-press',    name: 'Plant IR E (Press)' },
+    { id: 'plant-ir-e-stockfit', name: 'Plant IR E (Stockfit)' },
+    { id: 'plant-ir-e-grinding', name: 'Plant IR E (Grinding)' },
+    { id: 'plant-ir-e-injection',name: 'Plant IR E (Injection Phylon)' },
+    { id: 'plant-ir-f-2nd',      name: 'Plant IR F (2nd Process)' },
+    { id: 'plant-ir-f-cutting',  name: 'Plant IR F (Cutting)' },
+    { id: 'idc',                 name: 'IDC' },
+    { id: 'mess-korea',          name: 'Mess Korea' },
+    { id: 'kantor-pj023',        name: 'Kantor Umum (PJ023)' },
+    { id: 'kantor-pj112',        name: 'Kantor Umum (PJ112)' },
+    { id: 'manmod',              name: 'Manmod' },
+    { id: 'office-dormitory',    name: 'Office Dormitory (Total)' },
+    { id: 'kompressor',          name: 'Kompressor Engineering' },
+    { id: 'wtp-wwtp',            name: 'WTP & WWTP' },
+    { id: 'kantin-b',            name: 'Kantin B' },
+    { id: 'others-pj023',        name: 'Others PJ023' },
+    { id: 'others-pj112',        name: 'Others PJ112' },
+    { id: 'utility',             name: 'Utility (Total)' },
+];
+
+let wcAdminCurrentMonth = '';
+let wcAdminCurrentWeek  = 1;
+let wcAdminData         = {}; // { "2025-09": { week1: {...}, ... } }
+let wcAdminUnsubscribe  = null;
+
+// ─── Listen to weeklyConsumption ────────────────────────────────────────────
+function wcAdminStartListener() {
+    if (wcAdminUnsubscribe) return;
+    wcAdminUnsubscribe = onSnapshot(collection(db, 'weeklyConsumption'), (snap) => {
+        wcAdminData = {};
+        snap.docs.forEach(d => { wcAdminData[d.id] = d.data(); });
+        wcRenderAdminMonthList();
+        if (wcAdminCurrentMonth) wcRenderAdminWeekForm();
+    }, err => console.warn('WC Admin error:', err.message));
+}
+
+// ─── Render Month List sidebar ───────────────────────────────────────────────
+function wcRenderAdminMonthList() {
+    const container = $('wc-admin-month-list');
+    if (!container) return;
+    const months = Object.keys(wcAdminData).sort((a, b) => b.localeCompare(a));
+    if (months.length === 0) {
+        container.innerHTML = '<p class="text-slate-600 text-xs text-center py-4">Belum ada data</p>';
+        return;
+    }
+    const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    container.innerHTML = months.map(mk => {
+        const [y, m] = mk.split('-');
+        const label = monthNames[parseInt(m)-1] + ' ' + y;
+        return `<button onclick="wcAdminSelectMonth('${mk}')"
+            class="w-full text-left px-4 py-2 rounded-xl text-sm transition-all ${
+                mk === wcAdminCurrentMonth
+                ? 'bg-energi-gold/20 text-energi-gold border border-energi-gold/30 font-bold'
+                : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }">${label}</button>`;
+    }).join('');
+}
+
+window.wcAdminSelectMonth = (mk) => {
+    wcAdminCurrentMonth = mk;
+    wcAdminCurrentWeek  = 1;
+    wcRenderAdminMonthList();
+    wcRenderAdminWeekForm();
+};
+
+// ─── Render week tab + form ──────────────────────────────────────────────────
+function wcRenderAdminWeekForm() {
+    const container = $('wc-admin-form-area');
+    if (!container) return;
+    if (!wcAdminCurrentMonth) {
+        container.innerHTML = '<p class="text-slate-500 text-sm text-center py-10">Pilih bulan di sebelah kiri</p>';
+        return;
+    }
+
+    const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const [y, m] = wcAdminCurrentMonth.split('-');
+    const monthLabel = monthNames[parseInt(m)-1] + ' ' + y;
+
+    // Week tabs
+    const weekTabs = [1,2,3,4,5].map(w => `
+        <button onclick="wcAdminSelectWeek(${w})"
+            class="px-5 py-2 text-xs font-bold rounded-xl transition-all ${
+                w === wcAdminCurrentWeek
+                ? 'bg-energi-gold text-darkbg shadow-[0_0_15px_rgba(212,175,55,0.3)]'
+                : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
+            }">Week ${w}</button>
+    `).join('');
+
+    // Current week data
+    const weekKey  = 'week' + wcAdminCurrentWeek;
+    const weekData = (wcAdminData[wcAdminCurrentMonth] || {})[weekKey] || {};
+
+    // Area rows
+    const rows = WC_AREAS_ADMIN.map((area, i) => {
+        const d = weekData[area.id] || {};
+        return `
+        <tr class="${i % 2 === 0 ? 'bg-white/2' : ''} hover:bg-white/4 transition-colors">
+            <td class="py-1.5 px-3 text-xs text-slate-500 font-mono w-6">${String(i+1).padStart(2,'0')}</td>
+            <td class="py-1.5 px-3 text-xs text-slate-200">${area.name}</td>
+            <td class="py-1.5 px-2">
+                <input type="number" step="0.01" placeholder="0"
+                    id="wca-kwh-${area.id}"
+                    value="${d.kwh !== undefined ? d.kwh : ''}"
+                    oninput="wcAutoCalcRatio('${area.id}')"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-energi-gold font-mono focus:outline-none focus:border-energi-gold/50">
+            </td>
+            <td class="py-1.5 px-2">
+                <input type="number" step="1" placeholder="0"
+                    id="wca-prod-${area.id}"
+                    value="${d.prod !== undefined ? d.prod : ''}"
+                    oninput="wcAutoCalcRatio('${area.id}')"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50">
+            </td>
+            <td class="py-1.5 px-2">
+                <input type="number" step="0.0001" placeholder="auto"
+                    id="wca-ratio-${area.id}"
+                    value="${d.ratio !== undefined ? d.ratio : ''}"
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-white/30" readonly>
+            </td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="text-white font-bold text-base">${monthLabel}</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Edit data konsumsi minggu ke-${wcAdminCurrentWeek}</p>
+            </div>
+            <div class="flex gap-2">${weekTabs}</div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-white/10">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-white/5 border-b border-white/10">
+                        <th class="py-2 px-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 text-left w-6">#</th>
+                        <th class="py-2 px-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 text-left min-w-[160px]">Area / Departemen</th>
+                        <th class="py-2 px-2 text-[9px] uppercase tracking-[0.2em] text-energi-gold text-left w-28">KWh</th>
+                        <th class="py-2 px-2 text-[9px] uppercase tracking-[0.2em] text-energi-cyan text-left w-28">Produksi (Pairs)</th>
+                        <th class="py-2 px-2 text-[9px] uppercase tracking-[0.2em] text-slate-400 text-left w-28">KWh/Pairs (auto)</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>
+
+        <div class="flex items-center gap-3 mt-5">
+            <button onclick="wcAdminSaveWeek()" class="btn-primary flex-1 flex items-center justify-center gap-2">
+                <span>💾</span> Simpan Week ${wcAdminCurrentWeek}
+            </button>
+            <button onclick="wcAdminClearWeek()" class="btn-outline flex items-center gap-2">
+                <span>🗑️</span> Reset
+            </button>
+        </div>
+    `;
+}
+
+window.wcAdminSelectWeek = (w) => {
+    wcAdminCurrentWeek = w;
+    wcRenderAdminWeekForm();
+};
+
+// ─── Auto-calc ratio ────────────────────────────────────────────────────────
+window.wcAutoCalcRatio = (areaId) => {
+    const kwh  = parseFloat($(`wca-kwh-${areaId}`)?.value)  || 0;
+    const prod = parseFloat($(`wca-prod-${areaId}`)?.value) || 0;
+    const ratioEl = $(`wca-ratio-${areaId}`);
+    if (ratioEl) ratioEl.value = prod > 0 ? (kwh / prod).toFixed(4) : '';
+};
+
+// ─── Save week data ──────────────────────────────────────────────────────────
+window.wcAdminSaveWeek = async () => {
+    if (!wcAdminCurrentMonth) { toast('Pilih bulan terlebih dahulu!', 'error'); return; }
+
+    const weekKey = 'week' + wcAdminCurrentWeek;
+    const areaData = {};
+
+    WC_AREAS_ADMIN.forEach(area => {
+        const kwh   = parseFloat($(`wca-kwh-${area.id}`)?.value)   || null;
+        const prod  = parseFloat($(`wca-prod-${area.id}`)?.value)  || null;
+        const ratio = parseFloat($(`wca-ratio-${area.id}`)?.value) || null;
+        if (kwh !== null || prod !== null) {
+            areaData[area.id] = {
+                kwh:   kwh   ?? 0,
+                prod:  prod  ?? 0,
+                ratio: ratio ?? (prod > 0 ? kwh / prod : 0)
+            };
+        }
+    });
+
+    try {
+        const docRef = doc(db, 'weeklyConsumption', wcAdminCurrentMonth);
+        await setDoc(docRef, { [weekKey]: areaData, updatedAt: Date.now() }, { merge: true });
+        toast(`✅ Data Week ${wcAdminCurrentWeek} — ${wcAdminCurrentMonth} berhasil disimpan!`);
+        // Refresh local cache
+        if (!wcAdminData[wcAdminCurrentMonth]) wcAdminData[wcAdminCurrentMonth] = {};
+        wcAdminData[wcAdminCurrentMonth][weekKey] = areaData;
+    } catch (e) {
+        toast('❌ Gagal menyimpan: ' + e.message, 'error');
+        console.error('WC Save error:', e);
+    }
+};
+
+// ─── Reset week ──────────────────────────────────────────────────────────────
+window.wcAdminClearWeek = () => {
+    if (!confirm(`Reset semua data Week ${wcAdminCurrentWeek}?`)) return;
+    WC_AREAS_ADMIN.forEach(area => {
+        const kwh   = $(`wca-kwh-${area.id}`);
+        const prod  = $(`wca-prod-${area.id}`);
+        const ratio = $(`wca-ratio-${area.id}`);
+        if (kwh)   kwh.value   = '';
+        if (prod)  prod.value  = '';
+        if (ratio) ratio.value = '';
+    });
+};
+
+// ─── Create new month ────────────────────────────────────────────────────────
+window.wcAdminCreateMonth = async () => {
+    const input = $('wc-admin-new-month');
+    if (!input) return;
+    const val = input.value.trim(); // "2025-09"
+    if (!/^\d{4}-\d{2}$/.test(val)) { toast('Format bulan: YYYY-MM (cth: 2025-09)', 'error'); return; }
+    if (wcAdminData[val]) { toast('Bulan ini sudah ada!', 'error'); return; }
+    try {
+        await setDoc(doc(db, 'weeklyConsumption', val), { createdAt: Date.now() });
+        toast(`✅ Bulan ${val} berhasil dibuat!`);
+        input.value = '';
+        wcAdminCurrentMonth = val;
+        wcAdminCurrentWeek  = 1;
+    } catch (e) {
+        toast('❌ ' + e.message, 'error');
+    }
+};
+
+// ─── Delete month ────────────────────────────────────────────────────────────
+window.wcAdminDeleteMonth = async (mk) => {
+    if (!mk) mk = wcAdminCurrentMonth;
+    if (!mk) { toast('Pilih bulan terlebih dahulu!', 'error'); return; }
+    if (!confirm(`Hapus semua data bulan ${mk}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    try {
+        await deleteDoc(doc(db, 'weeklyConsumption', mk));
+        toast(`Bulan ${mk} berhasil dihapus.`);
+        if (wcAdminCurrentMonth === mk) {
+            wcAdminCurrentMonth = '';
+            const form = $('wc-admin-form-area');
+            if (form) form.innerHTML = '<p class="text-slate-500 text-sm text-center py-10">Pilih bulan di sebelah kiri</p>';
+        }
+    } catch (e) {
+        toast('❌ ' + e.message, 'error');
+    }
+};
+
+// ─── Init when admin dashboard loads ────────────────────────────────────────
+// Hook into sidebar link click for weekly tab
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-tab="weekly-admin"]');
+    if (btn && currentUser) {
+        wcAdminStartListener();
+        // Also set default month to current
+        if (!wcAdminCurrentMonth) {
+            const now = new Date();
+            const mm  = String(now.getMonth() + 1).padStart(2, '0');
+            wcAdminCurrentMonth = `${now.getFullYear()}-${mm}`;
+        }
+        setTimeout(() => {
+            wcRenderAdminMonthList();
+            wcRenderAdminWeekForm();
+        }, 200);
+    }
+});
