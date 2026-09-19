@@ -1997,25 +1997,37 @@
         }
 
         // ── Init when tab is opened ──────────────────────────────────────────
-        // Hook into existing openTab event listener
-        const _wcOrigOpenTab = window.openTab;
-        window.openTab = function(tabId, btn) {
-            if (_wcOrigOpenTab) _wcOrigOpenTab(tabId, btn);
-            if (tabId === 'weekly-consumption') {
-                if (!wcUnsubscribers.main) wcStartListener();
-                // Also init month selector if already loaded
-                setTimeout(() => {
-                    wcRenderMonthSelector();
-                    wcRenderWeekButtons();
-                    wcRenderTable();
-                    wcRenderTrendChart();
-                    wcUpdateStats();
-                }, 100);
-            }
-        };
+        // We must patch openTab AFTER main.js sets it (main.js runs on DOMContentLoaded)
+        // So we listen to DOMContentLoaded too, or use a small retry.
+        function wcPatchOpenTab() {
+            const orig = window.openTab;
+            window.openTab = function(tabId, btn) {
+                if (orig) orig(tabId, btn);
+                if (tabId === 'weekly-consumption') {
+                    if (!wcUnsubscribers.main) wcStartListener();
+                    setTimeout(() => {
+                        wcRenderMonthSelector();
+                        wcRenderWeekButtons();
+                        wcRenderTable();
+                        wcRenderTrendChart();
+                        wcUpdateStats();
+                    }, 300);
+                }
+            };
+        }
 
-        // ── Also add to footer quick link ─────────────────────────────────────
-        // (footer pintasan already handled by inline onclick in HTML)
+        // Patch after main.js DOMContentLoaded has had a chance to set window.openTab
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(wcPatchOpenTab, 50);
+                // Also auto-start listener immediately
+                wcStartListener();
+            });
+        } else {
+            // DOM already ready
+            setTimeout(wcPatchOpenTab, 50);
+            wcStartListener();
+        }
 
     </script>
 
