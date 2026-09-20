@@ -1774,20 +1774,53 @@
             const weekData = (wcAllData[wcCurrentMonth] || {})[wcCurrentWeek] || {};
             const avgRatio = wcMonthAvgRatio();
 
+            // ── Sub-area IDs for auto-total rows ────────────────────────────
+            const DORM_SUB_IDS    = ['idc','mess-korea','kantor-pj023','kantor-pj112','manmod'];
+            const UTILITY_SUB_IDS = ['kompressor','wtp-wwtp','kantin-b','others-pj023','others-pj112'];
+
+            function sumSubs(ids) {
+                let kwh = 0, prod = 0;
+                ids.forEach(id => {
+                    const d = weekData[id];
+                    if (d) {
+                        kwh  += parseFloat(d.kwh  || 0);
+                        prod += parseFloat(d.prod || 0);
+                    }
+                });
+                return { kwh, prod, ratio: prod > 0 ? kwh / prod : null };
+            }
+
             let html = '';
             WC_AREAS.forEach((area, idx) => {
-                const d = weekData[area.id] || { kwh: '', prod: '', ratio: '' };
                 const rowStyle = wcRowStyle(area.type);
                 const no = idx + 1;
 
-                const kwh    = d.kwh   !== '' && d.kwh   != null ? parseFloat(d.kwh).toLocaleString('id-ID') : '\u2014';
-                const prod   = d.prod  !== '' && d.prod  != null ? parseFloat(d.prod).toLocaleString('id-ID') : '\u2014';
-                const ratioRaw = d.ratio !== '' && d.ratio != null ? parseFloat(d.ratio) : null;
-                const ratio  = ratioRaw != null ? ratioRaw.toFixed(3) : '\u2014';
+                // ── Auto-compute totals for the two total rows ───────────────
+                let d;
+                if (area.id === 'office-dormitory') {
+                    d = sumSubs(DORM_SUB_IDS);
+                } else if (area.id === 'utility') {
+                    d = sumSubs(UTILITY_SUB_IDS);
+                } else {
+                    const raw = weekData[area.id] || {};
+                    d = {
+                        kwh:   raw.kwh   !== undefined ? raw.kwh   : '',
+                        prod:  raw.prod  !== undefined ? raw.prod  : '',
+                        ratio: raw.ratio !== undefined ? raw.ratio : null
+                    };
+                }
+
+                const kwhNum   = (d.kwh !== '' && d.kwh != null && d.kwh !== 0) ? parseFloat(d.kwh) : null;
+                const prodNum  = (d.prod !== '' && d.prod != null && d.prod !== 0) ? parseFloat(d.prod) : null;
+                const ratioRaw = d.ratio != null ? parseFloat(d.ratio) : (kwhNum != null && prodNum > 0 ? kwhNum / prodNum : null);
+
+                const kwhStr   = kwhNum  != null ? kwhNum.toLocaleString('id-ID')  : '\u2014';
+                const prodStr  = prodNum != null ? prodNum.toLocaleString('id-ID') : '\u2014';
+                const ratioStr = ratioRaw != null ? ratioRaw.toFixed(3) : '\u2014';
 
                 // Status badge
                 let statusBadge = '<span class="text-slate-700 text-[9px]">\u2014</span>';
-                if (ratioRaw != null && avgRatio != null) {
+                if (ratioRaw != null && avgRatio != null && area.type === 'plant') {
                     if (ratioRaw <= avgRatio * 0.9) {
                         statusBadge = '<span class="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[9px] font-bold border border-green-500/20">\u2713 Efisien</span>';
                     } else if (ratioRaw <= avgRatio) {
@@ -1795,6 +1828,12 @@
                     } else {
                         statusBadge = '<span class="px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 text-[9px] font-bold border border-red-500/20">\u25b2 Tinggi</span>';
                     }
+                }
+                if (area.type === 'dormitory-total') {
+                    statusBadge = '<span class="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 text-[9px] font-bold border border-yellow-500/30">TOTAL</span>';
+                }
+                if (area.type === 'utility-total') {
+                    statusBadge = '<span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-[9px] font-bold border border-orange-500/30">TOTAL</span>';
                 }
 
                 // Name styling
@@ -1808,28 +1847,30 @@
                 <tr class="border-b border-white/5 transition-colors ${rowStyle}" style="animation: fadeInUpWinner 0.3s ease ${idx * 0.03}s both">
                     <td class="px-4 py-2.5 text-[11px] text-slate-600 font-mono">${String(no).padStart(2,'0')}</td>
                     <td class="px-4 py-2.5 ${nameStyle}">${area.name}</td>
-                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${kwh !== '\u2014' ? 'text-energi-gold' : 'text-slate-700'}">${kwh}</td>
-                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${prod !== '\u2014' ? 'text-energi-cyan' : 'text-slate-700'}">${prod}</td>
-                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${ratioRaw != null ? 'text-white' : 'text-slate-700'}">${ratio}</td>
+                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${kwhNum != null ? 'text-energi-gold' : 'text-slate-700'}">${kwhStr}</td>
+                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${prodNum != null ? 'text-energi-cyan' : 'text-slate-700'}">${prodStr}</td>
+                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${ratioRaw != null ? 'text-white' : 'text-slate-700'}">${ratioStr}</td>
                     <td class="px-4 py-2.5 text-center">${statusBadge}</td>
                 </tr>`;
             });
 
-            // Total row
-            const totKwh  = Object.values(weekData).reduce((s, d) => s + (parseFloat(d.kwh)  || 0), 0);
-            const totProd = Object.values(weekData).reduce((s, d) => s + (parseFloat(d.prod) || 0), 0);
+            // ── Grand Total row (only plant areas) ───────────────────────────
+            const plantAreas = WC_AREAS.filter(a => a.type === 'plant');
+            const totKwh  = plantAreas.reduce((s, a) => s + parseFloat((weekData[a.id] || {}).kwh  || 0), 0);
+            const totProd = plantAreas.reduce((s, a) => s + parseFloat((weekData[a.id] || {}).prod || 0), 0);
             const totRatio = totProd > 0 ? (totKwh / totProd) : 0;
             html += `
             <tr class="border-t-2 border-energi-gold/30 bg-energi-gold/5">
-                <td class="px-4 py-3 text-[11px] text-slate-500" colspan="2"><span class="font-black text-energi-gold uppercase tracking-widest text-xs">Total</span></td>
-                <td class="px-4 py-3 text-right font-black text-sm text-energi-gold font-mono">${totKwh.toLocaleString('id-ID')}</td>
-                <td class="px-4 py-3 text-right font-black text-sm text-energi-cyan font-mono">${totProd.toLocaleString('id-ID')}</td>
+                <td class="px-4 py-3 text-[11px] text-slate-500" colspan="2"><span class="font-black text-energi-gold uppercase tracking-widest text-xs">Total Plant</span></td>
+                <td class="px-4 py-3 text-right font-black text-sm text-energi-gold font-mono">${totKwh > 0 ? totKwh.toLocaleString('id-ID') : '\u2014'}</td>
+                <td class="px-4 py-3 text-right font-black text-sm text-energi-cyan font-mono">${totProd > 0 ? totProd.toLocaleString('id-ID') : '\u2014'}</td>
                 <td class="px-4 py-3 text-right font-black text-sm text-white font-mono">${totRatio > 0 ? totRatio.toFixed(3) : '\u2014'}</td>
-                <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold text-[9px] font-bold border border-energi-gold/30">TOTAL</span></td>
+                <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold text-[9px] font-bold border border-energi-gold/30">PLANT</span></td>
             </tr>`;
 
             tbody.innerHTML = html;
         }
+
 
         // ── Update summary stats ─────────────────────────────────────────────
         function wcUpdateStats() {
