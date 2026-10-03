@@ -14,47 +14,16 @@
     <link rel="preconnect" href="https://drive.google.com">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-    <!-- Premium Fonts: Plus Jakarta Sans (body) + DM Serif Display (heading accent) -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;800&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Performance: Tailwind CSS static build (bukan CDN runtime 380KB) -->
+    <link rel="stylesheet" href="tailwind-output.css">
+    <!-- Performance: Chart.js dimuat deferred, bukan blocking -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 
     <style>
-        /* ── Base Typography ─────────────────────────────────── */
-        :root {
-            --font-body: 'Plus Jakarta Sans', 'Outfit', sans-serif;
-            --font-display: 'DM Serif Display', 'Outfit', serif;
-            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-        }
-
-        body {
-            font-family: var(--font-body) !important;
-            font-size: 15px;
-            line-height: 1.65;
-            color: #cbd5e1;
-            letter-spacing: 0.01em;
-            font-feature-settings: 'kern' 1, 'liga' 1;
-        }
-
-        /* Heading hierarchy yang jelas */
-        h1 { font-family: var(--font-body) !important; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; color: #ffffff; }
-        h2 { font-family: var(--font-body) !important; font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; color: #f1f5f9; }
-        h3 { font-family: var(--font-body) !important; font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: #e2e8f0; }
-        h4 { font-family: var(--font-body) !important; font-size: 1rem; font-weight: 600; color: #e2e8f0; }
-
-        /* Body paragraf — lebih cerah, lebih mudah dibaca */
-        p { color: #94a3b8; line-height: 1.7; font-weight: 400; }
-        p strong { color: #e2e8f0; font-weight: 600; }
-
-        /* Label & badges kecil */
-        .label-xs { font-family: var(--font-body); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
-
-        /* Monospace untuk NIK, kode, angka */
-        .font-mono, [class*="font-mono"] { font-family: var(--font-mono) !important; }
-
-        /* Judul italic accent — gunakan DM Serif */
-        .font-serif, [class*="font-serif"] { font-family: var(--font-display) !important; }
-
-        /* Teks gradient tetap tajam */
-        .text-transparent { -webkit-background-clip: text; background-clip: text; }
+        body { font-family: 'Outfit', 'Inter', sans-serif !important; }
+        .font-serif { font-family: 'Outfit', sans-serif !important; }
     </style>
 
     <!-- importmap HARUS sebelum semua module script yang menggunakannya -->
