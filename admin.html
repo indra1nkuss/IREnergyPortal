@@ -206,6 +206,7 @@
             .sidebar-link.active { border-left: none !important; border-bottom: 2px solid #D4AF37; }
         }
     </style>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
 
@@ -258,28 +259,28 @@
             <!-- Sidebar -->
             <aside class="admin-sidebar w-full md:w-56 bg-[#08080c] border-r border-white/5 p-3 flex md:flex-col gap-1 shrink-0">
                 <button class="sidebar-link active flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="dashboard-tab">
-                    <span>📊</span> <span>Dashboard</span>
+                    <span><i class="ph-fill ph-chart-bar"></i></span> <span>Dashboard</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="winners-tab">
-                    <span>🏆</span> <span>Pemenang</span>
+                    <span><i class="ph-fill ph-trophy"></i></span> <span>Pemenang</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="seu-tab">
-                    <span>⚡</span> <span>SEU IR</span>
+                    <span><i class="ph-fill ph-lightning"></i></span> <span>SEU IR</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="enpi-tab">
-                    <span>📋</span> <span>ENPI</span>
+                    <span><i class="ph-fill ph-clipboard-text"></i></span> <span>ENPI</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="project-tab">
-                    <span>🔧</span> <span>Project Efisiensi</span>
+                    <span><i class="ph-fill ph-wrench"></i></span> <span>Project Efisiensi</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="weekly-admin">
-                    <span>📅</span> <span>Weekly Consumption</span>
+                    <span><i class="ph-fill ph-calendar-blank"></i></span> <span>Weekly Consumption</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="team-tab">
-                    <span>👥</span> <span>Team</span>
+                    <span><i class="ph-fill ph-users"></i></span> <span>Team</span>
                 </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="gallery-tab">
-                    <span>📸</span> <span>Dokumentasi</span>
+                    <span><i class="ph-fill ph-camera"></i></span> <span>Dokumentasi</span>
                 </button>
             </aside>
 
@@ -289,16 +290,16 @@
                 <!-- DASHBOARD TAB -->
                 <div id="dashboard-tab" class="tab-content active">
                     <div class="mb-6">
-                        <h2 class="text-xl md:text-2xl font-bold text-white">📊 Dashboard</h2>
+                        <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-chart-bar"></i> Dashboard</h2>
                         <p class="text-slate-500 text-xs mt-1">Ringkasan konten Portal Energi IR</p>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="stats-grid">
-                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-winners">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">🏆 Pemenang</p></div>
-                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-seu">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">⚡ SEU Mesin</p></div>
-                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-enpi">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">📋 ENPI Fitur</p></div>
-                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-project">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">🔧 Projects</p></div>
-                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-gallery">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">📸 Foto</p></div>
-                    <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-team">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold">👥 Team</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-winners">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-trophy"></i> Pemenang</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-seu">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-lightning"></i> SEU Mesin</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-enpi">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-clipboard-text"></i> ENPI Fitur</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-project">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-wrench"></i> Projects</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-gallery">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-camera"></i> Foto</p></div>
+                    <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-team">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-users"></i> Team</p></div>
                     </div>
                     <div class="mt-8 card-admin p-6 text-center">
                         <p class="text-slate-400 text-sm">🔄 Semua data terhubung <strong class="text-energi-cyan">realtime</strong> dengan Firebase.</p>
@@ -310,7 +311,7 @@
                 <div id="winners-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">🏆 Pemenang</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-trophy"></i> Pemenang</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola 100 data pemenang training online</p>
                         </div>
                         <div class="flex gap-2">
@@ -318,12 +319,17 @@
                             <button onclick="seedWinners()" class="btn-outline text-xs">📥 Seed 100</button>
                         </div>
                     </div>
+                    <!-- Year Filter Pills -->
+                    <div class="flex flex-wrap items-center gap-2 mb-4">
+                        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Filter Tahun:</span>
+                        <div id="winners-year-pills" class="flex flex-wrap gap-2"></div>
+                    </div>
                     <div class="mb-4">
                         <input type="text" id="winners-search" placeholder="Cari NIK, Nama, atau Departemen..." class="w-full max-w-md">
                     </div>
                     <div class="card-admin overflow-x-auto">
                         <table class="table-admin" id="winners-table">
-                            <thead><tr><th>No</th><th>NIK</th><th>Nama</th><th>Departemen</th><th class="text-right">Aksi</th></tr></thead>
+                            <thead><tr><th>No</th><th>Tahun</th><th>NIK</th><th>Nama</th><th>Departemen</th><th class="text-right">Aksi</th></tr></thead>
                             <tbody id="winners-body"></tbody>
                         </table>
                         <div id="winners-empty" class="empty-state hidden">Belum ada data pemenang. Klik "Seed 100" untuk mengisi.</div>
@@ -335,7 +341,7 @@
                 <div id="seu-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">⚡ SEU IR — Mesin</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-lightning"></i> SEU IR — Mesin</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola data konsumsi energi 7 mesin</p>
                         </div>
                         <button onclick="openModal('seu')" class="btn-primary text-xs">+ Tambah Mesin</button>
@@ -354,7 +360,7 @@
                 <div id="enpi-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">📋 ENPI — Data</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-clipboard-text"></i> ENPI — Data</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola data grafik ENPI (Aktual, Target, Next Target)</p>
                         </div>
                         <div class="flex gap-2">
@@ -382,7 +388,7 @@
                 <div id="project-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">🔧 Project Efisiensi</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-wrench"></i> Project Efisiensi</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola program-project efisiensi</p>
                         </div>
                         <button onclick="openModal('project')" class="btn-primary text-xs">+ Tambah Project</button>
@@ -401,14 +407,14 @@
                 <div id="weekly-admin" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">📅 Weekly Consumption</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-calendar-blank"></i> Weekly Consumption</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola data pemakaian energi mingguan</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Top Bar: List Bulan -->
-                        <div class="bg-darkcard/70 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                        <div class="bg-darkcard/85 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <h3 class="text-white text-sm font-bold whitespace-nowrap">Bulan:</h3>
                                 <div id="wc-admin-month-list" class="flex flex-wrap gap-2">
@@ -419,12 +425,12 @@
                             <div class="flex gap-2">
                                 <input type="text" id="wc-admin-new-month" placeholder="YYYY-MM" class="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none w-28">
                                 <button onclick="wcAdminCreateMonth()" class="btn-primary px-3 py-1.5 text-xs rounded-lg whitespace-nowrap">+ Buat</button>
-                                <button onclick="wcAdminDeleteMonth()" class="px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10 rounded-lg transition-colors border border-red-500/20 whitespace-nowrap">🗑️ Hapus</button>
+                                <button onclick="wcAdminDeleteMonth()" class="px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10 rounded-lg transition-colors border border-red-500/20 whitespace-nowrap"><i class="ph-bold ph-trash"></i> Hapus</button>
                             </div>
                         </div>
 
                         <!-- Form Area -->
-                        <div class="bg-darkcard/70 border border-white/10 rounded-2xl p-4 md:p-6" id="wc-admin-form-area">
+                        <div class="bg-darkcard/85 border border-white/10 rounded-2xl p-4 md:p-6" id="wc-admin-form-area">
                             <!-- Render by JS -->
                             <p class="text-slate-500 text-sm text-center py-10">Pilih bulan di atas</p>
                         </div>
@@ -435,7 +441,7 @@
                 <div id="gallery-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">📸 Dokumentasi</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-camera"></i> Dokumentasi</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola foto dokumentasi pemenang</p>
                         </div>
                         <button onclick="openModal('gallery')" class="btn-primary text-xs">+ Upload Foto</button>
@@ -453,7 +459,7 @@
                 <div id="team-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white">👥 Team Energy IR</h2>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-users"></i> Team Energy IR</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola anggota tim</p>
                         </div>
                         <div class="flex gap-2">

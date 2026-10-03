@@ -80,7 +80,7 @@ export function openTab(tabId, btnElement) {
     window.scrollTo({ top: 0, behavior: 'auto' });
 
     const navMenu = document.getElementById('nav-menu');
-    if(navMenu && !navMenu.classList.contains('hidden') && window.innerWidth < 768) {
+    if (navMenu && !navMenu.classList.contains('hidden') && window.innerWidth < 768) {
         navMenu.classList.add('hidden');
     }
 
@@ -129,9 +129,9 @@ export function openTab(tabId, btnElement) {
 
 function showNewSection(targetSection) {
     targetSection.classList.remove('hidden');
-    void targetSection.offsetWidth; 
+    void targetSection.offsetWidth;
     targetSection.classList.add('block', 'animate-fade-in');
-    
+
     setTimeout(() => {
         isAnimating = false;
         // Logic render tim & galeri dipindah ke main event listener
@@ -155,7 +155,7 @@ export function typeWriter() {
     if (!typingElement) return;
 
     const currentText = textArray[textIndex];
-    
+
     if (isDeleting) {
         typingElement.textContent = currentText.substring(0, charIndex - 1);
         charIndex--;
@@ -164,14 +164,25 @@ export function typeWriter() {
         charIndex++;
     }
 
-    let typeSpeed = isDeleting ? 25 : 50; 
+    // 1. Kecepatan Ngetik Normal (50ms per huruf)
+    let typeSpeed = 200;
+
+    // 2. Kecepatan Menghapus (30ms per huruf)
+    if (isDeleting) {
+        typeSpeed = 100;
+    }
+
+    // 3. JIKA SUDAH SELESAI NGETIK 1 KALIMAT UTUH
     if (!isDeleting && charIndex === currentText.length) {
-        typeSpeed = 2500; 
-        isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
+        // INI ADALAH JEDA DI AKHIR KALIMAT (4000ms = 4 Detik)
+        typeSpeed = 600;
+        isDeleting = true; // Ubah status menjadi menghapus untuk siklus selanjutnya
+    }
+    // 4. JIKA TEKS SUDAH TERHAPUS HABIS
+    else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         textIndex = (textIndex + 1) % textArray.length;
-        typeSpeed = 500; 
+        typeSpeed = 70; // Jeda sebelum mulai mengetik kalimat baru
     }
     setTimeout(typeWriter, typeSpeed);
 }

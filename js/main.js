@@ -6,7 +6,7 @@
 import { initMobileMenu, openTab, typeWriter, toggleDropdown } from './ui.js';
 import { initSearch } from './winners.js';
 import { renderTeam } from './team.js';
-import { closeLightbox } from './gallery.js';
+import { closeLightbox, openLightbox } from './gallery.js';
 import { initTheme } from './theme.js';
 import { initInteractions } from './interactions.js';
 import { initChatbot } from './chat.js';
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global functions for HTML onclick
     window.openTab = openTab;
     window.closeLightbox = closeLightbox;
+    window.openLightbox = openLightbox;
     window.toggleDropdown = toggleDropdown;
 
     // 2. Chatbot

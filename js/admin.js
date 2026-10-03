@@ -126,6 +126,11 @@ window.openModal = (collection, editId = null) => {
         winners: `
             <h3 class="text-lg font-bold text-white mb-6">${title} Pemenang</h3>
             <div class="space-y-4">
+                <div><label class="text-xs text-slate-400 block mb-1">Tahun</label>
+                    <select id="m-year" class="w-full">
+                        ${[2024,2025,2026,2027,2028].map(y => `<option value="${y}" ${y === new Date().getFullYear() ? 'selected' : ''}>${y}</option>`).join('')}
+                    </select>
+                </div>
                 <div><label class="text-xs text-slate-400 block mb-1">NIK</label><input type="text" id="m-nik" class="w-full"></div>
                 <div><label class="text-xs text-slate-400 block mb-1">Nama Lengkap</label><input type="text" id="m-name" class="w-full"></div>
                 <div><label class="text-xs text-slate-400 block mb-1">Departemen</label><input type="text" id="m-dept" class="w-full"></div>
@@ -282,7 +287,7 @@ window.saveData = async (collType) => {
     }
 
     // ─── Non-gallery ─────────────────────────────────────────────────────────
-    const fields = collType === 'winners' ? ['nik', 'name', 'dept'] :
+    const fields = collType === 'winners' ? ['year', 'nik', 'name', 'dept'] :
                    collType === 'seu' ? ['name', 'kwh', 'percentage'] :
                    collType === 'team' ? ['name', 'role', 'image', 'portfolioLink'] :
                    collType === 'enpi' ? ['indicator', 'year', 'actual', 'target', 'nextTarget'] :
@@ -294,7 +299,8 @@ window.saveData = async (collType) => {
     fields.forEach(f => {
         const formId = formFieldMap[f] || f;
         let val = getVal(`m-${formId}`);
-        if (f === 'kwh' || f === 'percentage' || f === 'actual' || f === 'target' || f === 'nextTarget' || f === 'year') val = parseFloat(val) || 0;
+        if (f === 'kwh' || f === 'percentage' || f === 'actual' || f === 'target' || f === 'nextTarget') val = parseFloat(val) || 0;
+        if (f === 'year') val = parseInt(val) || new Date().getFullYear();
         data[f] = val;
         if (val) hasValue = true;
     });
@@ -425,7 +431,7 @@ window.seedProject = async () => {
 
 // ─── Realtime Listeners ──────────────────────────────────────────────────────
 function initRealtimeListeners() {
-    unsubscribers.winners = onSnapshot(query(collection(db, 'winners'), orderBy('order')), (snap) => {
+    unsubscribers.winners = onSnapshot(query(collection(db, 'winners'), orderBy('year', 'desc'), orderBy('order')), (snap) => {
         winnersData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderWinners();
         updateStats();
@@ -463,9 +469,12 @@ let winnersPage = 1;
 const WINNERS_PER_PAGE = 15;
 
 function renderWinners() {
+    renderWinnersYearPills();
     const search = ($('winners-search')?.value || '').toLowerCase();
     let filtered = winnersData;
-    if (search) filtered = winnersData.filter(w => w.nik?.includes(search) || w.name?.toLowerCase().includes(search) || w.dept?.toLowerCase().includes(search));
+    // Filter per tahun
+    if (winnersYearFilter !== 'all') filtered = filtered.filter(w => String(w.year || '') === String(winnersYearFilter));
+    if (search) filtered = filtered.filter(w => w.nik?.includes(search) || w.name?.toLowerCase().includes(search) || w.dept?.toLowerCase().includes(search));
 
     const totalPages = Math.ceil(filtered.length / WINNERS_PER_PAGE) || 1;
     if (winnersPage > totalPages) winnersPage = totalPages;
@@ -479,6 +488,7 @@ function renderWinners() {
     body.innerHTML = pageItems.map((w, i) => `
         <tr>
             <td class="text-slate-500 font-mono text-xs">${start + i + 1}</td>
+            <td><span class="px-2 py-0.5 bg-energi-gold/15 text-energi-gold rounded text-[10px] font-bold">${w.year || '-'}</span></td>
             <td class="font-mono text-energi-cyan text-xs">${w.nik}</td>
             <td class="text-white font-medium">${w.name}</td>
             <td class="text-slate-400 text-xs">${w.dept}</td>
@@ -501,7 +511,35 @@ function renderWinners() {
     pag.innerHTML = html;
 }
 
+// ─── Winners Year Filter ─────────────────────────────────────────────────────
+let winnersYearFilter = 'all';
+
+window.setWinnersYear = (year) => {
+    winnersYearFilter = year;
+    winnersPage = 1;
+    // Update active state pills
+    document.querySelectorAll('.admin-year-pill').forEach(p => {
+        p.classList.toggle('bg-energi-gold', p.dataset.year === String(year));
+        p.classList.toggle('text-darkbg', p.dataset.year === String(year));
+        p.classList.toggle('bg-white/5', p.dataset.year !== String(year));
+        p.classList.toggle('text-slate-300', p.dataset.year !== String(year));
+    });
+    renderWinners();
+};
+
+function renderWinnersYearPills() {
+    const container = $('winners-year-pills');
+    if (!container) return;
+    const years = ['all', ...new Set(winnersData.map(w => w.year || new Date().getFullYear()).filter(Boolean).sort((a,b) => b-a))];
+    container.innerHTML = years.map(y => `
+        <button class="admin-year-pill px-3 py-1 rounded-full text-xs font-bold transition-all ${
+            String(y) === String(winnersYearFilter) ? 'bg-energi-gold text-darkbg' : 'bg-white/5 text-slate-300 hover:bg-white/10'
+        }" data-year="${y}" onclick="setWinnersYear('${y}')">${y === 'all' ? 'Semua Tahun' : y}</button>
+    `).join('');
+}
+
 $('winners-search')?.addEventListener('input', () => { winnersPage = 1; renderWinners(); });
+
 
 // ─── Render Generic Table ────────────────────────────────────────────────────
 function renderTable(type, items) {

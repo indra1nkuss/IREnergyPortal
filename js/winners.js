@@ -2,34 +2,82 @@
  * WINNERS LIST
  * Pure Firestore — tidak ada fallback static.
  * Data dari window.__fireWinners yang diisi oleh realtime listener.
+ * Support: filter per tahun + search + pagination.
  */
 
 const itemsPerPage = 10;
 let winnersPage = 1;
 let searchTerm = '';
+let selectedYear = 'all'; // 'all' atau angka tahun
 
+// ─── Data Access ─────────────────────────────────────────────────────────────
 function getAllWinners() {
     const fw = window.__fireWinners;
     return (fw && fw.length > 0)
-        ? fw.map(w => ({ nik: w.nik, name: w.name, dept: w.dept, id: w.id }))
+        ? fw.map(w => ({ nik: w.nik, name: w.name, dept: w.dept, year: w.year, id: w.id }))
         : [];
 }
 
-function getFilteredWinners() {
+function getAvailableYears() {
     const all = getAllWinners();
-    if (!searchTerm) return all;
-    const q = searchTerm.toLowerCase();
-    return all.filter(w =>
-        w.name.toLowerCase().includes(q) ||
-        w.dept.toLowerCase().includes(q) ||
-        w.nik.includes(q)
-    );
+    const years = [...new Set(all.map(w => w.year).filter(Boolean))].sort((a, b) => b - a);
+    return years;
 }
+
+function getFilteredWinners() {
+    let all = getAllWinners();
+    // Filter tahun
+    if (selectedYear !== 'all') {
+        all = all.filter(w => String(w.year) === String(selectedYear));
+    }
+    // Filter search
+    if (searchTerm) {
+        const q = searchTerm.toLowerCase();
+        all = all.filter(w =>
+            (w.name || '').toLowerCase().includes(q) ||
+            (w.dept || '').toLowerCase().includes(q) ||
+            (w.nik || '').includes(q)
+        );
+    }
+    return all;
+}
+
+// ─── Year Pills ───────────────────────────────────────────────────────────────
+function renderYearPills() {
+    const container = document.getElementById('winners-year-pills');
+    if (!container) return;
+
+    const years = getAvailableYears();
+    const currentYear = new Date().getFullYear();
+
+    let html = `
+        <button class="year-pill ${selectedYear === 'all' ? 'active' : ''}" onclick="window.setWinnersYear('all')">
+            Semua
+        </button>
+    `;
+    years.forEach(y => {
+        const isActive = String(selectedYear) === String(y);
+        const isCurrent = y === currentYear;
+        html += `
+            <button class="year-pill ${isActive ? 'active' : ''}" onclick="window.setWinnersYear(${y})">
+                ${y}${isCurrent ? ' <span class="text-energi-cyan text-[8px] font-black">●</span>' : ''}
+            </button>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+window.setWinnersYear = (year) => {
+    selectedYear = year;
+    winnersPage = 1;
+    renderYearPills();
+    displayWinners(1);
+};
 
 export function initSearch() {
     const searchInput = document.getElementById('search-input');
     if (!searchInput) return;
-
     searchInput.addEventListener('input', function (e) {
         searchTerm = e.target.value;
         winnersPage = 1;
@@ -38,6 +86,7 @@ export function initSearch() {
 }
 
 export function refreshWinners() {
+    renderYearPills();
     displayWinners();
 }
 
@@ -50,6 +99,15 @@ export function displayWinners(page) {
 
     if (!listContainer) return;
     listContainer.innerHTML = '';
+
+    // Update year pills setiap kali di-render (data bisa baru masuk)
+    renderYearPills();
+
+    // Update stats label tahun
+    const yearLabel = document.getElementById('winners-year-label');
+    if (yearLabel) {
+        yearLabel.textContent = selectedYear === 'all' ? 'Semua Tahun' : `Tahun ${selectedYear}`;
+    }
 
     const filtered = getFilteredWinners();
 
@@ -67,7 +125,10 @@ export function displayWinners(page) {
     pageItems.forEach((winner, index) => {
         const no = start + index + 1;
         const formatNo = String(no).padStart(2, '0');
-        const delay = index * 0.1;
+        const delay = index * 0.07;
+        const yearBadge = winner.year
+            ? `<span class="text-[9px] font-black text-energi-gold bg-energi-gold/10 border border-energi-gold/20 px-1.5 py-0.5 rounded font-mono">${winner.year}</span>`
+            : '';
 
         listContainer.insertAdjacentHTML('beforeend', `
             <div class="stagger-item group flex items-center gap-4 p-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-energi-gold/50 hover:bg-energi-gold/5 transition-all duration-500 opacity-0 transform translate-y-8" style="animation: fadeInUpWinner 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s">
@@ -77,13 +138,14 @@ export function displayWinners(page) {
                 </div>
                 <div class="flex-grow min-w-0">
                     <h3 class="text-base md:text-lg font-bold text-white group-hover:text-energi-gold transition-colors truncate">${winner.name}</h3>
-                    <div class="flex flex-wrap gap-2 mt-1">
+                    <div class="flex flex-wrap gap-2 mt-1 items-center">
                         <span class="text-[10px] md:text-xs font-mono text-energi-cyan bg-energi-cyan/10 px-2 py-0.5 rounded border border-energi-cyan/20">ID: ${winner.nik}</span>
                         <span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1"><span class="w-1 h-1 rounded-full bg-slate-600"></span> ${winner.dept}</span>
+                        ${yearBadge}
                     </div>
                 </div>
                 <div class="hidden sm:flex flex-col items-end gap-1">
-                    <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-[0_0_15px_rgba(212,175,55,0.1)]">TERBAIK</div>
+                    <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[10px] font-black uppercase tracking-tighter">TERBAIK</div>
                     <div class="text-[9px] text-slate-500 font-mono italic">Validated ✓</div>
                 </div>
             </div>
@@ -93,6 +155,7 @@ export function displayWinners(page) {
     renderPagination(filtered.length);
 }
 
+// ─── Pagination ───────────────────────────────────────────────────────────────
 function renderPagination(total) {
     const container = document.getElementById('pagination-container');
     if (!container) return;
