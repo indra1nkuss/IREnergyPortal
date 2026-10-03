@@ -274,6 +274,9 @@
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="winners-tab">
                     <span><i class="ph-fill ph-trophy"></i></span> <span>Pemenang</span>
                 </button>
+                <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="dept-tab">
+                    <span><i class="ph-fill ph-buildings"></i></span> <span>Departemen</span>
+                </button>
                 <button class="sidebar-link flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-sm text-slate-400" data-tab="seu-tab">
                     <span><i class="ph-fill ph-lightning"></i></span> <span>SEU IR</span>
                 </button>
@@ -345,6 +348,26 @@
                         <div id="winners-empty" class="empty-state hidden">Belum ada data pemenang. Klik "Seed 100" untuk mengisi.</div>
                     </div>
                     <div class="flex items-center justify-center gap-2 mt-4" id="winners-pagination"></div>
+                </div>
+
+                <!-- DEPARTEMENT TAB -->
+                <div id="dept-tab" class="tab-content">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-buildings"></i> Departemen</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola data nama departemen</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('departments')" class="btn-primary text-xs">+ Tambah</button>
+                        </div>
+                    </div>
+                    <div class="card-admin overflow-x-auto">
+                        <table class="table-admin" id="dept-table">
+                            <thead><tr><th>No</th><th>Nama Departemen</th><th class="text-right">Aksi</th></tr></thead>
+                            <tbody id="dept-body"></tbody>
+                        </table>
+                        <div id="dept-empty" class="empty-state hidden">Belum ada data departemen.</div>
+                    </div>
                 </div>
 
                 <!-- SEU TAB -->

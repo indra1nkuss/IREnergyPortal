@@ -9,6 +9,7 @@ const itemsPerPage = 10;
 let winnersPage = 1;
 let searchTerm = '';
 let selectedYear = 'all'; // 'all' atau angka tahun
+let selectedDept = 'all'; // 'all' atau nama departemen
 
 // ─── Data Access ─────────────────────────────────────────────────────────────
 function getAllWinners() {
@@ -24,11 +25,21 @@ function getAvailableYears() {
     return years;
 }
 
+function getAvailableDepts() {
+    const all = getAllWinners();
+    const depts = [...new Set(all.map(w => w.dept).filter(Boolean))].sort();
+    return depts;
+}
+
 function getFilteredWinners() {
     let all = getAllWinners();
     // Filter tahun
     if (selectedYear !== 'all') {
         all = all.filter(w => String(w.year) === String(selectedYear));
+    }
+    // Filter departemen
+    if (selectedDept !== 'all') {
+        all = all.filter(w => w.dept === selectedDept);
     }
     // Filter search
     if (searchTerm) {
@@ -67,6 +78,20 @@ function renderYearPills() {
     container.innerHTML = html;
 }
 
+// ─── Dept Select ───────────────────────────────────────────────────────────────
+function renderDeptSelect() {
+    const container = document.getElementById('winners-dept-select');
+    if (!container) return;
+
+    const depts = getAvailableDepts();
+    
+    let html = `<option value="all">Semua Departemen</option>`;
+    depts.forEach(d => {
+        html += `<option value="${d}" ${selectedDept === d ? 'selected' : ''}>${d}</option>`;
+    });
+    container.innerHTML = html;
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 window.setWinnersYear = (year) => {
     selectedYear = year;
@@ -75,18 +100,34 @@ window.setWinnersYear = (year) => {
     displayWinners(1);
 };
 
+window.setWinnersDept = (dept) => {
+    selectedDept = dept;
+    winnersPage = 1;
+    renderDeptSelect();
+    displayWinners(1);
+};
+
 export function initSearch() {
     const searchInput = document.getElementById('search-input');
-    if (!searchInput) return;
-    searchInput.addEventListener('input', function (e) {
-        searchTerm = e.target.value;
-        winnersPage = 1;
-        displayWinners();
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            searchTerm = e.target.value;
+            winnersPage = 1;
+            displayWinners();
+        });
+    }
+
+    const deptSelect = document.getElementById('winners-dept-select');
+    if (deptSelect) {
+        deptSelect.addEventListener('change', function (e) {
+            window.setWinnersDept(e.target.value);
+        });
+    }
 }
 
 export function refreshWinners() {
     renderYearPills();
+    renderDeptSelect();
     displayWinners();
 }
 
@@ -100,8 +141,9 @@ export function displayWinners(page) {
     if (!listContainer) return;
     listContainer.innerHTML = '';
 
-    // Update year pills setiap kali di-render (data bisa baru masuk)
+    // Update year pills dan dept select setiap kali di-render (data bisa baru masuk)
     renderYearPills();
+    renderDeptSelect();
 
     // Update stats label tahun
     const yearLabel = document.getElementById('winners-year-label');

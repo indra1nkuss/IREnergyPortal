@@ -41,6 +41,7 @@ let currentUser = null;
 let currentCollection = '';
 let currentEditId = null;
 let winnersData = [];
+let departmentsData = [];
 let unsubscribers = {};
 
 // ─── DOM Helpers ────────────────────────────────────────────────────────────
@@ -133,10 +134,23 @@ window.openModal = (collection, editId = null) => {
                 </div>
                 <div><label class="text-xs text-slate-400 block mb-1">NIK</label><input type="text" id="m-nik" class="w-full"></div>
                 <div><label class="text-xs text-slate-400 block mb-1">Nama Lengkap</label><input type="text" id="m-name" class="w-full"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">Departemen</label><input type="text" id="m-dept" class="w-full"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Departemen</label>
+                    <select id="m-dept" class="w-full">
+                        ${departmentsData.length > 0 ? departmentsData.map(d => `<option value="${d.name}">${d.name}</option>`).join('') : '<option value="">(Belum ada departemen)</option>'}
+                    </select>
+                </div>
                 <div class="flex gap-3 mt-6 justify-end">
                     <button class="btn-outline" onclick="closeModal()">Batal</button>
                     <button class="btn-primary" onclick="saveData('winners')">${editId ? 'Update' : 'Simpan'}</button>
+                </div>
+            </div>`,
+        departments: `
+            <h3 class="text-lg font-bold text-white mb-6">${title} Departemen</h3>
+            <div class="space-y-4">
+                <div><label class="text-xs text-slate-400 block mb-1">Nama Departemen</label><input type="text" id="m-name" class="w-full"></div>
+                <div class="flex gap-3 mt-6 justify-end">
+                    <button class="btn-outline" onclick="closeModal()">Batal</button>
+                    <button class="btn-primary" onclick="saveData('departments')">${editId ? 'Update' : 'Simpan'}</button>
                 </div>
             </div>`,
         seu: `
@@ -216,7 +230,7 @@ window.closeModal = () => {
 };
 
 async function populateForm(collection, id) {
-    const colMap = { winners: 'winners', seu: 'seuMachines', enpi: 'enpiItems', project: 'projectItems', gallery: 'gallery', team: 'team' };
+    const colMap = { winners: 'winners', departments: 'departments', seu: 'seuMachines', enpi: 'enpiItems', project: 'projectItems', gallery: 'gallery', team: 'team' };
     const colName = colMap[collection];
     if (!colName) return;
     try {
@@ -243,7 +257,7 @@ async function populateForm(collection, id) {
 // ─── CRUD Save ──────────────────────────────────────────────────────────────
 window.saveData = async (collType) => {
     console.log('🔥 saveData:', collType, 'editId:', currentEditId);
-    const colMap = { winners: 'winners', seu: 'seuMachines', enpi: 'enpiItems', project: 'projectItems', gallery: 'gallery', team: 'team' };
+    const colMap = { winners: 'winners', departments: 'departments', seu: 'seuMachines', enpi: 'enpiItems', project: 'projectItems', gallery: 'gallery', team: 'team' };
     const colName = colMap[collType];
     if (!colName) { toast('Koleksi tidak dikenal!', 'error'); return; }
 
@@ -288,6 +302,7 @@ window.saveData = async (collType) => {
 
     // ─── Non-gallery ─────────────────────────────────────────────────────────
     const fields = collType === 'winners' ? ['year', 'nik', 'name', 'dept'] :
+                   collType === 'departments' ? ['name'] :
                    collType === 'seu' ? ['name', 'kwh', 'percentage'] :
                    collType === 'team' ? ['name', 'role', 'image', 'portfolioLink'] :
                    collType === 'enpi' ? ['indicator', 'year', 'actual', 'target', 'nextTarget'] :
@@ -338,7 +353,7 @@ window.saveData = async (collType) => {
 // ─── Delete ──────────────────────────────────────────────────────────────────
 window.deleteData = async (collType, id) => {
     if (!confirm('Yakin ingin menghapus data ini?')) return;
-    const colMap = { winners: 'winners', seu: 'seuMachines', enpi: 'enpiItems', project: 'projectItems', gallery: 'gallery', team: 'team' };
+    const colMap = { winners: 'winners', departments: 'departments', seu: 'seuMachines', enpi: 'enpiItems', project: 'projectItems', gallery: 'gallery', team: 'team' };
     const colName = colMap[collType];
     if (!colName) return;
     try {
@@ -437,6 +452,10 @@ function initRealtimeListeners() {
             .sort((a, b) => (b.year || 0) - (a.year || 0) || (a.order || 0) - (b.order || 0));
         renderWinners();
         updateStats();
+    });
+    unsubscribers.departments = onSnapshot(query(collection(db, 'departments'), orderBy('order')), (snap) => {
+        departmentsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderTable('dept', departmentsData);
     });
     unsubscribers.seu = onSnapshot(query(collection(db, 'seuMachines'), orderBy('order')), (snap) => {
         renderTable('seu', snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -546,6 +565,7 @@ $('winners-search')?.addEventListener('input', () => { winnersPage = 1; renderWi
 // ─── Render Generic Table ────────────────────────────────────────────────────
 function renderTable(type, items) {
     const confs = {
+        dept: { cols: ['name'], headers: ['Nama Departemen'], render: (v) => v },
         seu: { cols: ['name', 'kwh', 'percentage'], headers: ['Nama Mesin', 'KWh / Year', '%'], render: (v, k) => k === 'kwh' ? Number(v).toLocaleString('id-ID') : k === 'percentage' ? v + '%' : v },
         enpi: { cols: ['icon', 'title', 'description'], headers: ['Ikon', 'Judul', 'Deskripsi'], render: (v, k) => k === 'icon' ? `<span class="text-lg">${v}</span>` : v },
         project: { cols: ['icon', 'title', 'description'], headers: ['Ikon', 'Judul', 'Deskripsi'], render: (v, k) => k === 'icon' ? `<span class="text-lg">${v}</span>` : v }

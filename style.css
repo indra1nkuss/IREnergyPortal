@@ -718,3 +718,13 @@ html { scroll-behavior: smooth; }
     border-color: #D4AF37;
     box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
 }
+
+select option {
+    background-color: #1a1a2e;
+    color: #ffffff;
+}
+select option:hover,
+select option:checked {
+    background-color: #D4AF37;
+    color: #050508;
+}
