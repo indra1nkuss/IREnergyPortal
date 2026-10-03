@@ -317,25 +317,19 @@
             <!-- Year Filter Pills -->
             <div class="flex justify-center flex-wrap gap-2 mb-6 reveal" id="winners-year-pills"></div>
 
-            <div class="max-w-3xl mx-auto mb-6 flex flex-col md:flex-row gap-3 reveal">
+            <div class="max-w-3xl mx-auto mb-8 flex flex-col md:flex-row gap-4 reveal">
                 <!-- Search Input -->
                 <div class="relative flex-grow">
-                    <span class="absolute left-5 top-3.5 text-slate-400 text-lg"><i class="ph-bold ph-magnifying-glass"></i></span>
-                    <input type="text" id="search-input" placeholder="Cari NIK, Nama..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-white placeholder-slate-500 focus:outline-none focus:border-energi-gold focus:bg-white/10 transition-all shadow-lg backdrop-blur-sm">
+                    <span class="absolute left-5 top-3 text-slate-400 text-lg"><i class="ph-bold ph-magnifying-glass"></i></span>
+                    <input type="text" id="search-input" placeholder="Cari NIK, Nama..." class="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-12 pr-6 text-white placeholder-slate-500 focus:outline-none focus:border-energi-gold focus:bg-white/10 transition-all text-sm shadow-lg backdrop-blur-sm">
                 </div>
                 
-                <!-- Custom Elegant Dropdown -->
-                <div class="relative w-full md:w-72 shrink-0 group" id="custom-dept-dropdown-wrapper">
-                    <div id="dept-dropdown-button" class="w-full bg-white/5 border border-white/10 rounded-full py-3 px-6 text-white cursor-pointer flex justify-between items-center hover:border-energi-gold/50 transition-all shadow-lg backdrop-blur-sm">
-                        <span id="dept-dropdown-label" class="truncate text-sm font-medium">Semua Departemen</span>
-                        <i class="ph-bold ph-caret-down text-slate-400 group-hover:text-energi-gold transition-colors"></i>
-                    </div>
-                    <!-- Dropdown Menu -->
-                    <div id="dept-dropdown-menu" class="absolute left-0 right-0 top-full mt-2 bg-[#050508]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 invisible transform translate-y-2 transition-all duration-300 z-50 max-h-64 overflow-y-auto hide-scrollbar">
-                        <div class="p-2" id="winners-dept-list">
-                            <!-- Options akan diisi oleh JS -->
-                        </div>
-                    </div>
+                <!-- Compact Native Select -->
+                <div class="relative w-full md:w-56 shrink-0">
+                    <select id="winners-dept-select" class="w-full bg-white/5 border border-white/10 rounded-full py-2.5 px-5 text-white focus:outline-none focus:border-energi-gold focus:bg-white/10 transition-all text-sm shadow-lg backdrop-blur-sm appearance-none cursor-pointer">
+                        <option value="all">Semua Departemen</option>
+                    </select>
+                    <span class="absolute right-4 top-3 text-slate-400 pointer-events-none"><i class="ph-bold ph-caret-down"></i></span>
                 </div>
             </div>
             <div class="max-w-4xl mx-auto">

@@ -80,35 +80,18 @@ function renderYearPills() {
     container.innerHTML = html;
 }
 
-// ─── Custom Dept Dropdown ─────────────────────────────────────────────────────
-function renderDeptDropdown() {
-    const listContainer = document.getElementById('winners-dept-list');
-    const label = document.getElementById('dept-dropdown-label');
-    if (!listContainer || !label) return;
+// ─── Dept Select ───────────────────────────────────────────────────────────────
+function renderDeptSelect() {
+    const container = document.getElementById('winners-dept-select');
+    if (!container) return;
 
     const depts = getAvailableDepts();
     
-    // Update Label
-    label.textContent = selectedDept === 'all' ? 'Semua Departemen' : selectedDept;
-
-    let html = `
-        <div class="px-4 py-2 hover:bg-white/10 rounded-lg cursor-pointer text-sm transition-colors ${selectedDept === 'all' ? 'text-energi-gold font-bold bg-white/5' : 'text-slate-300'}" 
-             onclick="window.setWinnersDept('all')">
-            Semua Departemen
-        </div>
-    `;
-    
+    let html = `<option value="all">Semua Departemen</option>`;
     depts.forEach(d => {
-        const isActive = selectedDept === d;
-        html += `
-            <div class="px-4 py-2 hover:bg-white/10 rounded-lg cursor-pointer text-sm transition-colors ${isActive ? 'text-energi-gold font-bold bg-white/5' : 'text-slate-300'}" 
-                 onclick="window.setWinnersDept('${d.replace(/'/g, "\\'")}')">
-                ${d}
-            </div>
-        `;
+        html += `<option value="${d}" ${selectedDept === d ? 'selected' : ''}>${d}</option>`;
     });
-    
-    listContainer.innerHTML = html;
+    container.innerHTML = html;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -122,15 +105,8 @@ window.setWinnersYear = (year) => {
 window.setWinnersDept = (dept) => {
     selectedDept = dept;
     winnersPage = 1;
-    renderDeptDropdown();
+    renderDeptSelect();
     displayWinners(1);
-    
-    // Auto-close dropdown
-    const menu = document.getElementById('dept-dropdown-menu');
-    if (menu) {
-        menu.classList.remove('opacity-100', 'visible', 'translate-y-0');
-        menu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-    }
 };
 
 export function initSearch() {
@@ -143,36 +119,17 @@ export function initSearch() {
         });
     }
 
-    // Dropdown toggle logic
-    const dropBtn = document.getElementById('dept-dropdown-button');
-    const dropMenu = document.getElementById('dept-dropdown-menu');
-    if (dropBtn && dropMenu) {
-        // Toggle menu on click
-        dropBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isOpen = dropMenu.classList.contains('visible');
-            if (isOpen) {
-                dropMenu.classList.remove('opacity-100', 'visible', 'translate-y-0');
-                dropMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-            } else {
-                dropMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2');
-                dropMenu.classList.add('opacity-100', 'visible', 'translate-y-0');
-            }
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!dropBtn.contains(e.target) && !dropMenu.contains(e.target)) {
-                dropMenu.classList.remove('opacity-100', 'visible', 'translate-y-0');
-                dropMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-            }
+    const deptSelect = document.getElementById('winners-dept-select');
+    if (deptSelect) {
+        deptSelect.addEventListener('change', function (e) {
+            window.setWinnersDept(e.target.value);
         });
     }
 }
 
 export function refreshWinners() {
     renderYearPills();
-    renderDeptDropdown();
+    renderDeptSelect();
     displayWinners();
 }
 
@@ -188,7 +145,7 @@ export function displayWinners(page) {
 
     // Update year pills dan dept dropdown setiap kali di-render (data bisa baru masuk)
     renderYearPills();
-    renderDeptDropdown();
+    renderDeptSelect();
 
     // Update stats label tahun
     const yearLabel = document.getElementById('winners-year-label');
