@@ -42,6 +42,16 @@
             border-color: rgba(0, 255, 255, 0.4) !important;
             box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.08) !important;
         }
+        /* Fix: dropdown option harus punya background gelap agar teks terbaca */
+        select option {
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+        }
+        select option:hover,
+        select option:checked {
+            background-color: #D4AF37 !important;
+            color: #050508 !important;
+        }
         textarea { resize: vertical; min-height: 80px; }
 
         .btn-primary {
