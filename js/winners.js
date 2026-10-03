@@ -80,30 +80,35 @@ function renderYearPills() {
     container.innerHTML = html;
 }
 
-// ─── Dept Pills ───────────────────────────────────────────────────────────────
-function renderDeptPills() {
-    const container = document.getElementById('winners-dept-pills');
-    if (!container) return;
+// ─── Custom Dept Dropdown ─────────────────────────────────────────────────────
+function renderDeptDropdown() {
+    const listContainer = document.getElementById('winners-dept-list');
+    const label = document.getElementById('dept-dropdown-label');
+    if (!listContainer || !label) return;
 
     const depts = getAvailableDepts();
-    if (depts.length === 0) {
-        container.innerHTML = '';
-        return;
-    }
     
+    // Update Label
+    label.textContent = selectedDept === 'all' ? 'Semua Departemen' : selectedDept;
+
     let html = `
-        <button class="year-pill ${selectedDept === 'all' ? 'active' : ''}" onclick="window.setWinnersDept('all')">
-            Semua Dept
-        </button>
+        <div class="px-4 py-2 hover:bg-white/10 rounded-lg cursor-pointer text-sm transition-colors ${selectedDept === 'all' ? 'text-energi-gold font-bold bg-white/5' : 'text-slate-300'}" 
+             onclick="window.setWinnersDept('all')">
+            Semua Departemen
+        </div>
     `;
+    
     depts.forEach(d => {
+        const isActive = selectedDept === d;
         html += `
-            <button class="year-pill ${selectedDept === d ? 'active' : ''}" onclick="window.setWinnersDept('${d.replace(/'/g, "\\'")}')">
+            <div class="px-4 py-2 hover:bg-white/10 rounded-lg cursor-pointer text-sm transition-colors ${isActive ? 'text-energi-gold font-bold bg-white/5' : 'text-slate-300'}" 
+                 onclick="window.setWinnersDept('${d.replace(/'/g, "\\'")}')">
                 ${d}
-            </button>
+            </div>
         `;
     });
-    container.innerHTML = html;
+    
+    listContainer.innerHTML = html;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -117,8 +122,15 @@ window.setWinnersYear = (year) => {
 window.setWinnersDept = (dept) => {
     selectedDept = dept;
     winnersPage = 1;
-    renderDeptPills();
+    renderDeptDropdown();
     displayWinners(1);
+    
+    // Auto-close dropdown
+    const menu = document.getElementById('dept-dropdown-menu');
+    if (menu) {
+        menu.classList.remove('opacity-100', 'visible', 'translate-y-0');
+        menu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+    }
 };
 
 export function initSearch() {
@@ -130,11 +142,37 @@ export function initSearch() {
             displayWinners();
         });
     }
+
+    // Dropdown toggle logic
+    const dropBtn = document.getElementById('dept-dropdown-button');
+    const dropMenu = document.getElementById('dept-dropdown-menu');
+    if (dropBtn && dropMenu) {
+        // Toggle menu on click
+        dropBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropMenu.classList.contains('visible');
+            if (isOpen) {
+                dropMenu.classList.remove('opacity-100', 'visible', 'translate-y-0');
+                dropMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+            } else {
+                dropMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+                dropMenu.classList.add('opacity-100', 'visible', 'translate-y-0');
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dropBtn.contains(e.target) && !dropMenu.contains(e.target)) {
+                dropMenu.classList.remove('opacity-100', 'visible', 'translate-y-0');
+                dropMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+            }
+        });
+    }
 }
 
 export function refreshWinners() {
     renderYearPills();
-    renderDeptPills();
+    renderDeptDropdown();
     displayWinners();
 }
 
@@ -148,9 +186,9 @@ export function displayWinners(page) {
     if (!listContainer) return;
     listContainer.innerHTML = '';
 
-    // Update year pills dan dept pills setiap kali di-render (data bisa baru masuk)
+    // Update year pills dan dept dropdown setiap kali di-render (data bisa baru masuk)
     renderYearPills();
-    renderDeptPills();
+    renderDeptDropdown();
 
     // Update stats label tahun
     const yearLabel = document.getElementById('winners-year-label');

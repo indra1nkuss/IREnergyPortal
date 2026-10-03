@@ -317,19 +317,26 @@
             <!-- Year Filter Pills -->
             <div class="flex justify-center flex-wrap gap-2 mb-6 reveal" id="winners-year-pills"></div>
 
-            <div class="max-w-2xl mx-auto mb-4 relative reveal">
-                <span class="absolute left-5 top-3.5 text-slate-400 text-lg"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" id="search-input" placeholder="Cari NIK, Nama..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-white placeholder-slate-500 focus:outline-none focus:border-energi-gold focus:bg-white/10 transition-all shadow-lg backdrop-blur-sm">
-            </div>
-
-            <!-- Dept Filter Pills (Sleek horizontal scroll) -->
-            <div class="w-full max-w-4xl mx-auto mb-6 reveal overflow-hidden relative">
-                <div id="winners-dept-pills" class="flex md:justify-center overflow-x-auto hide-scrollbar gap-2 py-2 px-4 whitespace-nowrap">
-                    <!-- Dept pills here -->
+            <div class="max-w-3xl mx-auto mb-6 flex flex-col md:flex-row gap-3 reveal">
+                <!-- Search Input -->
+                <div class="relative flex-grow">
+                    <span class="absolute left-5 top-3.5 text-slate-400 text-lg"><i class="ph-bold ph-magnifying-glass"></i></span>
+                    <input type="text" id="search-input" placeholder="Cari NIK, Nama..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-white placeholder-slate-500 focus:outline-none focus:border-energi-gold focus:bg-white/10 transition-all shadow-lg backdrop-blur-sm">
                 </div>
-                <!-- Gradient edges untuk indikasi bisa discroll di mobile -->
-                <div class="absolute top-0 bottom-0 left-0 w-8 bg-gradient-to-r from-[#050508] to-transparent pointer-events-none md:hidden"></div>
-                <div class="absolute top-0 bottom-0 right-0 w-8 bg-gradient-to-l from-[#050508] to-transparent pointer-events-none md:hidden"></div>
+                
+                <!-- Custom Elegant Dropdown -->
+                <div class="relative w-full md:w-72 shrink-0 group" id="custom-dept-dropdown-wrapper">
+                    <div id="dept-dropdown-button" class="w-full bg-white/5 border border-white/10 rounded-full py-3 px-6 text-white cursor-pointer flex justify-between items-center hover:border-energi-gold/50 transition-all shadow-lg backdrop-blur-sm">
+                        <span id="dept-dropdown-label" class="truncate text-sm font-medium">Semua Departemen</span>
+                        <i class="ph-bold ph-caret-down text-slate-400 group-hover:text-energi-gold transition-colors"></i>
+                    </div>
+                    <!-- Dropdown Menu -->
+                    <div id="dept-dropdown-menu" class="absolute left-0 right-0 top-full mt-2 bg-[#050508]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] opacity-0 invisible transform translate-y-2 transition-all duration-300 z-50 max-h-64 overflow-y-auto hide-scrollbar">
+                        <div class="p-2" id="winners-dept-list">
+                            <!-- Options akan diisi oleh JS -->
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="max-w-4xl mx-auto">
                 <div id="winner-list" class="grid gap-3 md:gap-4 min-h-[500px] content-start"></div>
