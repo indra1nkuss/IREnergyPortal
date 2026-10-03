@@ -1,5 +1,5 @@
-/* === GLOBAL RESET & OUTFIT FONT === */
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif !important; }
+/* === GLOBAL RESET & TYPOGRAPHY === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
     overflow-x: hidden;
@@ -10,6 +10,10 @@ html, body {
 
 body {
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Warna teks default lebih terang untuk keterbacaan di dark bg */
+    color: #cbd5e1;
 }
 
 /* Premium Background Texture (Glowing Dots + Grain Overlay) */
