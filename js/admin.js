@@ -455,7 +455,7 @@ function initRealtimeListeners() {
     });
     unsubscribers.departments = onSnapshot(query(collection(db, 'departments'), orderBy('order')), (snap) => {
         departmentsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderTable('dept', departmentsData);
+        renderTable('departments', departmentsData);
     });
     unsubscribers.seu = onSnapshot(query(collection(db, 'seuMachines'), orderBy('order')), (snap) => {
         renderTable('seu', snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -565,7 +565,7 @@ $('winners-search')?.addEventListener('input', () => { winnersPage = 1; renderWi
 // ─── Render Generic Table ────────────────────────────────────────────────────
 function renderTable(type, items) {
     const confs = {
-        dept: { cols: ['name'], headers: ['Nama Departemen'], render: (v) => v },
+        departments: { cols: ['name'], headers: ['Nama Departemen'], render: (v) => v },
         seu: { cols: ['name', 'kwh', 'percentage'], headers: ['Nama Mesin', 'KWh / Year', '%'], render: (v, k) => k === 'kwh' ? Number(v).toLocaleString('id-ID') : k === 'percentage' ? v + '%' : v },
         enpi: { cols: ['icon', 'title', 'description'], headers: ['Ikon', 'Judul', 'Deskripsi'], render: (v, k) => k === 'icon' ? `<span class="text-lg">${v}</span>` : v },
         project: { cols: ['icon', 'title', 'description'], headers: ['Ikon', 'Judul', 'Deskripsi'], render: (v, k) => k === 'icon' ? `<span class="text-lg">${v}</span>` : v }
