@@ -26,9 +26,11 @@ function getAvailableYears() {
 }
 
 function getAvailableDepts() {
-    const all = getAllWinners();
-    const depts = [...new Set(all.map(w => w.dept).filter(Boolean))].sort();
-    return depts;
+    const fd = window.__fireDepartments;
+    if (fd && fd.length > 0) {
+        return fd.map(d => d.name).sort();
+    }
+    return [];
 }
 
 function getFilteredWinners() {
@@ -78,16 +80,28 @@ function renderYearPills() {
     container.innerHTML = html;
 }
 
-// ─── Dept Select ───────────────────────────────────────────────────────────────
-function renderDeptSelect() {
-    const container = document.getElementById('winners-dept-select');
+// ─── Dept Pills ───────────────────────────────────────────────────────────────
+function renderDeptPills() {
+    const container = document.getElementById('winners-dept-pills');
     if (!container) return;
 
     const depts = getAvailableDepts();
+    if (depts.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
     
-    let html = `<option value="all">Semua Departemen</option>`;
+    let html = `
+        <button class="year-pill ${selectedDept === 'all' ? 'active' : ''}" onclick="window.setWinnersDept('all')">
+            Semua Dept
+        </button>
+    `;
     depts.forEach(d => {
-        html += `<option value="${d}" ${selectedDept === d ? 'selected' : ''}>${d}</option>`;
+        html += `
+            <button class="year-pill ${selectedDept === d ? 'active' : ''}" onclick="window.setWinnersDept('${d.replace(/'/g, "\\'")}')">
+                ${d}
+            </button>
+        `;
     });
     container.innerHTML = html;
 }
@@ -103,7 +117,7 @@ window.setWinnersYear = (year) => {
 window.setWinnersDept = (dept) => {
     selectedDept = dept;
     winnersPage = 1;
-    renderDeptSelect();
+    renderDeptPills();
     displayWinners(1);
 };
 
@@ -116,18 +130,11 @@ export function initSearch() {
             displayWinners();
         });
     }
-
-    const deptSelect = document.getElementById('winners-dept-select');
-    if (deptSelect) {
-        deptSelect.addEventListener('change', function (e) {
-            window.setWinnersDept(e.target.value);
-        });
-    }
 }
 
 export function refreshWinners() {
     renderYearPills();
-    renderDeptSelect();
+    renderDeptPills();
     displayWinners();
 }
 
@@ -141,9 +148,9 @@ export function displayWinners(page) {
     if (!listContainer) return;
     listContainer.innerHTML = '';
 
-    // Update year pills dan dept select setiap kali di-render (data bisa baru masuk)
+    // Update year pills dan dept pills setiap kali di-render (data bisa baru masuk)
     renderYearPills();
-    renderDeptSelect();
+    renderDeptPills();
 
     // Update stats label tahun
     const yearLabel = document.getElementById('winners-year-label');
