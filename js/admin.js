@@ -431,8 +431,10 @@ window.seedProject = async () => {
 
 // ─── Realtime Listeners ──────────────────────────────────────────────────────
 function initRealtimeListeners() {
-    unsubscribers.winners = onSnapshot(query(collection(db, 'winners'), orderBy('year', 'desc'), orderBy('order')), (snap) => {
-        winnersData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    unsubscribers.winners = onSnapshot(query(collection(db, 'winners'), orderBy('order')), (snap) => {
+        // Sort client-side: tahun terbaru dulu, lalu urutan
+        winnersData = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => (b.year || 0) - (a.year || 0) || (a.order || 0) - (b.order || 0));
         renderWinners();
         updateStats();
     });
