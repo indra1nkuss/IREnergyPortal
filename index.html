@@ -595,28 +595,28 @@
                     <div class="bg-darkcard/80 backdrop-blur-xl border border-white/10 p-6 rounded-2xl">
                         <div class="flex flex-col md:flex-row items-center justify-between gap-5">
                             <!-- Month Pills -->
-                            <div class="flex flex-col gap-2 w-full md:w-auto">
-                                <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold text-center md:text-left">Pilih Bulan</p>
+                            <div class="flex flex-col gap-2.5 w-full md:w-auto">
+                                <p class="text-xs uppercase tracking-wider text-slate-300 font-bold text-center md:text-left">Pilih Bulan</p>
                                 <div id="wc-month-selector" class="flex flex-wrap gap-2 justify-center md:justify-start">
                                     <!-- Diisi oleh script -->
                                 </div>
                             </div>
                             <!-- Summary Stats (dynamic) -->
                             <div class="grid grid-cols-3 gap-3 w-full md:w-auto">
-                                <div class="text-center bg-white/5 rounded-2xl p-3 border border-white/5">
-                                    <p class="text-[9px] uppercase tracking-widest text-energi-gold font-black mb-1">Total KWh</p>
-                                    <p class="text-xl font-black text-white" id="wc-stat-kwh">—</p>
-                                    <p class="text-[9px] text-slate-500 mt-0.5">Bulan ini</p>
+                                <div class="text-center bg-white/5 rounded-2xl p-3.5 border border-white/5">
+                                    <p class="text-xs uppercase tracking-wider text-energi-gold font-bold mb-1">Total KWh</p>
+                                    <p class="text-xl md:text-2xl font-black text-white" id="wc-stat-kwh">—</p>
+                                    <p class="text-xs text-slate-400 mt-0.5 font-medium">Bulan ini</p>
                                 </div>
-                                <div class="text-center bg-white/5 rounded-2xl p-3 border border-white/5">
-                                    <p class="text-[9px] uppercase tracking-widest text-energi-cyan font-black mb-1">Produksi</p>
-                                    <p class="text-xl font-black text-white" id="wc-stat-prod">—</p>
-                                    <p class="text-[9px] text-slate-500 mt-0.5">Total Pairs</p>
+                                <div class="text-center bg-white/5 rounded-2xl p-3.5 border border-white/5">
+                                    <p class="text-xs uppercase tracking-wider text-energi-cyan font-bold mb-1">Produksi</p>
+                                    <p class="text-xl md:text-2xl font-black text-white" id="wc-stat-prod">—</p>
+                                    <p class="text-xs text-slate-400 mt-0.5 font-medium">Total Pairs</p>
                                 </div>
-                                <div class="text-center bg-white/5 rounded-2xl p-3 border border-white/5">
-                                    <p class="text-[9px] uppercase tracking-widest text-energi-gold font-black mb-1">Avg KWh/P</p>
-                                    <p class="text-xl font-black text-white" id="wc-stat-ratio">—</p>
-                                    <p class="text-[9px] text-slate-500 mt-0.5">Rata-rata</p>
+                                <div class="text-center bg-white/5 rounded-2xl p-3.5 border border-white/5">
+                                    <p class="text-xs uppercase tracking-wider text-energi-gold font-bold mb-1">Avg KWh/P</p>
+                                    <p class="text-xl md:text-2xl font-black text-white" id="wc-stat-ratio">—</p>
+                                    <p class="text-xs text-slate-400 mt-0.5 font-medium">Rata-rata</p>
                                 </div>
                             </div>
                         </div>
@@ -627,24 +627,24 @@
                 <div class="reveal bg-darkcard/85 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(212,175,55,0.04)]">
                     <!-- Week Tab Selector -->
                     <div class="flex border-b border-white/10 overflow-x-auto scrollbar-hide">
-                        <button id="wc-week-btn-1" onclick="selectWeek(1)" class="wc-week-btn active-week flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-energi-gold text-energi-gold bg-energi-gold/5">
-                            <span class="block text-[9px] tracking-widest opacity-60 mb-0.5">WEEK</span> 1
+                        <button id="wc-week-btn-1" onclick="selectWeek(1)" class="wc-week-btn active-week flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-energi-gold text-energi-gold bg-energi-gold/5">
+                            <span class="block text-[10px] tracking-wider opacity-80 mb-0.5 font-semibold">WEEK</span> 1
                         </button>
-                        <button id="wc-week-btn-2" onclick="selectWeek(2)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-transparent text-slate-500 hover:text-white">
-                            <span class="block text-[9px] tracking-widest opacity-60 mb-0.5">WEEK</span> 2
+                        <button id="wc-week-btn-2" onclick="selectWeek(2)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-transparent text-slate-400 hover:text-white">
+                            <span class="block text-[10px] tracking-wider opacity-80 mb-0.5 font-semibold">WEEK</span> 2
                         </button>
-                        <button id="wc-week-btn-3" onclick="selectWeek(3)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-transparent text-slate-500 hover:text-white">
-                            <span class="block text-[9px] tracking-widest opacity-60 mb-0.5">WEEK</span> 3
+                        <button id="wc-week-btn-3" onclick="selectWeek(3)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-transparent text-slate-400 hover:text-white">
+                            <span class="block text-[10px] tracking-wider opacity-80 mb-0.5 font-semibold">WEEK</span> 3
                         </button>
-                        <button id="wc-week-btn-4" onclick="selectWeek(4)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-transparent text-slate-500 hover:text-white">
-                            <span class="block text-[9px] tracking-widest opacity-60 mb-0.5">WEEK</span> 4
+                        <button id="wc-week-btn-4" onclick="selectWeek(4)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-transparent text-slate-400 hover:text-white">
+                            <span class="block text-[10px] tracking-wider opacity-80 mb-0.5 font-semibold">WEEK</span> 4
                         </button>
-                        <button id="wc-week-btn-5" onclick="selectWeek(5)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-transparent text-slate-500 hover:text-white">
-                            <span class="block text-[9px] tracking-widest opacity-60 mb-0.5">WEEK</span> 5
+                        <button id="wc-week-btn-5" onclick="selectWeek(5)" class="wc-week-btn flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-transparent text-slate-400 hover:text-white">
+                            <span class="block text-[10px] tracking-wider opacity-80 mb-0.5 font-semibold">WEEK</span> 5
                         </button>
                         <!-- Week Date Range Label -->
                         <div class="ml-auto flex items-center px-6">
-                            <span id="wc-week-date-label" class="text-[10px] text-slate-500 font-mono whitespace-nowrap">—</span>
+                            <span id="wc-week-date-label" class="text-xs md:text-sm text-slate-300 font-mono whitespace-nowrap font-medium">—</span>
                         </div>
                     </div>
 
@@ -652,19 +652,19 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead>
-                                <tr class="bg-white/3">
-                                    <th class="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold w-10">No</th>
-                                    <th class="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold min-w-[180px]">Area / Departemen</th>
-                                    <th class="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-energi-gold font-bold text-right">KWh</th>
-                                    <th class="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-energi-cyan font-bold text-right">Produksi (Pairs)</th>
-                                    <th class="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-slate-300 font-bold text-right">KWh/Pairs</th>
-                                    <th class="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold text-center">Status</th>
+                                <tr class="bg-white/5 border-b border-white/10">
+                                    <th class="px-4 py-3.5 text-xs uppercase tracking-wider text-slate-300 font-bold w-12">No</th>
+                                    <th class="px-4 py-3.5 text-xs uppercase tracking-wider text-slate-200 font-bold min-w-[190px]">Area / Departemen</th>
+                                    <th class="px-4 py-3.5 text-xs uppercase tracking-wider text-energi-gold font-bold text-right">KWh</th>
+                                    <th class="px-4 py-3.5 text-xs uppercase tracking-wider text-energi-cyan font-bold text-right">Produksi (Pairs)</th>
+                                    <th class="px-4 py-3.5 text-xs uppercase tracking-wider text-amber-200 font-bold text-right">KWh/Pairs</th>
+                                    <th class="px-4 py-3.5 text-xs uppercase tracking-wider text-slate-300 font-bold text-center">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="wc-table-body">
                                 <tr>
                                     <td colspan="6" class="px-4 py-16 text-center">
-                                        <div class="flex flex-col items-center gap-3 text-slate-600">
+                                        <div class="flex flex-col items-center gap-3 text-slate-500">
                                             <span class="text-4xl"><i class="ph-fill ph-calendar-blank"></i></span>
                                             <p class="text-sm font-medium">Pilih bulan untuk melihat data konsumsi mingguan</p>
                                         </div>
@@ -675,15 +675,15 @@
                     </div>
 
                     <!-- Notes Footer -->
-                    <div class="border-t border-white/5 bg-white/2 px-6 py-4">
+                    <div class="border-t border-white/10 bg-white/3 px-6 py-4">
                         <div class="flex flex-wrap gap-x-8 gap-y-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 rounded-sm bg-yellow-500/30 border border-yellow-500/40 flex-shrink-0"></div>
-                                <p class="text-[10px] text-slate-500"><strong class="text-slate-400">Office Dormitory</strong> = total IDC + Mess Korea + Kantor Umum (PJ023) + Kantor Umum (PJ112) + Manmod</p>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-3.5 h-3.5 rounded-sm bg-yellow-500/30 border border-yellow-500/50 flex-shrink-0"></div>
+                                <p class="text-xs text-slate-300"><strong class="text-yellow-300 font-semibold">Office Dormitory</strong> = total IDC + Mess Korea + Kantor Umum (PJ023) + Kantor Umum (PJ112) + Manmod</p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-3 h-3 rounded-sm bg-orange-500/30 border border-orange-500/40 flex-shrink-0"></div>
-                                <p class="text-[10px] text-slate-500"><strong class="text-slate-400">Utility</strong> = total Kompressor Engineering + WTP & WWTP + Kantin B + Others PJ023 + Others PJ112</p>
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-3.5 h-3.5 rounded-sm bg-orange-500/30 border border-orange-500/50 flex-shrink-0"></div>
+                                <p class="text-xs text-slate-300"><strong class="text-orange-300 font-semibold">Utility</strong> = total Kompressor Engineering + WTP & WWTP + Kantin B + Others PJ023 + Others PJ112</p>
                             </div>
                         </div>
                     </div>
@@ -692,12 +692,12 @@
                 <!-- Trend Chart across 5 weeks -->
                 <div class="reveal bg-darkcard/85 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.03)]">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-9 h-9 rounded-xl bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center"><i class="ph-fill ph-trend-up"></i></div>
+                        <div class="w-9 h-9 rounded-xl bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center text-energi-gold"><i class="ph-fill ph-trend-up"></i></div>
                         <div>
-                            <h3 class="text-white font-bold text-sm uppercase tracking-wider">Trend KWh/Pairs — 5 Minggu</h3>
-                            <p class="text-[9px] text-slate-500 uppercase tracking-widest">Grafik perbandingan antar minggu</p>
+                            <h3 class="text-white font-bold text-sm md:text-base uppercase tracking-wider">Trend KWh/Pairs — 5 Minggu</h3>
+                            <p class="text-xs text-slate-400 font-medium">Grafik perbandingan antar minggu</p>
                         </div>
-                        <div class="ml-auto text-[10px] text-slate-500 font-mono" id="wc-chart-month-label">—</div>
+                        <div class="ml-auto text-xs md:text-sm text-slate-300 font-mono font-medium" id="wc-chart-month-label">—</div>
                     </div>
                     <canvas id="wcTrendChart" style="max-height: 260px;"></canvas>
                 </div>
@@ -705,10 +705,10 @@
                 <!-- Audit Note -->
                 <div class="reveal bg-gradient-to-r from-energi-gold/5 via-energi-cyan/5 to-energi-gold/5 border border-energi-gold/20 p-5 md:p-6 rounded-2xl backdrop-blur-md">
                     <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 rounded-full bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center text-lg shrink-0 mt-0.5"><i class="ph-fill ph-lock-key"></i></div>
+                        <div class="w-10 h-10 rounded-full bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center text-lg shrink-0 mt-0.5 text-energi-gold"><i class="ph-fill ph-lock-key"></i></div>
                         <div>
-                            <h4 class="text-energi-gold font-bold text-sm mb-1">Catatan Audit & Monitoring</h4>
-                            <p class="text-slate-400 text-xs leading-relaxed">Data konsumsi energi mingguan ini berfungsi sebagai <strong class="text-white">rekam jejak resmi</strong> yang dapat digunakan sebagai bahan audit energi, evaluasi kinerja per departemen, dan dasar perhitungan target efisiensi tahun berikutnya. Setiap Kepala Departemen dan PIC diharapkan memantau tren KWh/Pairs secara aktif.</p>
+                            <h4 class="text-energi-gold font-bold text-sm md:text-base mb-1">Catatan Audit & Monitoring</h4>
+                            <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Data konsumsi energi mingguan ini berfungsi sebagai <strong class="text-white">rekam jejak resmi</strong> yang dapat digunakan sebagai bahan audit energi, evaluasi kinerja per departemen, dan dasar perhitungan target efisiensi tahun berikutnya. Setiap Kepala Departemen dan PIC diharapkan memantau tren KWh/Pairs secara aktif.</p>
                         </div>
                     </div>
                 </div>
@@ -1695,10 +1695,10 @@
             if (!sel) return;
             sel.innerHTML = wcMonths.map(mk => `
                 <button onclick="wcSelectMonth('${mk}')"
-                    class="wc-month-pill px-4 py-1.5 rounded-full text-xs font-bold tracking-wide transition-all border ${
+                    class="wc-month-pill px-4 py-2 rounded-full text-xs md:text-sm font-bold tracking-wide transition-all border ${
                         mk === wcCurrentMonth
                         ? 'bg-energi-gold text-darkbg border-energi-gold shadow-[0_0_15px_rgba(212,175,55,0.4)]'
-                        : 'bg-white/5 text-slate-400 border-white/10 hover:border-energi-gold/40 hover:text-energi-gold'
+                        : 'bg-white/5 text-slate-300 border-white/10 hover:border-energi-gold/40 hover:text-energi-gold'
                     }">
                     ${wcMonthLabel(mk)}
                 </button>
@@ -1728,9 +1728,9 @@
                 const btn = document.getElementById('wc-week-btn-' + i);
                 if (!btn) continue;
                 if (i === wcCurrentWeek) {
-                    btn.className = 'wc-week-btn active-week flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-energi-gold text-energi-gold bg-energi-gold/5';
+                    btn.className = 'wc-week-btn active-week flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-energi-gold text-energi-gold bg-energi-gold/5';
                 } else {
-                    btn.className = 'wc-week-btn flex-shrink-0 px-6 py-4 text-xs font-bold uppercase tracking-[0.15em] transition-all border-b-2 border-transparent text-slate-500 hover:text-white';
+                    btn.className = 'wc-week-btn flex-shrink-0 px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all border-b-2 border-transparent text-slate-400 hover:text-white';
                 }
             }
             // Update date label
@@ -1782,9 +1782,9 @@
 
             if (!wcCurrentMonth) {
                 tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-16 text-center">
-                    <div class="flex flex-col items-center gap-3 text-slate-600">
+                    <div class="flex flex-col items-center gap-3 text-slate-500">
                         <span class="text-4xl"><i class="ph-fill ph-calendar-blank"></i></span>
-                        <p class="text-sm font-medium">Pilih bulan untuk melihat data konsumsi mingguan</p>
+                        <p class="text-sm font-medium text-slate-300">Pilih bulan untuk melihat data konsumsi mingguan</p>
                     </div></td></tr>`;
                 return;
             }
@@ -1837,38 +1837,38 @@
                 const ratioStr = ratioRaw != null ? ratioRaw.toFixed(3) : '\u2014';
 
                 // Status badge
-                let statusBadge = '<span class="text-slate-700 text-[9px]">\u2014</span>';
+                let statusBadge = '<span class="text-slate-600 text-xs font-mono">\u2014</span>';
                 if (ratioRaw != null && avgRatio != null && area.type === 'plant') {
                     if (ratioRaw <= avgRatio * 0.9) {
-                        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[9px] font-bold border border-green-500/20">\u2713 Efisien</span>';
+                        statusBadge = '<span class="px-2.5 py-1 rounded-full bg-green-500/15 text-green-400 text-xs font-bold border border-green-500/25 whitespace-nowrap">\u2713 Efisien</span>';
                     } else if (ratioRaw <= avgRatio) {
-                        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 text-[9px] font-bold border border-blue-500/20">\u25cf Normal</span>';
+                        statusBadge = '<span class="px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-400 text-xs font-bold border border-blue-500/25 whitespace-nowrap">\u25cf Normal</span>';
                     } else {
-                        statusBadge = '<span class="px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 text-[9px] font-bold border border-red-500/20">\u25b2 Tinggi</span>';
+                        statusBadge = '<span class="px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 text-xs font-bold border border-red-500/25 whitespace-nowrap">\u25b2 Tinggi</span>';
                     }
                 }
                 if (area.type === 'dormitory-total') {
-                    statusBadge = '<span class="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 text-[9px] font-bold border border-yellow-500/30">TOTAL</span>';
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-bold border border-yellow-500/35 whitespace-nowrap">TOTAL</span>';
                 }
                 if (area.type === 'utility-total') {
-                    statusBadge = '<span class="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 text-[9px] font-bold border border-orange-500/30">TOTAL</span>';
+                    statusBadge = '<span class="px-2.5 py-1 rounded-full bg-orange-500/20 text-orange-300 text-xs font-bold border border-orange-500/35 whitespace-nowrap">TOTAL</span>';
                 }
 
                 // Name styling
                 const nameStyle = area.type.includes('total')
-                    ? 'font-bold text-white'
+                    ? 'font-bold text-white text-sm'
                     : area.type.includes('sub')
-                    ? 'text-slate-400 pl-3 text-[11px]'
-                    : 'text-slate-200 text-xs';
+                    ? 'text-slate-300 pl-4 text-xs font-medium'
+                    : 'text-slate-100 text-sm font-semibold';
 
                 html += `
                 <tr class="border-b border-white/5 transition-colors ${rowStyle}" style="animation: fadeInUpWinner 0.3s ease ${idx * 0.03}s both">
-                    <td class="px-4 py-2.5 text-[11px] text-slate-600 font-mono">${String(no).padStart(2,'0')}</td>
-                    <td class="px-4 py-2.5 ${nameStyle}">${area.name}</td>
-                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${kwhNum != null ? 'text-energi-gold' : 'text-slate-700'}">${kwhStr}</td>
-                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${prodNum != null ? 'text-energi-cyan' : 'text-slate-700'}">${prodStr}</td>
-                    <td class="px-4 py-2.5 text-right font-mono text-[11px] ${ratioRaw != null ? 'text-white' : 'text-slate-700'}">${ratioStr}</td>
-                    <td class="px-4 py-2.5 text-center">${statusBadge}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400 font-mono font-medium">${String(no).padStart(2,'0')}</td>
+                    <td class="px-4 py-3 ${nameStyle}">${area.name}</td>
+                    <td class="px-4 py-3 text-right font-mono text-sm font-semibold ${kwhNum != null ? 'text-energi-gold' : 'text-slate-600'}">${kwhStr}</td>
+                    <td class="px-4 py-3 text-right font-mono text-sm font-semibold ${prodNum != null ? 'text-energi-cyan' : 'text-slate-600'}">${prodStr}</td>
+                    <td class="px-4 py-3 text-right font-mono text-sm font-bold ${ratioRaw != null ? 'text-white' : 'text-slate-600'}">${ratioStr}</td>
+                    <td class="px-4 py-3 text-center">${statusBadge}</td>
                 </tr>`;
             });
 
@@ -1879,11 +1879,11 @@
             const totRatio = totProd > 0 ? (totKwh / totProd) : 0;
             html += `
             <tr class="border-t-2 border-energi-gold/30 bg-energi-gold/5">
-                <td class="px-4 py-3 text-[11px] text-slate-500" colspan="2"><span class="font-black text-energi-gold uppercase tracking-widest text-xs">Total Plant</span></td>
-                <td class="px-4 py-3 text-right font-black text-sm text-energi-gold font-mono">${totKwh > 0 ? totKwh.toLocaleString('id-ID') : '\u2014'}</td>
-                <td class="px-4 py-3 text-right font-black text-sm text-energi-cyan font-mono">${totProd > 0 ? totProd.toLocaleString('id-ID') : '\u2014'}</td>
-                <td class="px-4 py-3 text-right font-black text-sm text-white font-mono">${totRatio > 0 ? totRatio.toFixed(3) : '\u2014'}</td>
-                <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold text-[9px] font-bold border border-energi-gold/30">PLANT</span></td>
+                <td class="px-4 py-3.5 text-xs text-slate-300 font-medium" colspan="2"><span class="font-black text-energi-gold uppercase tracking-wider text-sm">Total Plant</span></td>
+                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-energi-gold font-mono">${totKwh > 0 ? totKwh.toLocaleString('id-ID') : '\u2014'}</td>
+                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-energi-cyan font-mono">${totProd > 0 ? totProd.toLocaleString('id-ID') : '\u2014'}</td>
+                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-white font-mono">${totRatio > 0 ? totRatio.toFixed(3) : '\u2014'}</td>
+                <td class="px-4 py-3.5 text-center"><span class="px-2.5 py-1 rounded-full bg-energi-gold/20 text-energi-gold text-xs font-bold border border-energi-gold/30 whitespace-nowrap">PLANT</span></td>
             </tr>`;
 
             tbody.innerHTML = html;
@@ -1983,7 +1983,9 @@
                                     borderColor: '#D4AF37',
                                     borderWidth: 1,
                                     titleColor: '#D4AF37',
+                                    titleFont: { size: 13, family: 'Outfit', weight: '700' },
                                     bodyColor: '#fff',
+                                    bodyFont: { size: 13, family: 'Outfit' },
                                     padding: 12,
                                     callbacks: {
                                         label: ctx => ' KWh/Pairs: ' + (ctx.raw != null ? ctx.raw.toFixed(4) : '\u2014')
@@ -1995,12 +1997,12 @@
                                     beginAtZero: false,
                                     grid: { color: 'rgba(255,255,255,0.06)', drawBorder: false },
                                     border: { display: false },
-                                    ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10, family: 'Outfit' }, padding: 8 }
+                                    ticks: { color: 'rgba(255,255,255,0.7)', font: { size: 12, family: 'Outfit' }, padding: 8 }
                                 },
                                 x: {
                                     grid: { display: false },
                                     border: { display: false },
-                                    ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11, family: 'Outfit', weight: '600' } }
+                                    ticks: { color: 'rgba(255,255,255,0.85)', font: { size: 12, family: 'Outfit', weight: '600' } }
                                 }
                             },
                             animation: { duration: 1200, easing: 'easeOutQuart' }
