@@ -738,17 +738,17 @@ html { scroll-behavior: smooth; }
 .year-pill {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 16px;
+    gap: 6px;
+    padding: 7px 18px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
     cursor: pointer;
     transition: all 0.2s ease;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
 }
 
 .year-pill:hover {

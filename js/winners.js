@@ -171,26 +171,26 @@ export function displayWinners(page) {
         const formatNo = String(no).padStart(2, '0');
         const delay = index * 0.07;
         const yearBadge = winner.year
-            ? `<span class="text-[9px] font-black text-energi-gold bg-energi-gold/10 border border-energi-gold/20 px-1.5 py-0.5 rounded font-mono">${winner.year}</span>`
+            ? `<span class="text-xs font-bold text-energi-gold bg-energi-gold/15 border border-energi-gold/30 px-2 py-0.5 rounded font-mono">${winner.year}</span>`
             : '';
 
         listContainer.insertAdjacentHTML('beforeend', `
-            <div class="stagger-item group flex items-center gap-4 p-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-energi-gold/50 hover:bg-energi-gold/5 transition-all duration-500 opacity-0 transform translate-y-8" style="animation: fadeInUpWinner 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s">
-                <div class="w-12 h-12 flex-shrink-0 bg-darkbg rounded-xl flex items-center justify-center font-black text-slate-400 group-hover:text-energi-gold group-hover:scale-110 transition-all border border-white/10 shadow-inner overflow-hidden relative">
+            <div class="stagger-item group flex items-center gap-4 p-4 md:p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-energi-gold/50 hover:bg-energi-gold/5 transition-all duration-500 opacity-0 transform translate-y-8" style="animation: fadeInUpWinner 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s">
+                <div class="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 bg-darkbg rounded-xl flex items-center justify-center font-black text-slate-300 group-hover:text-energi-gold group-hover:scale-105 transition-all border border-white/10 shadow-inner overflow-hidden relative">
                     <div class="absolute inset-0 bg-gradient-to-br from-energi-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span class="relative z-10">${formatNo}</span>
+                    <span class="relative z-10 text-sm md:text-base">${formatNo}</span>
                 </div>
                 <div class="flex-grow min-w-0">
-                    <h3 class="text-base md:text-lg font-bold text-white group-hover:text-energi-gold transition-colors truncate">${winner.name}</h3>
-                    <div class="flex flex-wrap gap-2 mt-1 items-center">
-                        <span class="text-[10px] md:text-xs font-mono text-energi-cyan bg-energi-cyan/10 px-2 py-0.5 rounded border border-energi-cyan/20">ID: ${winner.nik}</span>
-                        <span class="text-[10px] md:text-xs text-slate-400 uppercase tracking-widest flex items-center gap-1"><span class="w-1 h-1 rounded-full bg-slate-600"></span> ${winner.dept}</span>
+                    <h3 class="text-base md:text-xl font-bold text-white group-hover:text-energi-gold transition-colors truncate">${winner.name}</h3>
+                    <div class="flex flex-wrap gap-2.5 mt-1.5 items-center">
+                        <span class="text-xs md:text-sm font-mono text-energi-cyan bg-energi-cyan/10 px-2.5 py-0.5 rounded-md border border-energi-cyan/25 font-semibold">NIK: ${winner.nik}</span>
+                        <span class="text-xs md:text-sm text-slate-300 font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> ${winner.dept}</span>
                         ${yearBadge}
                     </div>
                 </div>
                 <div class="hidden sm:flex flex-col items-end gap-1">
-                    <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[10px] font-black uppercase tracking-tighter">TERBAIK</div>
-                    <div class="text-[9px] text-slate-500 font-mono italic">Validated ✓</div>
+                    <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[11px] font-black uppercase tracking-wider">TERBAIK</div>
+                    <div class="text-[10px] text-slate-400 font-mono italic">Validated ✓</div>
                 </div>
             </div>
         `);
