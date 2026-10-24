@@ -510,6 +510,180 @@ window.seedWinners = async () => {
     toast('100 data pemenang berhasil ditambahkan! 🎉');
 };
 
+// ─── Fitur Import & Export Excel Pemenang ──────────────────────────────────────
+let pendingImportWinners = [];
+
+window.closeExcelModal = () => {
+    const modal = $('excel-modal');
+    if (modal) modal.classList.remove('open');
+    pendingImportWinners = [];
+    const input = $('excel-winners-file');
+    if (input) input.value = '';
+};
+
+window.downloadWinnersTemplate = () => {
+    if (typeof XLSX === 'undefined') {
+        toast('Library Excel belum siap. Periksa koneksi internet.', 'error');
+        return;
+    }
+    const currentYear = new Date().getFullYear();
+    const templateData = [
+        { 'No': 1, 'Tahun': currentYear, 'NIK': '101001', 'Nama': 'Ahmad Subarjo', 'Departemen': 'Operasional Produksi' },
+        { 'No': 2, 'Tahun': currentYear, 'NIK': '101002', 'Nama': 'Budi Santoso', 'Departemen': 'Engineering & Maintenance' },
+        { 'No': 3, 'Tahun': currentYear, 'NIK': '101003', 'Nama': 'Citra Kirana', 'Departemen': 'Quality Control Analyst' },
+        { 'No': 4, 'Tahun': currentYear, 'NIK': '101004', 'Nama': 'Dadan Hermawan', 'Departemen': 'Logistik & Supply Chain' },
+        { 'No': 5, 'Tahun': currentYear, 'NIK': '101005', 'Nama': 'Euis Komalasari', 'Departemen': 'Human Resources' }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    ws['!cols'] = [
+        { wch: 6 },
+        { wch: 10 },
+        { wch: 14 },
+        { wch: 28 },
+        { wch: 28 }
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Template_Pemenang');
+    XLSX.writeFile(wb, `Template_Pemenang_Energi_${currentYear}.xlsx`);
+    toast('✅ Template Excel berhasil diunduh!');
+};
+
+window.handleWinnersExcelImport = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (typeof XLSX === 'undefined') {
+        toast('Library Excel belum siap. Silakan refresh halaman.', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+            if (!rows || rows.length === 0) {
+                toast('File Excel kosong atau tidak terbaca.', 'error');
+                return;
+            }
+
+            const currentYear = new Date().getFullYear();
+            const parsed = [];
+
+            rows.forEach((r, idx) => {
+                const keys = Object.keys(r);
+                const findVal = (regex) => {
+                    const match = keys.find(k => regex.test(k.trim()));
+                    return match !== undefined ? String(r[match]).trim() : '';
+                };
+
+                const yearVal = findVal(/^(tahun|year|thn)$/i);
+                const nikVal = findVal(/^(nik|id|no\s*id|employee\s*id)$/i);
+                const nameVal = findVal(/^(nama|name|nama\s*lengkap|employee\s*name)$/i);
+                const deptVal = findVal(/^(departemen|departement|dept|divisi|bagian)$/i);
+
+                // Baris valid jika ada nama atau NIK
+                if (nameVal || nikVal) {
+                    const yearNum = yearVal ? parseInt(yearVal.replace(/[^0-9]/g, ''), 10) : currentYear;
+                    parsed.push({
+                        no: idx + 1,
+                        year: !isNaN(yearNum) && yearNum > 2000 ? yearNum : currentYear,
+                        nik: nikVal || '-',
+                        name: nameVal || 'Tanpa Nama',
+                        dept: deptVal || 'Umum'
+                    });
+                }
+            });
+
+            if (parsed.length === 0) {
+                toast('Format kolom tidak dikenali. Harap gunakan template yang disediakan.', 'error');
+                return;
+            }
+
+            pendingImportWinners = parsed;
+
+            $('excel-file-info').textContent = `${file.name} • ${parsed.length} data terbaca`;
+            $('excel-validation-note').innerHTML = `Berhasil membaca <strong class="text-energi-gold">${parsed.length}</strong> data pemenang dari file. Menampilkan preview maksimal 10 baris pertama:`;
+            $('excel-total-count').textContent = `Total: ${parsed.length} data pemenang siap diimpor`;
+
+            const previewItems = parsed.slice(0, 10);
+            $('excel-preview-body').innerHTML = previewItems.map((item, i) => `
+                <tr>
+                    <td class="text-slate-500 font-mono">${i + 1}</td>
+                    <td><span class="px-2 py-0.5 bg-energi-gold/15 text-energi-gold rounded font-bold">${item.year}</span></td>
+                    <td class="font-mono text-energi-cyan">${item.nik}</td>
+                    <td class="text-white font-medium">${item.name}</td>
+                    <td class="text-slate-400">${item.dept}</td>
+                </tr>
+            `).join('');
+
+            $('excel-modal').classList.add('open');
+        } catch (err) {
+            console.error('Excel parse error:', err);
+            toast('Gagal membaca file Excel: ' + err.message, 'error');
+        }
+    };
+    reader.onerror = () => toast('Gagal membuka file.', 'error');
+    reader.readAsArrayBuffer(file);
+};
+
+window.confirmImportWinners = async () => {
+    if (!pendingImportWinners || pendingImportWinners.length === 0) {
+        toast('Tidak ada data untuk diimpor.', 'error');
+        return;
+    }
+
+    const btn = $('btn-confirm-excel');
+    const originalBtnText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="loading-spinner mr-2"></span> Menyimpan...`;
+
+    try {
+        // Ambil order terakhir
+        const all = await getDocs(query(collection(db, 'winners'), orderBy('order', 'desc')));
+        let currentOrder = all.empty ? 0 : (all.docs[0]?.data()?.order || 0);
+
+        const BATCH_SIZE = 400;
+        const totalItems = pendingImportWinners.length;
+        let importedCount = 0;
+
+        for (let i = 0; i < totalItems; i += BATCH_SIZE) {
+            const chunk = pendingImportWinners.slice(i, i + BATCH_SIZE);
+            const batch = writeBatch(db);
+
+            chunk.forEach(item => {
+                currentOrder++;
+                const docRef = doc(collection(db, 'winners'));
+                batch.set(docRef, {
+                    nik: item.nik,
+                    name: item.name,
+                    dept: item.dept,
+                    year: item.year,
+                    order: currentOrder,
+                    createdAt: new Date().toISOString()
+                });
+            });
+
+            await batch.commit();
+            importedCount += chunk.length;
+        }
+
+        toast(`🎉 Berhasil mengimpor ${importedCount} data pemenang ke database!`);
+        closeExcelModal();
+    } catch (err) {
+        console.error('Import save error:', err);
+        toast('Gagal menyimpan ke database: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+    }
+};
+
 window.seedSEU = async () => {
     if (!confirm('Tambahkan data departemen SEU default? Data ini adalah contoh konsumsi energi tahunan departemen IR.')) return;
     const depts = [

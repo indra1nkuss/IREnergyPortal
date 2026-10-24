@@ -217,6 +217,8 @@
         }
     </style>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- SheetJS Library untuk Import/Export Excel (.xlsx/.csv) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -227,6 +229,58 @@
     <div id="modal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
         <div class="modal-box" id="modal-box">
             <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- EXCEL PREVIEW MODAL -->
+    <div id="excel-modal" class="modal-overlay" onclick="if(event.target===this)closeExcelModal()">
+        <div class="modal-box" style="max-width: 650px;" id="excel-modal-box">
+            <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
+                        <i class="ph-fill ph-file-xls"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold text-white">Konfirmasi Import Excel</h3>
+                        <p class="text-[11px] text-slate-400 font-mono" id="excel-file-info">Menganalisis file...</p>
+                    </div>
+                </div>
+                <button onclick="closeExcelModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="mb-4 bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-slate-300 flex items-start gap-2.5">
+                <span class="text-energi-gold text-base leading-none">ℹ️</span>
+                <div>
+                    <p class="font-bold text-white mb-0.5">Ringkasan Validasi Data</p>
+                    <p id="excel-validation-note" class="text-slate-400 leading-relaxed">Menyiapkan data pemenang untuk di-import.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-white/10 mb-4 max-h-56 overflow-y-auto">
+                <table class="table-admin text-xs w-full">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tahun</th>
+                            <th>NIK</th>
+                            <th>Nama</th>
+                            <th>Departemen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="excel-preview-body"></tbody>
+                </table>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-white/10">
+                <span class="text-xs text-slate-400 font-mono" id="excel-total-count">0 data siap diimpor</span>
+                <div class="flex gap-2">
+                    <button onclick="closeExcelModal()" class="btn-outline text-xs">Batal</button>
+                    <button id="btn-confirm-excel" onclick="confirmImportWinners()" class="btn-gold text-xs flex items-center gap-1.5">
+                        <i class="ph-bold ph-check"></i>
+                        <span>Simpan ke Database</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -327,7 +381,19 @@
                             <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-trophy"></i> Pemenang</h2>
                             <p class="text-slate-500 text-xs mt-1">Kelola 100 data pemenang training online</p>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Tombol Download Template Excel -->
+                            <button onclick="downloadWinnersTemplate()" class="btn-outline text-xs flex items-center gap-1.5" title="Unduh format template Excel untuk diisi">
+                                <i class="ph-bold ph-file-arrow-down text-energi-cyan"></i>
+                                <span>Template Excel</span>
+                            </button>
+                            <!-- Tombol Import Excel -->
+                            <label for="excel-winners-file" class="btn-gold text-xs flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]" title="Upload file Excel (.xlsx / .csv)">
+                                <i class="ph-bold ph-file-xls text-emerald-950"></i>
+                                <span>Import Excel</span>
+                            </label>
+                            <input type="file" id="excel-winners-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleWinnersExcelImport(event)">
+
                             <button onclick="openModal('winners')" class="btn-primary text-xs">+ Tambah</button>
                             <button onclick="seedWinners()" class="btn-outline text-xs">📥 Seed 100</button>
                         </div>
