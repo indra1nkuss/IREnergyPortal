@@ -10,9 +10,11 @@ class EnergyNetwork {
         this.container = document.getElementById('three-bg');
         if (!this.container) return;
 
-        // Performance: skip Three.js entirely on very low-end devices
-        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) {
+        // Performance: Matikan Three.js canvas di mobile (< 768px) atau device low-end
+        // Menghilangkan 100% beban WebGL & GPU loop di HP, baterai awet & scroll 60 FPS bebas lag
+        if (window.innerWidth < 768 || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)) {
             this.container.style.display = 'none';
+            window.addEventListener('resize', () => this.onWindowResize());
             return;
         }
 
@@ -133,9 +135,22 @@ class EnergyNetwork {
     }
 
     onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        if (window.innerWidth < 768) {
+            if (this.container) this.container.style.display = 'none';
+            if (this.animationId) {
+                cancelAnimationFrame(this.animationId);
+                this.animationId = null;
+            }
+            return;
+        } else {
+            if (this.container) this.container.style.display = 'block';
+            if (!this.animationId && this.scene) this.animate();
+        }
+        if (this.camera && this.renderer) {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
     }
 
     onMouseMove(e) {

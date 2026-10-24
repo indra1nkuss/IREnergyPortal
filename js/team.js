@@ -44,7 +44,7 @@ export function renderTeam() {
             <div class="hex-container relative z-10 mx-auto">
                 <div class="hex-border"></div>
                 <div class="hex-photo-wrap">
-                    <img src="${imagePath}" alt="${person.name}" loading="lazy"
+                    <img src="${imagePath}" alt="${person.name}" loading="lazy" decoding="async"
                          class="hex-photo object-cover w-full h-full transition-transform duration-500"
                          onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(person.name)}&background=0a0a0f&color=D4AF37&bold=true';">
                 </div>

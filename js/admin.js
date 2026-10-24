@@ -219,7 +219,7 @@ window.openModal = (collection, editId = null) => {
                     <label class="text-xs text-slate-400 block mb-2 font-medium">Foto Profil</label>
                     <div class="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col items-center gap-3">
                         <label for="m-team-file" class="relative group cursor-pointer block" title="Klik untuk pilih foto dari galeri">
-                            <img id="team-avatar-preview" src="images/default.jpg" class="w-24 h-24 rounded-full object-cover border-2 border-energi-gold shadow-[0_0_20px_rgba(212,175,55,0.25)] bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=User&background=0a0a0f&color=D4AF37&bold=true';">
+                            <img id="team-avatar-preview" src="images/default.jpg" decoding="async" class="w-24 h-24 rounded-full object-cover border-2 border-energi-gold shadow-[0_0_20px_rgba(212,175,55,0.25)] bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=User&background=0a0a0f&color=D4AF37&bold=true';">
                             <div class="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                 <span class="text-lg">📷</span>
                                 <span class="text-[10px] text-white font-bold">Ganti Foto</span>
@@ -731,7 +731,7 @@ function renderTeamTable(items) {
             <td class="text-slate-400 text-xs">${item.role || '-'}</td>
             <td>
                 <div class="flex items-center gap-2">
-                    <img src="${item.image || 'images/default.jpg'}" class="w-8 h-8 rounded-full object-cover border border-energi-gold/40 bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=0a0a0f&color=D4AF37&bold=true';">
+                    <img src="${item.image || 'images/default.jpg'}" loading="lazy" decoding="async" class="w-8 h-8 rounded-full object-cover border border-energi-gold/40 bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=0a0a0f&color=D4AF37&bold=true';">
                     <span class="text-slate-500 text-[10px] truncate max-w-[120px] hidden md:inline font-mono">${item.image ? (item.image.startsWith('http') ? 'Cloudinary' : item.image) : '-'}</span>
                 </div>
             </td>
@@ -752,7 +752,7 @@ function renderGallery(items) {
     body.innerHTML = items.map((item, i) => `
         <tr>
             <td class="text-slate-500 font-mono text-xs">${i + 1}</td>
-            <td><img src="${item.imageUrl}" class="preview-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230a0a0f%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22central%22 font-size=%2240%22>🖼️</text></svg>'"></td>
+            <td><img src="${item.imageUrl}" loading="lazy" decoding="async" class="preview-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%230a0a0f%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dominant-baseline=%22central%22 font-size=%2240%22>🖼️</text></svg>'"></td>
             <td class="text-slate-300 text-xs">${item.caption || '-'}</td>
             <td class="text-right">
                 <button onclick="openModal('gallery','${item.id}')" class="btn-outline btn-sm mr-1">✏️</button>
@@ -812,7 +812,7 @@ window.renderTeamGalleryGrid = async () => {
     grid.innerHTML = allPhotos.map(item => `
         <div data-photo-url="${encodeURIComponent(item.imageUrl)}" 
              class="team-gallery-item cursor-pointer group relative rounded-lg overflow-hidden border border-white/10 hover:border-energi-gold active:scale-95 transition-all aspect-square bg-[#0a0a0f]" title="${item.caption || 'Klik untuk memilih foto'}">
-            <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 pointer-events-none" onerror="this.src='images/default.jpg'">
+            <img src="${item.imageUrl}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 pointer-events-none" onerror="this.src='images/default.jpg'">
             <div class="absolute inset-0 bg-energi-gold/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                 <span class="text-[10px] bg-darkbg/90 text-energi-gold px-1.5 py-0.5 rounded font-bold border border-energi-gold/50">Pilih</span>
             </div>
