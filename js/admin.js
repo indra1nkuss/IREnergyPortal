@@ -1163,30 +1163,32 @@ console.log('✅ Admin Portal Energi siap!');
 // ══════════════════════════════════════════════════════════════════════════════
 
 const WC_AREAS_ADMIN = [
-    { id: 'plant-ir-a',          name: 'Plant IR A' },
-    { id: 'plant-ir-b',          name: 'Plant IR B' },
-    { id: 'plant-ir-c',          name: 'Plant IR C' },
-    { id: 'plant-ir-d',          name: 'Plant IR D' },
-    { id: 'plant-ir-e-rubber',   name: 'Plant IR E (Rubber)' },
-    { id: 'plant-ir-e-mixing',   name: 'Plant IR E (Mixing)' },
-    { id: 'plant-ir-e-press',    name: 'Plant IR E (Press)' },
-    { id: 'plant-ir-e-stockfit', name: 'Plant IR E (Stockfit)' },
-    { id: 'plant-ir-e-grinding', name: 'Plant IR E (Grinding)' },
-    { id: 'plant-ir-e-injection',name: 'Plant IR E (Injection Phylon)' },
-    { id: 'plant-ir-f-2nd',      name: 'Plant IR F (2nd Process)' },
-    { id: 'plant-ir-f-cutting',  name: 'Plant IR F (Cutting)' },
-    { id: 'idc',                 name: 'IDC' },
-    { id: 'mess-korea',          name: 'Mess Korea' },
-    { id: 'kantor-pj023',        name: 'Kantor Umum (PJ023)' },
-    { id: 'kantor-pj112',        name: 'Kantor Umum (PJ112)' },
-    { id: 'manmod',              name: 'Manmod' },
-    { id: 'office-dormitory',    name: 'Office Dormitory (Total)' },
-    { id: 'kompressor',          name: 'Kompressor Engineering' },
-    { id: 'wtp-wwtp',            name: 'WTP & WWTP' },
-    { id: 'kantin-b',            name: 'Kantin B' },
-    { id: 'others-pj023',        name: 'Others PJ023' },
-    { id: 'others-pj112',        name: 'Others PJ112' },
-    { id: 'utility',             name: 'Utility (Total)' },
+    { id: 'plant-ir-a',          name: 'Plant IR A',                   type: 'plant' },
+    { id: 'plant-ir-b',          name: 'Plant IR B',                   type: 'plant' },
+    { id: 'plant-ir-c',          name: 'Plant IR C',                   type: 'plant' },
+    { id: 'plant-ir-d',          name: 'Plant IR D',                   type: 'plant' },
+    { id: 'plant-ir-e-rubber',   name: 'Plant IR E (Rubber)',          type: 'plant' },
+    { id: 'plant-ir-e-mixing',   name: 'Plant IR E (Mixing)',          type: 'plant' },
+    { id: 'plant-ir-e-press',    name: 'Plant IR E (Press)',           type: 'plant' },
+    { id: 'plant-ir-e-stockfit', name: 'Plant IR E (Stockfit)',        type: 'plant' },
+    { id: 'plant-ir-e-grinding', name: 'Plant IR E (Grinding)',        type: 'plant' },
+    { id: 'plant-ir-e-injection',name: 'Plant IR E (Injection Phylon)',type: 'plant' },
+    { id: 'plant-ir-f-2nd',      name: 'Plant IR F (2nd Process)',     type: 'plant' },
+    { id: 'plant-ir-f-cutting',  name: 'Plant IR F (Cutting)',         type: 'plant' },
+    // Baris total khusus — KWh = auto-sum plant, Prod = input mandiri (1 angka total mingguan)
+    { id: 'total-plant',         name: 'Total Plant',                  type: 'plant-total' },
+    { id: 'idc',                 name: 'IDC',                          type: 'dormitory-sub' },
+    { id: 'mess-korea',          name: 'Mess Korea',                   type: 'dormitory-sub' },
+    { id: 'kantor-pj023',        name: 'Kantor Umum (PJ023)',          type: 'dormitory-sub' },
+    { id: 'kantor-pj112',        name: 'Kantor Umum (PJ112)',          type: 'dormitory-sub' },
+    { id: 'manmod',              name: 'Manmod',                       type: 'dormitory-sub' },
+    { id: 'office-dormitory',    name: 'Office Dormitory (Total)',     type: 'dormitory-total' },
+    { id: 'kompressor',          name: 'Kompressor Engineering',       type: 'utility-sub' },
+    { id: 'wtp-wwtp',            name: 'WTP & WWTP',                   type: 'utility-sub' },
+    { id: 'kantin-b',            name: 'Kantin B',                     type: 'utility-sub' },
+    { id: 'others-pj023',        name: 'Others PJ023',                 type: 'utility-sub' },
+    { id: 'others-pj112',        name: 'Others PJ112',                 type: 'utility-sub' },
+    { id: 'utility',             name: 'Utility (Total)',              type: 'utility-total' },
 ];
 
 let wcAdminCurrentMonth = '';
@@ -1276,31 +1278,59 @@ function wcRenderAdminWeekForm() {
     }
 
     // Area rows — semua baris dapat diinput, termasuk office-dormitory & utility
+    const PLANT_IDS = WC_AREAS_ADMIN.filter(a => a.type === 'plant').map(a => a.id);
+
     const rows = WC_AREAS_ADMIN.map((area, i) => {
-        const isTotal = area.id === 'office-dormitory' || area.id === 'utility';
+        const isDormTotal   = area.id === 'office-dormitory';
+        const isUtilTotal   = area.id === 'utility';
+        const isKwhAutoOnly = isDormTotal || isUtilTotal;
+        const isPlantTotal  = area.type === 'plant-total';
         const saved = weekData[area.id] || {};
 
-        // KWh: auto-sum dari sub-area, namun Prod & Ratio dari data tersimpan
-        const kwhVal   = isTotal ? adminSumKwh(area.id === 'office-dormitory' ? DORM_SUB_IDS : UTILITY_SUB_IDS) : (saved.kwh !== undefined ? saved.kwh : '');
+        // KWh value
+        let kwhVal;
+        if (isPlantTotal) {
+            kwhVal = adminSumKwh(PLANT_IDS); // auto-sum semua plant
+        } else if (isKwhAutoOnly) {
+            kwhVal = adminSumKwh(area.id === 'office-dormitory' ? DORM_SUB_IDS : UTILITY_SUB_IDS);
+        } else {
+            kwhVal = saved.kwh !== undefined ? saved.kwh : '';
+        }
+
         const prodVal  = saved.prod  !== undefined ? saved.prod  : '';
         const ratioVal = saved.ratio !== undefined ? saved.ratio : '';
 
-        const rowBg = isTotal
-            ? (area.id === 'office-dormitory' ? 'bg-yellow-500/10 border-t border-white/10' : 'bg-orange-500/10 border-t border-white/10')
-            : (i % 2 === 0 ? 'bg-white/2' : '');
+        // Row background
+        const rowBg = isPlantTotal
+            ? 'bg-energi-gold/10 border-t-2 border-energi-gold/40 border-b border-white/10'
+            : isKwhAutoOnly
+                ? (isDormTotal ? 'bg-yellow-500/10 border-t border-white/10' : 'bg-orange-500/10 border-t border-white/10')
+                : (i % 2 === 0 ? 'bg-white/2' : '');
 
-        const nameCell = isTotal
-            ? `<span class="font-bold text-white">${area.name}</span><span class="ml-2 text-[9px] font-normal text-slate-500">(KWh auto)</span>`
-            : area.name;
+        // Name cell
+        let nameCell;
+        if (isPlantTotal) {
+            nameCell = `<span class="font-black text-energi-gold uppercase tracking-wide">${area.name}</span><span class="ml-2 text-[9px] font-normal text-slate-500">(KWh auto · Prod mandiri)</span>`;
+        } else if (isKwhAutoOnly) {
+            nameCell = `<span class="font-bold text-white">${area.name}</span><span class="ml-2 text-[9px] font-normal text-slate-500">(KWh auto)</span>`;
+        } else {
+            nameCell = area.name;
+        }
 
-        // KWh: readonly untuk total rows (auto-sum), editable untuk lainnya
-        const kwhInput = isTotal
+        // KWh input — readonly untuk baris auto-sum
+        const kwhReadonly = isPlantTotal || isKwhAutoOnly;
+        const kwhInput = kwhReadonly
             ? `<input type="number" id="wca-kwh-${area.id}" value="${kwhVal}"
                     class="w-full bg-black/20 border border-white/5 rounded-lg px-3 py-2 text-sm text-energi-gold font-mono cursor-not-allowed opacity-70" readonly tabindex="-1">`
             : `<input type="number" step="0.01" placeholder="0"
                     id="wca-kwh-${area.id}" value="${kwhVal}"
                     oninput="wcAutoCalcRatio('${area.id}'); wcAdminRefreshTotals();"
                     class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-gold font-mono focus:outline-none focus:border-energi-gold/50">`;
+
+        // Prod input — semua editable kecuali tidak ada pengecualian
+        const prodInputClass = isPlantTotal
+            ? 'w-full bg-white/5 border border-energi-cyan/40 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan font-bold'
+            : 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50';
 
         return `
         <tr class="${rowBg} hover:bg-white/4 transition-colors">
@@ -1312,7 +1342,7 @@ function wcRenderAdminWeekForm() {
                     id="wca-prod-${area.id}"
                     value="${prodVal}"
                     oninput="wcAutoCalcRatio('${area.id}');"
-                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50">
+                    class="${prodInputClass}">
             </td>
             <td class="py-2 px-3">
                 <input type="number" step="0.0001" placeholder="auto"
@@ -1322,6 +1352,7 @@ function wcRenderAdminWeekForm() {
             </td>
         </tr>`;
     }).join('');
+
 
     container.innerHTML = `
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-5 gap-4">
@@ -1381,10 +1412,11 @@ window.wcAutoCalcRatio = (areaId) => {
     if (ratioEl) ratioEl.value = prod > 0 ? (kwh / prod).toFixed(4) : '';
 };
 
-// ─── Refresh KWh auto-total rows (Office Dormitory & Utility) ────────────────
+// ─── Refresh KWh auto-total rows ─────────────────────────────────────────────
 // Hanya KWh yang dijumlah otomatis dari sub-area.
 // Produksi/Pairs diisi mandiri oleh admin — tidak dijumlah.
 window.wcAdminRefreshTotals = () => {
+    const PLANT_IDS       = WC_AREAS_ADMIN.filter(a => a.type === 'plant').map(a => a.id);
     const DORM_SUB_IDS    = ['idc','mess-korea','kantor-pj023','kantor-pj112','manmod'];
     const UTILITY_SUB_IDS = ['kompressor','wtp-wwtp','kantin-b','others-pj023','others-pj112'];
 
@@ -1401,9 +1433,11 @@ window.wcAdminRefreshTotals = () => {
         if (ratioEl) ratioEl.value = prod > 0 ? (kwh / prod).toFixed(4) : '';
     }
 
+    recalcKwhOnly(PLANT_IDS,       'total-plant');
     recalcKwhOnly(DORM_SUB_IDS,    'office-dormitory');
     recalcKwhOnly(UTILITY_SUB_IDS, 'utility');
 };
+
 
 // ─── Save week data ──────────────────────────────────────────────────────────
 window.wcAdminSaveWeek = async () => {

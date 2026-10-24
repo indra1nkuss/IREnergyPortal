@@ -2023,11 +2023,14 @@
                 </tr>`;
             });
 
-            // ── Grand Total row (only plant areas) ───────────────────────────
+            // ── Grand Total row ───────────────────────────────────────────────
+            // KWh = sum semua plant | Prod = dari 'total-plant' (nilai tersimpan, bukan dijumlah)
             const plantAreas = WC_AREAS.filter(a => a.type === 'plant');
-            const totKwh  = plantAreas.reduce((s, a) => s + parseFloat((weekData[a.id] || {}).kwh  || 0), 0);
-            const totProd = plantAreas.reduce((s, a) => s + parseFloat((weekData[a.id] || {}).prod || 0), 0);
-            const totRatio = totProd > 0 ? (totKwh / totProd) : 0;
+            const totKwh  = plantAreas.reduce((s, a) => s + parseFloat((weekData[a.id] || {}).kwh || 0), 0);
+            // Produksi/Pairs diambil dari entry khusus 'total-plant', bukan hasil sum
+            const totalPlantData = weekData['total-plant'] || {};
+            const totProd  = parseFloat(totalPlantData.prod || 0);
+            const totRatio = (totKwh > 0 && totProd > 0) ? (totKwh / totProd) : 0;
             html += `
             <tr class="border-t-2 border-energi-gold/30 bg-energi-gold/5">
                 <td class="px-4 py-3.5 text-xs text-slate-300 font-medium" colspan="2"><span class="font-black text-energi-gold uppercase tracking-wider text-sm">Total Plant</span></td>
@@ -2039,6 +2042,7 @@
 
             tbody.innerHTML = html;
         }
+
 
 
         // ── Update summary stats ─────────────────────────────────────────────
