@@ -431,6 +431,7 @@ body {
 /* ==============================================
    OPTIMASI PERFORMA (GPU ACCELERATION)
    ============================================== */
+.luxury-card, .aurora-blob, nav, .video-premium-frame, .stagger-item {
     will-change: transform, opacity;
     transform: translateZ(0); /* Memaksa browser pakai GPU */
 }
@@ -617,6 +618,7 @@ html { scroll-behavior: smooth; }
 
 /* Fix video aspect ratio on small devices */
 @media (max-width: 640px) {
+    .video-mobile-wrapper {
         width: 100%;
         padding: 0 10px;
     }
@@ -665,11 +667,41 @@ html { scroll-behavior: smooth; }
 }
 
 
-        border-radius: 0 !important; overflow: hidden !important; transform: none !important; padding: 0 !important; }
-        background: #000 !important; position: relative !important; }
-        width: 100% !important; height: 100% !important; border: 0 !important; }
-        font-size: 0.8rem !important; margin: 0 auto; }
+@media (max-width: 768px) {
+    .video-premium-frame {
+        border-radius: 1.25rem !important;
+        padding: 0px !important;
+        border-width: 2px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .video-premium-frame .aspect-video {
+        border-radius: 1.15rem !important;
+        background: #000 !important;
+        position: relative !important;
+    }
+
+    .video-premium-frame iframe {
+        border-radius: 1.15rem !important;
+        width: 100% !important;
+        height: 100% !important;
+        border: 0 !important;
+    }
+
+    .video-mobile-wrapper a {
+        width: 100% !important;
+        max-width: 280px;
+        padding: 1rem !important;
+        font-size: 0.8rem !important;
+        letter-spacing: 0.1em;
+        margin: 0 auto;
+    }
 }
+
+.card-shine::after {
     content: '';
     position: absolute;
     top: -50%;
