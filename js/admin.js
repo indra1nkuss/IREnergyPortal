@@ -47,6 +47,7 @@ let unsubscribers = {};
 
 // ─── DOM Helpers ────────────────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
+window.$ = $;
 const show = (el) => el?.classList.remove('hidden');
 const hide = (el) => el?.classList.add('hidden');
 const toast = (msg, type = 'success') => {
@@ -213,22 +214,22 @@ window.openModal = (collection, editId = null) => {
                 <div>
                     <label class="text-xs text-slate-400 block mb-2 font-medium">Foto Profil</label>
                     <div class="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col items-center gap-3">
-                        <div class="relative group cursor-pointer" onclick="$('m-team-file').click()" title="Klik untuk pilih foto dari galeri">
+                        <label for="m-team-file" class="relative group cursor-pointer block" title="Klik untuk pilih foto dari galeri">
                             <img id="team-avatar-preview" src="images/default.jpg" class="w-24 h-24 rounded-full object-cover border-2 border-energi-gold shadow-[0_0_20px_rgba(212,175,55,0.25)] bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=User&background=0a0a0f&color=D4AF37&bold=true';">
-                            <div class="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                 <span class="text-lg">📷</span>
                                 <span class="text-[10px] text-white font-bold">Ganti Foto</span>
                             </div>
-                        </div>
+                        </label>
 
                         <!-- Input File untuk Galeri Perangkat (HP / Komputer) -->
                         <input type="file" id="m-team-file" accept="image/*" class="hidden">
                         <input type="hidden" id="m-image" value="">
 
                         <div class="flex flex-wrap gap-2 justify-center w-full">
-                            <button type="button" onclick="$('m-team-file').click()" class="btn-primary btn-sm flex items-center gap-1.5 text-xs">
+                            <label for="m-team-file" class="btn-primary btn-sm flex items-center gap-1.5 text-xs cursor-pointer select-none">
                                 <span>📁</span> Pilih dari Galeri HP / PC
-                            </button>
+                            </label>
                             <button type="button" id="btn-toggle-gallery" onclick="toggleTeamGalleryPicker()" class="btn-outline btn-sm flex items-center gap-1.5 text-xs">
                                 <span>🖼️</span> Dari Dokumentasi
                             </button>
@@ -238,10 +239,10 @@ window.openModal = (collection, editId = null) => {
                         <!-- Panel Galeri Dokumentasi Portal -->
                         <div id="team-gallery-picker" class="hidden w-full mt-2 p-3 bg-[#050508] border border-white/10 rounded-xl">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold text-energi-cyan">Pilih Foto dari Dokumentasi:</span>
+                                <span class="text-xs font-bold text-energi-cyan">Pilih Foto dari Galeri:</span>
                                 <button type="button" onclick="toggleTeamGalleryPicker()" class="text-slate-400 hover:text-white text-xs px-1">✕ Tutup</button>
                             </div>
-                            <div id="team-gallery-grid" class="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1">
+                            <div id="team-gallery-grid" class="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
                                 <!-- Populated dynamically -->
                             </div>
                         </div>
@@ -738,48 +739,85 @@ function renderGallery(items) {
 
 // ─── Team Gallery Picker Helpers ─────────────────────────────────────────────
 window.toggleTeamGalleryPicker = () => {
-    const picker = $('team-gallery-picker');
+    const picker = document.getElementById('team-gallery-picker');
     if (!picker) return;
     const isHidden = picker.classList.contains('hidden');
     if (isHidden) {
-        renderTeamGalleryGrid();
+        window.renderTeamGalleryGrid();
         picker.classList.remove('hidden');
     } else {
         picker.classList.add('hidden');
     }
 };
 
-window.renderTeamGalleryGrid = () => {
-    const grid = $('team-gallery-grid');
+window.renderTeamGalleryGrid = async () => {
+    const grid = document.getElementById('team-gallery-grid');
     if (!grid) return;
+
+    grid.innerHTML = '<p class="col-span-4 text-center text-xs text-slate-400 py-4"><span class="loading-spinner"></span> Memuat galeri...</p>';
+
+    // Pastikan data galeri termuat dari Firestore jika masih kosong
     if (!galleryData || galleryData.length === 0) {
-        grid.innerHTML = '<p class="col-span-4 text-center text-xs text-slate-500 py-3">Belum ada foto di Galeri Dokumentasi. Silakan upload foto terlebih dahulu di menu Dokumentasi.</p>';
+        try {
+            const snap = await getDocs(query(collection(db, 'gallery'), orderBy('order')));
+            galleryData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } catch (e) {
+            console.warn('Gagal load galeri:', e);
+        }
+    }
+
+    // Foto preset bawaan sistem
+    const presets = [
+        { imageUrl: 'images/indra.png', caption: 'Indra (Preset)' },
+        { imageUrl: 'images/energiteam.png', caption: 'Team Energi (Preset)' },
+        { imageUrl: 'images/energylogo.png', caption: 'Logo Energi' },
+        { imageUrl: 'images/energylogo1.png', caption: 'Logo Gold' }
+    ];
+
+    const allPhotos = [
+        ...(galleryData || []).map(g => ({ imageUrl: g.imageUrl || g.url || g.image, caption: g.caption || 'Foto Dokumentasi' })),
+        ...presets
+    ].filter(p => !!p.imageUrl);
+
+    if (allPhotos.length === 0) {
+        grid.innerHTML = '<p class="col-span-4 text-center text-xs text-slate-500 py-3">Belum ada foto dokumentasi di galeri.</p>';
         return;
     }
-    grid.innerHTML = galleryData.map(item => `
-        <div onclick="selectPhotoFromGallery('${item.imageUrl}')" 
-             class="cursor-pointer group relative rounded-lg overflow-hidden border border-white/10 hover:border-energi-gold transition-all aspect-square bg-[#0a0a0f]" title="${item.caption || 'Pilih foto'}">
-            <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-            <div class="absolute inset-0 bg-energi-gold/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+
+    grid.innerHTML = allPhotos.map(item => `
+        <div data-photo-url="${encodeURIComponent(item.imageUrl)}" 
+             class="team-gallery-item cursor-pointer group relative rounded-lg overflow-hidden border border-white/10 hover:border-energi-gold active:scale-95 transition-all aspect-square bg-[#0a0a0f]" title="${item.caption || 'Klik untuk memilih foto'}">
+            <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 pointer-events-none" onerror="this.src='images/default.jpg'">
+            <div class="absolute inset-0 bg-energi-gold/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                 <span class="text-[10px] bg-darkbg/90 text-energi-gold px-1.5 py-0.5 rounded font-bold border border-energi-gold/50">Pilih</span>
             </div>
         </div>
     `).join('');
+
+    // Pasang listener klik langsung pada setiap kartu foto
+    grid.querySelectorAll('.team-gallery-item').forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = decodeURIComponent(card.dataset.photoUrl);
+            window.selectPhotoFromGallery(url);
+        });
+    });
 };
 
 window.selectPhotoFromGallery = (url) => {
-    const prev = $('team-avatar-preview');
+    const prev = document.getElementById('team-avatar-preview');
     if (prev) prev.src = url;
-    const imgInput = $('m-image');
+    const imgInput = document.getElementById('m-image');
     if (imgInput) imgInput.value = url;
-    // reset file input
-    const fileInput = $('m-team-file');
+    // reset file input perangkat
+    const fileInput = document.getElementById('m-team-file');
     if (fileInput) fileInput.value = '';
-    const info = $('team-file-info');
+    const info = document.getElementById('team-file-info');
     if (info) info.textContent = '✓ Foto dipilih dari Galeri Dokumentasi';
-    const picker = $('team-gallery-picker');
+    const picker = document.getElementById('team-gallery-picker');
     if (picker) picker.classList.add('hidden');
-    toast('Foto dari galeri dipilih!');
+    toast('✅ Foto dari galeri berhasil dipilih!');
 };
 
 // ─── File Preview ────────────────────────────────────────────────────────────
@@ -788,7 +826,7 @@ document.addEventListener('change', (e) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
             const prev = document.querySelector('#m-preview img');
-            const previewDiv = $('#m-preview');
+            const previewDiv = document.getElementById('m-preview');
             if (prev) prev.src = ev.target.result;
             if (previewDiv) previewDiv.classList.remove('hidden');
         };
@@ -799,12 +837,12 @@ document.addEventListener('change', (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onload = (ev) => {
-            const prev = $('team-avatar-preview');
+            const prev = document.getElementById('team-avatar-preview');
             if (prev) prev.src = ev.target.result;
-            const info = $('team-file-info');
+            const info = document.getElementById('team-file-info');
             if (info) info.textContent = `✓ File dipilih: ${file.name} (${Math.round(file.size/1024)} KB)`;
             // sembunyikan gallery picker jika terbuka
-            const picker = $('team-gallery-picker');
+            const picker = document.getElementById('team-gallery-picker');
             if (picker) picker.classList.add('hidden');
         };
         reader.readAsDataURL(file);
