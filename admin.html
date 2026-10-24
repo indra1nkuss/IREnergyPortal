@@ -308,7 +308,7 @@
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="stats-grid">
                         <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-winners">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-trophy"></i> Pemenang</p></div>
-                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-seu">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-lightning"></i> SEU Mesin</p></div>
+                        <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-seu">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-lightning"></i> SEU Dept.</p></div>
                         <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-enpi">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-clipboard-text"></i> ENPI Fitur</p></div>
                         <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-gold" id="stat-project">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-wrench"></i> Projects</p></div>
                         <div class="stats-tile text-center"><p class="text-3xl font-black text-energi-cyan" id="stat-gallery">0</p><p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-bold"><i class="ph-fill ph-camera"></i> Foto</p></div>
@@ -374,18 +374,29 @@
                 <div id="seu-tab" class="tab-content">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-lightning"></i> SEU IR — Mesin</h2>
-                            <p class="text-slate-500 text-xs mt-1">Kelola data konsumsi energi 7 mesin</p>
+                            <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-lightning"></i> SEU IR — Departemen</h2>
+                            <p class="text-slate-500 text-xs mt-1">Kelola data konsumsi energi tahunan seluruh departemen. Sistem otomatis menghitung % dan memfilter SEU (≥ 5%).</p>
                         </div>
-                        <button onclick="openModal('seu')" class="btn-primary text-xs">+ Tambah Mesin</button>
-                            <button onclick="seedSEU()" class="btn-outline text-xs">📥 Seed 7 Mesin</button>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('seu')" class="btn-primary text-xs">+ Tambah Departemen</button>
+                            <button onclick="seedSEU()" class="btn-outline text-xs">📥 Seed Default</button>
+                        </div>
+                    </div>
+                    <!-- Info banner -->
+                    <div class="mb-4 p-3 bg-energi-gold/5 border border-energi-gold/20 rounded-xl flex items-start gap-3">
+                        <span class="text-energi-gold text-lg mt-0.5">⚡</span>
+                        <div class="text-xs text-slate-400 leading-relaxed">
+                            <strong class="text-energi-gold">Cara kerja SEU IR:</strong> Input nama departemen + KWh/Year untuk semua departemen (termasuk Others jika ada).
+                            Sistem akan otomatis menghitung persentase dan menampilkan departemen dengan ≥ 5% sebagai SEU di portal.
+                            <strong class="text-white">Kategori "Others" tidak akan ditampilkan sebagai SEU meskipun ≥ 5%.</strong>
+                        </div>
                     </div>
                     <div class="card-admin overflow-x-auto">
                         <table class="table-admin" id="seu-table">
-                            <thead><tr><th>#</th><th>Nama Mesin</th><th>KWh / Year</th><th>Persentase (%)</th><th class="text-right">Aksi</th></tr></thead>
+                            <thead><tr><th>#</th><th>Nama Departemen</th><th>KWh / Year</th><th>% (Auto)</th><th class="text-right">Aksi</th></tr></thead>
                             <tbody id="seu-body"></tbody>
                         </table>
-                        <div id="seu-empty" class="empty-state hidden">Belum ada data mesin.</div>
+                        <div id="seu-empty" class="empty-state hidden">Belum ada data departemen.</div>
                     </div>
                 </div>
 

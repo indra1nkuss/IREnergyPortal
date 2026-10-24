@@ -156,11 +156,15 @@ window.openModal = (collection, editId = null) => {
                 </div>
             </div>`,
         seu: `
-            <h3 class="text-lg font-bold text-white mb-6">${title} Mesin SEU</h3>
+            <h3 class="text-lg font-bold text-white mb-6">${title} Departemen SEU</h3>
             <div class="space-y-4">
-                <div><label class="text-xs text-slate-400 block mb-1">Nama Mesin</label><input type="text" id="m-name" class="w-full"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">KWh / Year</label><input type="number" id="m-kwh" step="0.01" class="w-full"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">Persentase (%)</label><input type="number" id="m-percentage" step="0.01" class="w-full"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Nama Departemen</label><input type="text" id="m-name" class="w-full" placeholder="Contoh: Operasional Produksi"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">KWh / Year</label><input type="number" id="m-kwh" step="0.01" class="w-full" placeholder="Contoh: 662572.48"></div>
+                <p class="text-[11px] text-slate-500 leading-relaxed p-2 bg-white/3 rounded-lg">
+                    ⚡ <strong class="text-energi-gold">Catatan:</strong> Persentase dihitung otomatis berdasarkan total KWh seluruh departemen.
+                    Departemen dengan ≥ 5% akan otomatis ditampilkan sebagai SEU di portal.<br>
+                    Untuk kategori <strong class="text-white">"Others"</strong>, meskipun ≥ 5% <strong class="text-energi-gold">tidak akan ditampilkan</strong> sebagai SEU.
+                </p>
                 <div class="flex gap-3 mt-6 justify-end">
                     <button class="btn-outline" onclick="closeModal()">Batal</button>
                     <button class="btn-primary" onclick="saveData('seu')">${editId ? 'Update' : 'Simpan'}</button>
@@ -409,7 +413,7 @@ window.saveData = async (collType) => {
     // ─── Non-gallery ─────────────────────────────────────────────────────────
     const fields = collType === 'winners' ? ['year', 'nik', 'name', 'dept'] :
                    collType === 'departments' ? ['name'] :
-                   collType === 'seu' ? ['name', 'kwh', 'percentage'] :
+                   collType === 'seu' ? ['name', 'kwh'] :
                    collType === 'team' ? ['name', 'role', 'image', 'portfolioLink'] :
                    collType === 'enpi' ? ['indicator', 'year', 'actual', 'target', 'nextTarget'] :
                    ['icon', 'title', 'description'];
@@ -507,20 +511,23 @@ window.seedWinners = async () => {
 };
 
 window.seedSEU = async () => {
-    if (!confirm('Tambahkan data 7 mesin SEU default?')) return;
-    const machines = [
-        { name: 'Hot Machine', kwh: 662572.48, percentage: 36.74 },
-        { name: 'Hot Machine', kwh: 423933.39, percentage: 23.51 },
-        { name: 'Compressor', kwh: 192944.66, percentage: 10.70 },
-        { name: 'Mixing', kwh: 136168.84, percentage: 7.55 },
-        { name: 'Cutting', kwh: 134318.64, percentage: 7.45 },
-        { name: 'Washing Machine', kwh: 134203.18, percentage: 7.44 },
-        { name: 'HF Welding', kwh: 119211.84, percentage: 6.61 }
+    if (!confirm('Tambahkan data departemen SEU default? Data ini adalah contoh konsumsi energi tahunan departemen IR.')) return;
+    const depts = [
+        { name: 'Operasional Produksi', kwh: 662572.48 },
+        { name: 'Engineering & Maintenance', kwh: 423933.39 },
+        { name: 'Utility & Infrastruktur', kwh: 192944.66 },
+        { name: 'Quality Control', kwh: 136168.84 },
+        { name: 'Logistik & Warehouse', kwh: 134318.64 },
+        { name: 'HSE & Safety', kwh: 134203.18 },
+        { name: 'Administrasi & Office', kwh: 119211.84 },
+        { name: 'HR & Training', kwh: 68450.12 },
+        { name: 'IT & Digital', kwh: 45230.50 },
+        { name: 'Others', kwh: 87240.75 }
     ];
     const batch = writeBatch(db);
-    machines.forEach((m, i) => batch.set(doc(collection(db, 'seuMachines')), { ...m, order: i + 1 }));
+    depts.forEach((d, i) => batch.set(doc(collection(db, 'seuMachines')), { ...d, order: i + 1 }));
     await batch.commit();
-    toast('7 data mesin SEU berhasil ditambahkan! ⚡');
+    toast('Data departemen SEU berhasil ditambahkan! ⚡');
 };
 
 window.seedENPI = async () => {
@@ -673,7 +680,25 @@ $('winners-search')?.addEventListener('input', () => { winnersPage = 1; renderWi
 function renderTable(type, items) {
     const confs = {
         departments: { cols: ['name'], headers: ['Nama Departemen'], render: (v) => v },
-        seu: { cols: ['name', 'kwh', 'percentage'], headers: ['Nama Mesin', 'KWh / Year', '%'], render: (v, k) => k === 'kwh' ? Number(v).toLocaleString('id-ID') : k === 'percentage' ? v + '%' : v },
+        seu: {
+            cols: ['name', 'kwh', 'pct'],
+            headers: ['Nama Departemen', 'KWh / Year', '% (Auto)'],
+            render: (v, k, item, allItems) => {
+                if (k === 'kwh') return Number(v).toLocaleString('id-ID');
+                if (k === 'pct') {
+                    // Hitung % dari total semua item
+                    const totalKwh = allItems.reduce((s, d) => s + (parseFloat(d.kwh) || 0), 0);
+                    const kwh = parseFloat(item.kwh) || 0;
+                    const pct = totalKwh > 0 ? (kwh / totalKwh * 100) : 0;
+                    const isSEU = item.name?.toLowerCase() !== 'others' && pct >= 5;
+                    const badge = isSEU
+                        ? `<span class="px-1.5 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold text-[9px] font-bold">${pct.toFixed(2)}% ⚡</span>`
+                        : `<span class="text-slate-500 text-[10px]">${pct.toFixed(2)}%</span>`;
+                    return badge;
+                }
+                return v;
+            }
+        },
         enpi: { cols: ['icon', 'title', 'description'], headers: ['Ikon', 'Judul', 'Deskripsi'], render: (v, k) => k === 'icon' ? `<span class="text-lg">${v}</span>` : v },
         project: { cols: ['icon', 'title', 'description'], headers: ['Ikon', 'Judul', 'Deskripsi'], render: (v, k) => k === 'icon' ? `<span class="text-lg">${v}</span>` : v }
     };
@@ -685,7 +710,7 @@ function renderTable(type, items) {
     body.innerHTML = items.map((item, i) => `
         <tr>
             <td class="text-slate-500 font-mono text-xs">${i + 1}</td>
-            ${c.cols.map(k => `<td class="${k==='name'||k==='title'?'text-white font-medium':'text-slate-400 text-xs'}">${c.render(item[k], k) || '-'}</td>`).join('')}
+            ${c.cols.map(k => `<td class="${k==='name'||k==='title'?'text-white font-medium':'text-slate-400 text-xs'}">${c.render(item[k], k, item, items) || '-'}</td>`).join('')}
             <td class="text-right">
                 <button onclick="openModal('${type}','${item.id}')" class="btn-outline btn-sm mr-1">✏️</button>
                 <button onclick="deleteData('${type}','${item.id}')" class="btn-danger btn-sm">🗑️</button>
