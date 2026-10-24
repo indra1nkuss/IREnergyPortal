@@ -1175,8 +1175,6 @@ const WC_AREAS_ADMIN = [
     { id: 'plant-ir-e-injection',name: 'Plant IR E (Injection Phylon)',type: 'plant' },
     { id: 'plant-ir-f-2nd',      name: 'Plant IR F (2nd Process)',     type: 'plant' },
     { id: 'plant-ir-f-cutting',  name: 'Plant IR F (Cutting)',         type: 'plant' },
-    // Baris total khusus — KWh = auto-sum plant, Prod = input mandiri (1 angka total mingguan)
-    { id: 'total-plant',         name: 'Total Plant',                  type: 'plant-total' },
     { id: 'idc',                 name: 'IDC',                          type: 'dormitory-sub' },
     { id: 'mess-korea',          name: 'Mess Korea',                   type: 'dormitory-sub' },
     { id: 'kantor-pj023',        name: 'Kantor Umum (PJ023)',          type: 'dormitory-sub' },
@@ -1277,60 +1275,39 @@ function wcRenderAdminWeekForm() {
         return kwh || '';
     }
 
-    // Area rows — semua baris dapat diinput, termasuk office-dormitory & utility
-    const PLANT_IDS = WC_AREAS_ADMIN.filter(a => a.type === 'plant').map(a => a.id);
-
+    // Area rows — semua baris dapat diinput
     const rows = WC_AREAS_ADMIN.map((area, i) => {
         const isDormTotal   = area.id === 'office-dormitory';
         const isUtilTotal   = area.id === 'utility';
         const isKwhAutoOnly = isDormTotal || isUtilTotal;
-        const isPlantTotal  = area.type === 'plant-total';
         const saved = weekData[area.id] || {};
 
         // KWh value
-        let kwhVal;
-        if (isPlantTotal) {
-            kwhVal = adminSumKwh(PLANT_IDS); // auto-sum semua plant
-        } else if (isKwhAutoOnly) {
-            kwhVal = adminSumKwh(area.id === 'office-dormitory' ? DORM_SUB_IDS : UTILITY_SUB_IDS);
-        } else {
-            kwhVal = saved.kwh !== undefined ? saved.kwh : '';
-        }
+        const kwhVal = isKwhAutoOnly
+            ? adminSumKwh(isDormTotal ? DORM_SUB_IDS : UTILITY_SUB_IDS)
+            : (saved.kwh !== undefined ? saved.kwh : '');
 
         const prodVal  = saved.prod  !== undefined ? saved.prod  : '';
         const ratioVal = saved.ratio !== undefined ? saved.ratio : '';
 
         // Row background
-        const rowBg = isPlantTotal
-            ? 'bg-energi-gold/10 border-t-2 border-energi-gold/40 border-b border-white/10'
-            : isKwhAutoOnly
-                ? (isDormTotal ? 'bg-yellow-500/10 border-t border-white/10' : 'bg-orange-500/10 border-t border-white/10')
-                : (i % 2 === 0 ? 'bg-white/2' : '');
+        const rowBg = isKwhAutoOnly
+            ? (isDormTotal ? 'bg-yellow-500/10 border-t border-white/10' : 'bg-orange-500/10 border-t border-white/10')
+            : (i % 2 === 0 ? 'bg-white/2' : '');
 
         // Name cell
-        let nameCell;
-        if (isPlantTotal) {
-            nameCell = `<span class="font-black text-energi-gold uppercase tracking-wide">${area.name}</span><span class="ml-2 text-[9px] font-normal text-slate-500">(KWh auto · Prod mandiri)</span>`;
-        } else if (isKwhAutoOnly) {
-            nameCell = `<span class="font-bold text-white">${area.name}</span><span class="ml-2 text-[9px] font-normal text-slate-500">(KWh auto)</span>`;
-        } else {
-            nameCell = area.name;
-        }
+        const nameCell = isKwhAutoOnly
+            ? `<span class="font-bold text-white">${area.name}</span><span class="ml-2 text-[9px] font-normal text-slate-500">(KWh auto)</span>`
+            : area.name;
 
         // KWh input — readonly untuk baris auto-sum
-        const kwhReadonly = isPlantTotal || isKwhAutoOnly;
-        const kwhInput = kwhReadonly
+        const kwhInput = isKwhAutoOnly
             ? `<input type="number" id="wca-kwh-${area.id}" value="${kwhVal}"
                     class="w-full bg-black/20 border border-white/5 rounded-lg px-3 py-2 text-sm text-energi-gold font-mono cursor-not-allowed opacity-70" readonly tabindex="-1">`
             : `<input type="number" step="0.01" placeholder="0"
                     id="wca-kwh-${area.id}" value="${kwhVal}"
                     oninput="wcAutoCalcRatio('${area.id}'); wcAdminRefreshTotals();"
                     class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-gold font-mono focus:outline-none focus:border-energi-gold/50">`;
-
-        // Prod input — semua editable kecuali tidak ada pengecualian
-        const prodInputClass = isPlantTotal
-            ? 'w-full bg-white/5 border border-energi-cyan/40 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan font-bold'
-            : 'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50';
 
         return `
         <tr class="${rowBg} hover:bg-white/4 transition-colors">
@@ -1342,7 +1319,7 @@ function wcRenderAdminWeekForm() {
                     id="wca-prod-${area.id}"
                     value="${prodVal}"
                     oninput="wcAutoCalcRatio('${area.id}');"
-                    class="${prodInputClass}">
+                    class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-energi-cyan font-mono focus:outline-none focus:border-energi-cyan/50">
             </td>
             <td class="py-2 px-3">
                 <input type="number" step="0.0001" placeholder="auto"
@@ -1412,11 +1389,10 @@ window.wcAutoCalcRatio = (areaId) => {
     if (ratioEl) ratioEl.value = prod > 0 ? (kwh / prod).toFixed(4) : '';
 };
 
-// ─── Refresh KWh auto-total rows ─────────────────────────────────────────────
+// ─── Refresh KWh auto-total rows (Office Dormitory & Utility) ────────────────
 // Hanya KWh yang dijumlah otomatis dari sub-area.
 // Produksi/Pairs diisi mandiri oleh admin — tidak dijumlah.
 window.wcAdminRefreshTotals = () => {
-    const PLANT_IDS       = WC_AREAS_ADMIN.filter(a => a.type === 'plant').map(a => a.id);
     const DORM_SUB_IDS    = ['idc','mess-korea','kantor-pj023','kantor-pj112','manmod'];
     const UTILITY_SUB_IDS = ['kompressor','wtp-wwtp','kantin-b','others-pj023','others-pj112'];
 
@@ -1428,12 +1404,10 @@ window.wcAdminRefreshTotals = () => {
         const kwhEl   = $(`wca-kwh-${totalId}`);
         const ratioEl = $(`wca-ratio-${totalId}`);
         if (kwhEl) kwhEl.value = kwh || '';
-        // Recalc ratio from this row's own prod (not summed)
         const prod = parseFloat($(`wca-prod-${totalId}`)?.value || 0);
         if (ratioEl) ratioEl.value = prod > 0 ? (kwh / prod).toFixed(4) : '';
     }
 
-    recalcKwhOnly(PLANT_IDS,       'total-plant');
     recalcKwhOnly(DORM_SUB_IDS,    'office-dormitory');
     recalcKwhOnly(UTILITY_SUB_IDS, 'utility');
 };

@@ -2024,19 +2024,18 @@
             });
 
             // ── Grand Total row ───────────────────────────────────────────────
-            // KWh = sum semua plant | Prod = dari 'total-plant' (nilai tersimpan, bukan dijumlah)
+            // KWh = sum semua plant | Prod = dari Plant IR A (angka produksi mingguan total pabrik)
             const plantAreas = WC_AREAS.filter(a => a.type === 'plant');
             const totKwh  = plantAreas.reduce((s, a) => s + parseFloat((weekData[a.id] || {}).kwh || 0), 0);
-            // Produksi/Pairs diambil dari entry khusus 'total-plant', bukan hasil sum
-            const totalPlantData = weekData['total-plant'] || {};
-            const totProd  = parseFloat(totalPlantData.prod || 0);
+            // Produksi/Pairs diambil dari Plant IR A (bukan hasil sum karena angka produksi adalah 1 total seminggu)
+            const totProd  = parseFloat((weekData['plant-ir-a'] || {}).prod || 0);
             const totRatio = (totKwh > 0 && totProd > 0) ? (totKwh / totProd) : 0;
             html += `
             <tr class="border-t-2 border-energi-gold/30 bg-energi-gold/5">
                 <td class="px-4 py-3.5 text-xs text-slate-300 font-medium" colspan="2"><span class="font-black text-energi-gold uppercase tracking-wider text-sm">Total Plant</span></td>
-                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-energi-gold font-mono">${totKwh > 0 ? totKwh.toLocaleString('id-ID') : '\u2014'}</td>
-                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-energi-cyan font-mono">${totProd > 0 ? totProd.toLocaleString('id-ID') : '\u2014'}</td>
-                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-white font-mono">${totRatio > 0 ? totRatio.toFixed(3) : '\u2014'}</td>
+                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-energi-gold font-mono">${totKwh > 0 ? totKwh.toLocaleString('id-ID') : '—'}</td>
+                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-energi-cyan font-mono">${totProd > 0 ? totProd.toLocaleString('id-ID') : '—'}</td>
+                <td class="px-4 py-3.5 text-right font-black text-sm md:text-base text-white font-mono">${totRatio > 0 ? totRatio.toFixed(3) : '—'}</td>
                 <td class="px-4 py-3.5 text-center"><span class="px-2.5 py-1 rounded-full bg-energi-gold/20 text-energi-gold text-xs font-bold border border-energi-gold/30 whitespace-nowrap">PLANT</span></td>
             </tr>`;
 
@@ -2053,7 +2052,7 @@
             if (!statKwh) return;
 
             if (!wcCurrentMonth || !wcAllData[wcCurrentMonth]) {
-                statKwh.textContent = statProd.textContent = statRatio.textContent = '\u2014';
+                statKwh.textContent = statProd.textContent = statRatio.textContent = '—';
                 return;
             }
 
@@ -2063,15 +2062,16 @@
                 WC_AREAS.forEach(a => {
                     if (wd[a.id] && a.type === 'plant') {
                         totalKwh  += parseFloat(wd[a.id].kwh  || 0);
-                        totalProd += parseFloat(wd[a.id].prod || 0);
                     }
                 });
+                // Produksi mingguan pabrik diambil dari Plant IR A (tidak dijumlah antar plant)
+                totalProd += parseFloat((wd['plant-ir-a'] || {}).prod || 0);
             }
             const avgRatio = totalProd > 0 ? (totalKwh / totalProd) : 0;
 
             statKwh.textContent  = totalKwh  > 999 ? (totalKwh / 1000).toFixed(1) + 'K' : totalKwh.toLocaleString('id-ID');
             statProd.textContent = totalProd > 999 ? (totalProd / 1000).toFixed(1) + 'K' : totalProd.toLocaleString('id-ID');
-            statRatio.textContent = avgRatio > 0 ? avgRatio.toFixed(3) : '\u2014';
+            statRatio.textContent = avgRatio > 0 ? avgRatio.toFixed(3) : '—';
         }
 
         // ── Trend Chart ──────────────────────────────────────────────────────
@@ -2091,13 +2091,14 @@
 
             for (let w = 1; w <= 5; w++) {
                 const wd = (wcAllData[wcCurrentMonth] || {})[w] || {};
-                let kw = 0, pr = 0;
+                let kw = 0;
                 WC_AREAS.forEach(a => {
                     if (wd[a.id] && a.type === 'plant') {
                         kw += parseFloat(wd[a.id].kwh  || 0);
-                        pr += parseFloat(wd[a.id].prod || 0);
                     }
                 });
+                // Produksi mingguan pabrik diambil dari Plant IR A
+                const pr = parseFloat((wd['plant-ir-a'] || {}).prod || 0);
                 ratioData.push(pr > 0 ? parseFloat((kw / pr).toFixed(4)) : null);
             }
 
