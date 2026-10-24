@@ -42,6 +42,7 @@ let currentCollection = '';
 let currentEditId = null;
 let winnersData = [];
 let departmentsData = [];
+let galleryData = [];
 let unsubscribers = {};
 
 // ─── DOM Helpers ────────────────────────────────────────────────────────────
@@ -206,15 +207,54 @@ window.openModal = (collection, editId = null) => {
                 </div>
             </div>`,
         team: `
-            <h3 class="text-lg font-bold text-white mb-6">${title} Anggota Tim</h3>
+            <h3 class="text-lg font-bold text-white mb-5">${title} Anggota Tim</h3>
             <div class="space-y-4">
-                <div><label class="text-xs text-slate-400 block mb-1">Nama Lengkap</label><input type="text" id="m-name" class="w-full"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">Role / Jabatan</label><input type="text" id="m-role" class="w-full" placeholder="EC Manager"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">URL Foto</label><input type="text" id="m-image" class="w-full" placeholder="images/nama.png"></div>
-                <div><label class="text-xs text-slate-400 block mb-1">Portfolio Link</label><input type="text" id="m-portfolioLink" class="w-full" placeholder="https://..."></div>
+                <!-- Foto Profil Section -->
+                <div>
+                    <label class="text-xs text-slate-400 block mb-2 font-medium">Foto Profil</label>
+                    <div class="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col items-center gap-3">
+                        <div class="relative group cursor-pointer" onclick="$('m-team-file').click()" title="Klik untuk pilih foto dari galeri">
+                            <img id="team-avatar-preview" src="images/default.jpg" class="w-24 h-24 rounded-full object-cover border-2 border-energi-gold shadow-[0_0_20px_rgba(212,175,55,0.25)] bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=User&background=0a0a0f&color=D4AF37&bold=true';">
+                            <div class="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="text-lg">📷</span>
+                                <span class="text-[10px] text-white font-bold">Ganti Foto</span>
+                            </div>
+                        </div>
+
+                        <!-- Input File untuk Galeri Perangkat (HP / Komputer) -->
+                        <input type="file" id="m-team-file" accept="image/*" class="hidden">
+                        <input type="hidden" id="m-image" value="">
+
+                        <div class="flex flex-wrap gap-2 justify-center w-full">
+                            <button type="button" onclick="$('m-team-file').click()" class="btn-primary btn-sm flex items-center gap-1.5 text-xs">
+                                <span>📁</span> Pilih dari Galeri HP / PC
+                            </button>
+                            <button type="button" id="btn-toggle-gallery" onclick="toggleTeamGalleryPicker()" class="btn-outline btn-sm flex items-center gap-1.5 text-xs">
+                                <span>🖼️</span> Dari Dokumentasi
+                            </button>
+                        </div>
+                        <p id="team-file-info" class="text-[11px] text-slate-400 text-center font-medium"></p>
+
+                        <!-- Panel Galeri Dokumentasi Portal -->
+                        <div id="team-gallery-picker" class="hidden w-full mt-2 p-3 bg-[#050508] border border-white/10 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-energi-cyan">Pilih Foto dari Dokumentasi:</span>
+                                <button type="button" onclick="toggleTeamGalleryPicker()" class="text-slate-400 hover:text-white text-xs px-1">✕ Tutup</button>
+                            </div>
+                            <div id="team-gallery-grid" class="grid grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div><label class="text-xs text-slate-400 block mb-1">Nama Lengkap</label><input type="text" id="m-name" class="w-full" placeholder="Contoh: Indra Nurul Kusuma"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Role / Jabatan</label><input type="text" id="m-role" class="w-full" placeholder="Contoh: EC Staff"></div>
+                <div><label class="text-xs text-slate-400 block mb-1">Portfolio Link (Opsional)</label><input type="text" id="m-portfolioLink" class="w-full" placeholder="https://..."></div>
+
                 <div class="flex gap-3 mt-6 justify-end">
                     <button class="btn-outline" onclick="closeModal()">Batal</button>
-                    <button class="btn-primary" onclick="saveData('team')">${editId ? 'Update' : 'Simpan'}</button>
+                    <button class="btn-primary" id="m-team-save-btn" onclick="saveData('team')">${editId ? 'Update' : 'Simpan'}</button>
                 </div>
             </div>`
     };
@@ -227,6 +267,10 @@ window.closeModal = () => {
     $('modal').classList.remove('open');
     currentEditId = null;
     currentCollection = '';
+    const picker = $('team-gallery-picker');
+    if (picker) picker.classList.add('hidden');
+    const info = $('team-file-info');
+    if (info) info.textContent = '';
 };
 
 async function populateForm(collection, id) {
@@ -246,6 +290,12 @@ async function populateForm(collection, id) {
             if (data.imageUrl) {
                 const prev = document.querySelector('#m-preview img');
                 if (prev) { prev.src = data.imageUrl; $('#m-preview').classList.remove('hidden'); }
+            }
+            if (collection === 'team' && data.image) {
+                const prev = $('team-avatar-preview');
+                if (prev) prev.src = data.image;
+                const imgInput = $('m-image');
+                if (imgInput) imgInput.value = data.image;
             }
         }
     } catch (e) {
@@ -297,6 +347,61 @@ window.saveData = async (collType) => {
         btn.disabled = false;
         btn.innerHTML = currentEditId ? 'Update' : 'Upload';
         closeModal();
+        return;
+    }
+
+    if (collType === 'team') {
+        const name = getVal('m-name');
+        const role = getVal('m-role');
+        const portfolioLink = getVal('m-portfolioLink');
+        let image = getVal('m-image') || '';
+        const file = $('m-team-file')?.files?.[0];
+
+        if (!name) { toast('Nama anggota tim wajib diisi.', 'error'); return; }
+
+        const btn = $('m-team-save-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Menyimpan...';
+        }
+
+        try {
+            if (file) {
+                if (!CLOUD_NAME || !UPLOAD_PRESET) {
+                    throw new Error('Cloudinary belum dikonfigurasi di config.js');
+                }
+                if (btn) btn.innerHTML = '<span class="loading-spinner"></span> Mengupload foto...';
+                image = await uploadToCloudinary(file);
+                console.log('☁️ Foto team uploaded:', image);
+            }
+
+            const teamPayload = {
+                name,
+                role,
+                image: image || 'images/default.jpg',
+                portfolioLink
+            };
+
+            if (currentEditId) {
+                await updateDoc(doc(db, colName, currentEditId), teamPayload);
+                toast('✅ Data anggota tim berhasil diupdate!');
+            } else {
+                const all = await getDocs(query(collection(db, colName), orderBy('order', 'desc')));
+                const lastOrder = all.empty ? 0 : (all.docs[0]?.data()?.order || 0);
+                teamPayload.order = lastOrder + 1;
+                await addDoc(collection(db, colName), teamPayload);
+                toast('✅ Anggota tim berhasil ditambahkan!');
+            }
+            closeModal();
+        } catch (e) {
+            toast('❌ Gagal menyimpan: ' + e.message, 'error');
+            console.error('Save error:', e);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = currentEditId ? 'Update' : 'Simpan';
+            }
+        }
         return;
     }
 
@@ -476,7 +581,8 @@ function initRealtimeListeners() {
         updateStats();
     });
     unsubscribers.gallery = onSnapshot(query(collection(db, 'gallery'), orderBy('order')), (snap) => {
-        renderGallery(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        galleryData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderGallery(galleryData);
         updateStats();
     });
     unsubscribers.team = onSnapshot(query(collection(db, 'team'), orderBy('order')), (snap) => {
@@ -597,8 +703,13 @@ function renderTeamTable(items) {
             <td class="text-slate-500 font-mono text-xs">${i + 1}</td>
             <td class="text-white font-medium">${item.name}</td>
             <td class="text-slate-400 text-xs">${item.role || '-'}</td>
-            <td class="text-slate-400 text-xs">${item.image || '-'}</td>
-            <td class="text-slate-400 text-xs">${item.portfolioLink ? '🔗' : '-'}</td>
+            <td>
+                <div class="flex items-center gap-2">
+                    <img src="${item.image || 'images/default.jpg'}" class="w-8 h-8 rounded-full object-cover border border-energi-gold/40 bg-[#050508]" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=0a0a0f&color=D4AF37&bold=true';">
+                    <span class="text-slate-500 text-[10px] truncate max-w-[120px] hidden md:inline font-mono">${item.image ? (item.image.startsWith('http') ? 'Cloudinary' : item.image) : '-'}</span>
+                </div>
+            </td>
+            <td class="text-slate-400 text-xs">${item.portfolioLink ? `<a href="${item.portfolioLink}" target="_blank" class="text-energi-cyan hover:underline">🔗 Link</a>` : '-'}</td>
             <td class="text-right">
                 <button onclick="openModal('team','${item.id}')" class="btn-outline btn-sm mr-1">✏️</button>
                 <button onclick="deleteData('team','${item.id}')" class="btn-danger btn-sm">🗑️</button>
@@ -625,6 +736,52 @@ function renderGallery(items) {
     `).join('');
 }
 
+// ─── Team Gallery Picker Helpers ─────────────────────────────────────────────
+window.toggleTeamGalleryPicker = () => {
+    const picker = $('team-gallery-picker');
+    if (!picker) return;
+    const isHidden = picker.classList.contains('hidden');
+    if (isHidden) {
+        renderTeamGalleryGrid();
+        picker.classList.remove('hidden');
+    } else {
+        picker.classList.add('hidden');
+    }
+};
+
+window.renderTeamGalleryGrid = () => {
+    const grid = $('team-gallery-grid');
+    if (!grid) return;
+    if (!galleryData || galleryData.length === 0) {
+        grid.innerHTML = '<p class="col-span-4 text-center text-xs text-slate-500 py-3">Belum ada foto di Galeri Dokumentasi. Silakan upload foto terlebih dahulu di menu Dokumentasi.</p>';
+        return;
+    }
+    grid.innerHTML = galleryData.map(item => `
+        <div onclick="selectPhotoFromGallery('${item.imageUrl}')" 
+             class="cursor-pointer group relative rounded-lg overflow-hidden border border-white/10 hover:border-energi-gold transition-all aspect-square bg-[#0a0a0f]" title="${item.caption || 'Pilih foto'}">
+            <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+            <div class="absolute inset-0 bg-energi-gold/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="text-[10px] bg-darkbg/90 text-energi-gold px-1.5 py-0.5 rounded font-bold border border-energi-gold/50">Pilih</span>
+            </div>
+        </div>
+    `).join('');
+};
+
+window.selectPhotoFromGallery = (url) => {
+    const prev = $('team-avatar-preview');
+    if (prev) prev.src = url;
+    const imgInput = $('m-image');
+    if (imgInput) imgInput.value = url;
+    // reset file input
+    const fileInput = $('m-team-file');
+    if (fileInput) fileInput.value = '';
+    const info = $('team-file-info');
+    if (info) info.textContent = '✓ Foto dipilih dari Galeri Dokumentasi';
+    const picker = $('team-gallery-picker');
+    if (picker) picker.classList.add('hidden');
+    toast('Foto dari galeri dipilih!');
+};
+
 // ─── File Preview ────────────────────────────────────────────────────────────
 document.addEventListener('change', (e) => {
     if (e.target.id === 'm-file' && e.target.files?.[0]) {
@@ -636,6 +793,21 @@ document.addEventListener('change', (e) => {
             if (previewDiv) previewDiv.classList.remove('hidden');
         };
         reader.readAsDataURL(e.target.files[0]);
+    }
+
+    if (e.target.id === 'm-team-file' && e.target.files?.[0]) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const prev = $('team-avatar-preview');
+            if (prev) prev.src = ev.target.result;
+            const info = $('team-file-info');
+            if (info) info.textContent = `✓ File dipilih: ${file.name} (${Math.round(file.size/1024)} KB)`;
+            // sembunyikan gallery picker jika terbuka
+            const picker = $('team-gallery-picker');
+            if (picker) picker.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
     }
 });
 
