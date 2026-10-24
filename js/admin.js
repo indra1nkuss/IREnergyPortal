@@ -1339,10 +1339,20 @@ function wcRenderAdminWeekForm() {
     container.innerHTML = `
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-5 gap-4">
             <div>
-                <h3 class="text-white font-bold text-lg">${monthLabel}</h3>
-                <p class="text-slate-500 text-sm mt-0.5">Edit data konsumsi minggu ke-${wcAdminCurrentWeek}</p>
+                <h3 class="text-white font-bold text-lg">${monthLabel} — Week ${wcAdminCurrentWeek}</h3>
+                <p class="text-slate-500 text-xs mt-0.5">Edit atau import data konsumsi minggu ke-${wcAdminCurrentWeek}</p>
             </div>
-            <div class="flex flex-wrap gap-2">${weekTabs}</div>
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap gap-1.5 mr-2">${weekTabs}</div>
+                <button onclick="downloadWCTemplate()" class="btn-outline text-xs flex items-center gap-1.5" title="Unduh template Excel untuk Week ${wcAdminCurrentWeek}">
+                    <i class="ph-bold ph-file-arrow-down text-energi-cyan"></i>
+                    <span>Template</span>
+                </button>
+                <label for="excel-wc-file" class="btn-gold text-xs flex items-center gap-1.5 cursor-pointer" title="Import data Excel untuk Week ${wcAdminCurrentWeek}">
+                    <i class="ph-bold ph-file-xls text-emerald-950"></i>
+                    <span>Import Excel</span>
+                </label>
+            </div>
         </div>
 
         <div class="overflow-x-auto rounded-2xl border border-white/10">
@@ -1524,3 +1534,232 @@ document.addEventListener('click', (e) => {
         }, 200);
     }
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// 📊 WEEKLY CONSUMPTION — EXCEL IMPORT / TEMPLATE
+// ══════════════════════════════════════════════════════════════════════════════
+
+let pendingImportWC = [];
+
+// ─── Close WC modal ──────────────────────────────────────────────────────────
+window.closeWCModal = () => {
+    const modal = $('wc-excel-modal');
+    if (modal) modal.classList.remove('open');
+    pendingImportWC = [];
+    const input = $('excel-wc-file');
+    if (input) input.value = '';
+};
+
+// ─── Download Template Excel (Weekly Consumption) ────────────────────────────
+window.downloadWCTemplate = () => {
+    if (typeof XLSX === 'undefined') {
+        toast('Library Excel belum siap. Periksa koneksi internet.', 'error');
+        return;
+    }
+
+    const weekLabel = wcAdminCurrentWeek ? `Week_${wcAdminCurrentWeek}` : 'Week_1';
+    const monthLabel = wcAdminCurrentMonth || new Date().toISOString().slice(0, 7);
+
+    // Build template rows from WC_AREAS_ADMIN (each area = one row)
+    const templateData = WC_AREAS_ADMIN.map((area, i) => ({
+        'No':             i + 1,
+        'Area':           area.name,
+        'KWh':            '',
+        'Produksi_Pairs': '',
+        'KWh_per_Pairs':  '(auto)'
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    ws['!cols'] = [
+        { wch: 5  },   // No
+        { wch: 32 },   // Area
+        { wch: 14 },   // KWh
+        { wch: 18 },   // Produksi_Pairs
+        { wch: 14 }    // KWh_per_Pairs
+    ];
+
+    // Mark auto-total rows with a note
+    const TOTAL_AREA_IDS = ['office-dormitory', 'utility'];
+    WC_AREAS_ADMIN.forEach((area, i) => {
+        if (TOTAL_AREA_IDS.includes(area.id)) {
+            const cellAddr = XLSX.utils.encode_cell({ c: 4, r: i + 1 }); // KWh_per_Pairs col
+            if (!ws[cellAddr]) ws[cellAddr] = {};
+            ws[cellAddr].v = '(auto-total)';
+        }
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `WC_${weekLabel}`);
+    XLSX.writeFile(wb, `Template_WeeklyConsumption_${monthLabel}_${weekLabel}.xlsx`);
+    toast(`✅ Template ${weekLabel} — ${monthLabel} berhasil diunduh!`);
+};
+
+// ─── Handle file input change ────────────────────────────────────────────────
+window.handleWCExcelImport = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (typeof XLSX === 'undefined') {
+        toast('Library Excel belum siap. Silakan refresh halaman.', 'error');
+        return;
+    }
+
+    if (!wcAdminCurrentMonth) {
+        toast('Pilih bulan terlebih dahulu sebelum import!', 'error');
+        // Reset file input
+        const input = $('excel-wc-file');
+        if (input) input.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+            if (!rows || rows.length === 0) {
+                toast('File Excel kosong atau tidak terbaca.', 'error');
+                return;
+            }
+
+            const AUTO_TOTAL_IDS = ['office-dormitory', 'utility'];
+            const parsed = [];
+            const unmatched = [];
+
+            rows.forEach((r) => {
+                const keys = Object.keys(r);
+                // Flexible column name matching
+                const findVal = (regex) => {
+                    const match = keys.find(k => regex.test(k.trim().replace(/\s+/g, '_')));
+                    return match !== undefined ? String(r[match]).trim() : '';
+                };
+
+                const areaName  = findVal(/^(area|nama_area|departemen|lokasi)$/i);
+                const kwhRaw    = findVal(/^(kwh|konsumsi|energi|pemakaian)$/i);
+                const prodRaw   = findVal(/^(produksi_pairs|produksi|pairs|prod)$/i);
+
+                if (!areaName) return; // skip rows without area name
+
+                // Match area name (case-insensitive, partial) to WC_AREAS_ADMIN
+                const matchedArea = WC_AREAS_ADMIN.find(a =>
+                    a.name.toLowerCase() === areaName.toLowerCase() ||
+                    a.name.toLowerCase().includes(areaName.toLowerCase()) ||
+                    areaName.toLowerCase().includes(a.name.toLowerCase())
+                );
+
+                if (!matchedArea) {
+                    unmatched.push(areaName);
+                    return;
+                }
+
+                const isAutoTotal = AUTO_TOTAL_IDS.includes(matchedArea.id);
+                const kwh  = isAutoTotal ? null : (parseFloat(kwhRaw)  || null);
+                const prod = isAutoTotal ? null : (parseFloat(prodRaw) || null);
+                const ratio = (kwh !== null && prod !== null && prod > 0)
+                    ? parseFloat((kwh / prod).toFixed(4))
+                    : null;
+
+                parsed.push({
+                    id:       matchedArea.id,
+                    name:     matchedArea.name,
+                    kwh:      kwh,
+                    prod:     prod,
+                    ratio:    ratio,
+                    isAutoTotal
+                });
+            });
+
+            if (parsed.length === 0) {
+                toast('Tidak ada area yang cocok. Pastikan kolom "Area" sesuai template.', 'error');
+                return;
+            }
+
+            pendingImportWC = parsed;
+
+            const monthFmt = wcAdminCurrentMonth;
+            const weekFmt  = `Week ${wcAdminCurrentWeek}`;
+
+            $('wc-excel-file-info').textContent =
+                `${file.name} • ${parsed.length} area terbaca • ${monthFmt} ${weekFmt}`;
+
+            let noteHtml = `Berhasil mencocokkan <strong class="text-energi-cyan">${parsed.length}</strong> area dari file untuk <strong class="text-white">${monthFmt} — ${weekFmt}</strong>.`;
+            if (unmatched.length > 0) {
+                noteHtml += ` <span class="text-yellow-400">${unmatched.length} baris tidak dikenali dan dilewati.</span>`;
+            }
+            $('wc-excel-validation-note').innerHTML = noteHtml;
+            $('wc-excel-total-count').textContent   = `Total: ${parsed.length} area siap diimpor`;
+
+            const previewItems = parsed.slice(0, 15);
+            $('wc-excel-preview-body').innerHTML = previewItems.map((item, i) => `
+                <tr class="${item.isAutoTotal ? 'bg-yellow-500/5 font-semibold' : ''}">
+                    <td class="text-slate-500 font-mono">${i + 1}</td>
+                    <td class="text-slate-200">${item.name}</td>
+                    <td class="text-energi-gold font-mono">${item.kwh !== null ? item.kwh.toLocaleString('id-ID') : '<span class="text-slate-500">auto</span>'}</td>
+                    <td class="text-energi-cyan font-mono">${item.prod !== null ? item.prod.toLocaleString('id-ID') : '<span class="text-slate-500">auto</span>'}</td>
+                    <td class="text-slate-300 font-mono">${item.ratio !== null ? item.ratio : '<span class="text-slate-500">auto</span>'}</td>
+                </tr>
+            `).join('');
+
+            $('wc-excel-modal').classList.add('open');
+
+        } catch (err) {
+            console.error('WC Excel parse error:', err);
+            toast('Gagal membaca file Excel: ' + err.message, 'error');
+        }
+    };
+    reader.onerror = () => toast('Gagal membuka file.', 'error');
+    reader.readAsArrayBuffer(file);
+};
+
+// ─── Confirm & save WC import to Firestore ───────────────────────────────────
+window.confirmImportWC = async () => {
+    if (!pendingImportWC || pendingImportWC.length === 0) {
+        toast('Tidak ada data untuk diimpor.', 'error');
+        return;
+    }
+
+    const btn = $('btn-confirm-wc-excel');
+    const originalBtnText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="loading-spinner mr-2"></span> Menyimpan...`;
+
+    try {
+        const weekKey = 'week' + wcAdminCurrentWeek;
+        const docRef  = doc(db, 'weeklyConsumption', wcAdminCurrentMonth);
+
+        // Build areaData object from parsed rows
+        const areaData = {};
+        pendingImportWC.forEach(item => {
+            if (!item.isAutoTotal) {
+                areaData[item.id] = {
+                    kwh:   item.kwh   ?? 0,
+                    prod:  item.prod  ?? 0,
+                    ratio: item.ratio ?? (item.prod > 0 ? +(item.kwh / item.prod).toFixed(4) : 0)
+                };
+            }
+        });
+
+        await setDoc(docRef, { [weekKey]: areaData, updatedAt: Date.now() }, { merge: true });
+
+        // Update local cache
+        if (!wcAdminData[wcAdminCurrentMonth]) wcAdminData[wcAdminCurrentMonth] = {};
+        wcAdminData[wcAdminCurrentMonth][weekKey] = areaData;
+
+        toast(`🎉 Berhasil mengimpor ${Object.keys(areaData).length} area ke ${wcAdminCurrentMonth} — Week ${wcAdminCurrentWeek}!`);
+        closeWCModal();
+
+        // Re-render form to show imported values
+        wcRenderAdminWeekForm();
+
+    } catch (err) {
+        console.error('WC Import save error:', err);
+        toast('Gagal menyimpan ke database: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+    }
+};

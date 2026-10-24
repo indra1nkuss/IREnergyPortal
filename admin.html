@@ -284,6 +284,58 @@
         </div>
     </div>
 
+    <!-- EXCEL PREVIEW MODAL — WEEKLY CONSUMPTION -->
+    <div id="wc-excel-modal" class="modal-overlay" onclick="if(event.target===this)closeWCModal()">
+        <div class="modal-box" style="max-width: 720px;" id="wc-excel-modal-box">
+            <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-energi-cyan flex items-center justify-center text-2xl border border-cyan-500/30">
+                        <i class="ph-fill ph-file-xls"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold text-white">Konfirmasi Import Weekly Consumption</h3>
+                        <p class="text-[11px] text-slate-400 font-mono" id="wc-excel-file-info">Menganalisis file...</p>
+                    </div>
+                </div>
+                <button onclick="closeWCModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            <div class="mb-4 bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-slate-300 flex items-start gap-2.5">
+                <span class="text-energi-cyan text-base leading-none">⚡</span>
+                <div>
+                    <p class="font-bold text-white mb-0.5">Ringkasan Validasi Data</p>
+                    <p id="wc-excel-validation-note" class="text-slate-400 leading-relaxed">Menyiapkan data konsumsi mingguan untuk di-import.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-white/10 mb-4 max-h-64 overflow-y-auto">
+                <table class="table-admin text-xs w-full">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Area / Departemen</th>
+                            <th class="text-energi-gold">KWh</th>
+                            <th class="text-energi-cyan">Produksi (Pairs)</th>
+                            <th>KWh/Pairs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wc-excel-preview-body"></tbody>
+                </table>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-white/10">
+                <span class="text-xs text-slate-400 font-mono" id="wc-excel-total-count">0 area siap diimpor</span>
+                <div class="flex gap-2">
+                    <button onclick="closeWCModal()" class="btn-outline text-xs">Batal</button>
+                    <button id="btn-confirm-wc-excel" onclick="confirmImportWC()" class="btn-gold text-xs flex items-center gap-1.5">
+                        <i class="ph-bold ph-check"></i>
+                        <span>Simpan ke Database</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== LOGIN SCREEN ===== -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#050508]">
         <div class="text-center max-w-md px-6">
@@ -518,7 +570,20 @@
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <div>
                             <h2 class="text-xl md:text-2xl font-bold text-white"><i class="ph-fill ph-calendar-blank"></i> Weekly Consumption</h2>
-                            <p class="text-slate-500 text-xs mt-1">Kelola data pemakaian energi mingguan</p>
+                            <p class="text-slate-500 text-xs mt-1">Kelola data pemakaian energi mingguan per area & departemen</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Tombol Template Excel Weekly -->
+                            <button onclick="downloadWCTemplate()" class="btn-outline text-xs flex items-center gap-1.5" title="Unduh format template Excel untuk minggu aktif">
+                                <i class="ph-bold ph-file-arrow-down text-energi-cyan"></i>
+                                <span>Template Excel</span>
+                            </button>
+                            <!-- Tombol Import Excel Weekly -->
+                            <label for="excel-wc-file" class="btn-gold text-xs flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]" title="Upload file Excel (.xlsx / .csv) untuk minggu aktif">
+                                <i class="ph-bold ph-file-xls text-emerald-950"></i>
+                                <span>Import Excel</span>
+                            </label>
+                            <input type="file" id="excel-wc-file" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleWCExcelImport(event)">
                         </div>
                     </div>
 
