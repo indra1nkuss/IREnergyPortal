@@ -1932,20 +1932,19 @@
             const weekData = (wcAllData[wcCurrentMonth] || {})[wcCurrentWeek] || {};
             const avgRatio = wcMonthAvgRatio();
 
-            // ── Sub-area IDs for auto-total rows ────────────────────────────
+            // ── Sub-area IDs: hanya untuk KWh auto-sum ──────────────────────
+            // Produksi/Pairs di office-dormitory & utility diambil dari data
+            // tersimpan (sama seperti departemen lain, tidak dijumlah)
             const DORM_SUB_IDS    = ['idc','mess-korea','kantor-pj023','kantor-pj112','manmod'];
             const UTILITY_SUB_IDS = ['kompressor','wtp-wwtp','kantin-b','others-pj023','others-pj112'];
 
-            function sumSubs(ids) {
-                let kwh = 0, prod = 0;
+            function sumKwhOnly(ids) {
+                let kwh = 0;
                 ids.forEach(id => {
                     const d = weekData[id];
-                    if (d) {
-                        kwh  += parseFloat(d.kwh  || 0);
-                        prod += parseFloat(d.prod || 0);
-                    }
+                    if (d) kwh += parseFloat(d.kwh || 0);
                 });
-                return { kwh, prod, ratio: prod > 0 ? kwh / prod : null };
+                return kwh;
             }
 
             let html = '';
@@ -1953,20 +1952,32 @@
                 const rowStyle = wcRowStyle(area.type);
                 const no = idx + 1;
 
-                // ── Auto-compute totals for the two total rows ───────────────
+                // ── Ambil data area ──────────────────────────────────────────
+                const raw = weekData[area.id] || {};
                 let d;
                 if (area.id === 'office-dormitory') {
-                    d = sumSubs(DORM_SUB_IDS);
+                    // KWh: auto-sum sub-area | Prod: dari data tersimpan sendiri
+                    const sumKwh = sumKwhOnly(DORM_SUB_IDS);
+                    d = {
+                        kwh:   sumKwh > 0 ? sumKwh : (raw.kwh !== undefined ? raw.kwh : ''),
+                        prod:  raw.prod  !== undefined ? raw.prod  : '',
+                        ratio: raw.ratio !== undefined ? raw.ratio : null
+                    };
                 } else if (area.id === 'utility') {
-                    d = sumSubs(UTILITY_SUB_IDS);
+                    const sumKwh = sumKwhOnly(UTILITY_SUB_IDS);
+                    d = {
+                        kwh:   sumKwh > 0 ? sumKwh : (raw.kwh !== undefined ? raw.kwh : ''),
+                        prod:  raw.prod  !== undefined ? raw.prod  : '',
+                        ratio: raw.ratio !== undefined ? raw.ratio : null
+                    };
                 } else {
-                    const raw = weekData[area.id] || {};
                     d = {
                         kwh:   raw.kwh   !== undefined ? raw.kwh   : '',
                         prod:  raw.prod  !== undefined ? raw.prod  : '',
                         ratio: raw.ratio !== undefined ? raw.ratio : null
                     };
                 }
+
 
                 const kwhNum   = (d.kwh !== '' && d.kwh != null && d.kwh !== 0) ? parseFloat(d.kwh) : null;
                 const prodNum  = (d.prod !== '' && d.prod != null && d.prod !== 0) ? parseFloat(d.prod) : null;
