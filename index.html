@@ -1087,19 +1087,30 @@
         </div>
     </footer>
 
-    <div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col justify-center items-center opacity-0 transition-opacity duration-300 backdrop-blur-xl p-4 md:p-8" onclick="closeLightbox()">
-        <!-- Close Button -->
-        <button class="absolute top-5 right-5 md:top-8 md:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-energi-gold hover:text-darkbg text-white text-2xl flex items-center justify-center transition-all duration-300 z-50 border border-white/20 shadow-2xl" onclick="closeLightbox()">
-            <i class="ph-bold ph-x"></i>
-        </button>
+    <div id="lightbox" class="fixed inset-0 z-[9999] bg-black/95 hidden flex-col justify-between items-center opacity-0 transition-opacity duration-300 backdrop-blur-xl p-3 sm:p-5 select-none" onclick="closeLightbox()" style="box-sizing:border-box;">
+        <!-- Bar Atas: Tombol Tutup Jelas & Mudah Ditekan -->
+        <div class="w-full flex justify-end items-center px-2 py-1 flex-shrink-0 z-50">
+            <button class="flex items-center gap-2 bg-white/10 hover:bg-energi-gold hover:text-darkbg text-white px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider transition-all duration-200 border border-white/20 shadow-xl" onclick="closeLightbox()">
+                <span>Tutup</span>
+                <i class="ph-bold ph-x text-base"></i>
+            </button>
+        </div>
         
-        <!-- Lightbox Content Container -->
-        <div class="flex flex-col items-center max-w-5xl w-full" onclick="event.stopPropagation()">
-            <img id="lightbox-img" src="" decoding="async" class="max-w-full max-h-[75vh] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] border border-white/20 scale-95 transition-transform duration-300 object-contain">
-            
-            <div id="lightbox-caption-box" class="mt-4 px-6 py-3 bg-[#0a0a14]/90 border border-white/15 rounded-2xl backdrop-blur-md text-center max-w-xl w-full shadow-2xl">
-                <span id="lightbox-tag" class="inline-block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-energi-gold bg-energi-gold/15 px-3 py-1 rounded-full border border-energi-gold/30 mb-1.5">Momen</span>
-                <p id="lightbox-caption" class="text-white text-sm md:text-base font-semibold tracking-wide"></p>
+        <!-- Frame Tengah: Foto 100% Utuh Masuk Layar Tanpa Terpotong (object-fit: contain) -->
+        <div class="flex-1 w-full flex items-center justify-center min-h-0 py-2" onclick="event.stopPropagation()">
+            <img id="lightbox-img" 
+                 src="" 
+                 decoding="async" 
+                 alt="Dokumentasi Full"
+                 class="scale-95 transition-transform duration-300 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] border border-white/10"
+                 style="max-width:92vw;max-height:calc(88vh - 120px);width:auto;height:auto;object-fit:contain;display:block;margin:auto;">
+        </div>
+
+        <!-- Bar Bawah: Narasi Momen Senter & Jelas -->
+        <div class="w-full flex justify-center items-center flex-shrink-0 pb-2 z-50" onclick="event.stopPropagation()">
+            <div id="lightbox-caption-box" class="px-5 py-2.5 bg-[#0e0e18]/95 border border-white/15 rounded-2xl backdrop-blur-md text-center max-w-lg w-full shadow-2xl">
+                <span id="lightbox-tag" class="inline-block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-energi-gold bg-energi-gold/15 px-2.5 py-0.5 rounded-full border border-energi-gold/30 mb-1">Momen</span>
+                <p id="lightbox-caption" class="text-white text-xs sm:text-sm font-semibold tracking-wide truncate"></p>
             </div>
         </div>
     </div>
