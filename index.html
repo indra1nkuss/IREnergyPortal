@@ -24,6 +24,38 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important; }
         .font-serif { font-family: 'Outfit', sans-serif !important; }
+    
+        /* Layout Galeri Compact & Rapi */
+        .gallery-compact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        @media (min-width: 640px) {
+            .gallery-compact-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+        }
+        @media (min-width: 768px) {
+            .gallery-compact-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .gallery-compact-grid {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+        @media (min-width: 1280px) {
+            .gallery-compact-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+
     </style>
 
     <!-- importmap HARUS sebelum semua module script yang menggunakannya -->
@@ -392,7 +424,7 @@
                 </div>
 
                 <!-- Grid Galeri Rapi & Proporsional -->
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5" id="gallery-container"></div>
+                <div class="gallery-compact-grid" id="gallery-container"></div>
             </div>
         </section>
 
@@ -1688,46 +1720,39 @@
 
                         return `
                         <div onclick="openLightbox('${safeUrl}', '${safeCaption}', 'Momen ${momentNum}')"
-                             class="stagger-item group flex flex-col bg-[#0e0e18] rounded-xl overflow-hidden border border-white/10 shadow-lg hover:border-energi-gold/80 hover:shadow-[0_10px_30px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer"
-                             style="animation-delay: ${(i+1)*0.03}s">
+                             class="group flex flex-col bg-[#0d0d16] rounded-xl overflow-hidden border border-white/10 hover:border-energi-gold hover:shadow-[0_4px_20px_rgba(212,175,55,0.25)] transition-all duration-200 cursor-pointer select-none">
                             
-                            <!-- Frame Persegi Panjang Seragam (Aspect 16:10) -->
-                            <div class="relative w-full aspect-[16/10] bg-[#05050a] flex items-center justify-center overflow-hidden">
+                            <!-- Frame Persegi Panjang Kecil & Seragam (Fixed Compact Height) -->
+                            <div class="relative w-full h-[155px] sm:h-[165px] bg-[#05050a] flex items-center justify-center p-2 overflow-hidden border-b border-white/5">
                                 
-                                <!-- Background blur halus dari gambar agar frame terisi indah & elegan -->
-                                <img src="${item.imageUrl}" 
-                                     alt="" 
-                                     aria-hidden="true"
-                                     class="absolute inset-0 w-full h-full object-cover filter blur-md opacity-25 scale-110 pointer-events-none">
-                                
-                                <!-- Foto Utama: object-contain utuh 100% tanpa terpotong (Portrait / Landscape muat penuh) -->
+                                <!-- Foto Utama: 100% Utuh Masuk Dalam Frame (Portrait & Landscape Muat Full Tanpa Krop) -->
                                 <img src="${item.imageUrl}" 
                                      alt="${captionText}" 
                                      loading="lazy" 
                                      decoding="async"
-                                     class="relative z-10 max-w-full max-h-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105">
+                                     class="max-w-full max-h-full w-auto h-auto object-contain transition-transform duration-300 group-hover:scale-105 pointer-events-none">
 
-                                <!-- Badge Nomor Momen (Pojok Kiri Atas) -->
-                                <div class="absolute top-2 left-2 z-20 bg-black/85 backdrop-blur-md text-energi-gold border border-energi-gold/40 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shadow">
+                                <!-- Badge Nomor Kecil di Pojok Kiri Atas -->
+                                <div class="absolute top-2 left-2 z-10 bg-black/80 text-energi-gold border border-energi-gold/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded shadow">
                                     #${momentNum}
                                 </div>
 
-                                <!-- Overlay Hover Zoom Hint -->
-                                <div class="absolute inset-0 z-20 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
-                                    <div class="px-3 py-1 rounded-full bg-energi-gold text-darkbg text-[10px] font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-transform duration-200">
-                                        <i class="ph-bold ph-magnifying-glass-plus"></i> Lihat Full
-                                    </div>
+                                <!-- Overlay Hover Lembut -->
+                                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
+                                    <span class="bg-energi-gold text-darkbg text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow">
+                                        Perbesar ↗
+                                    </span>
                                 </div>
                             </div>
 
-                            <!-- Narasi Momen Rapi & Senter (Centered) -->
-                            <div class="p-3 flex flex-col items-center justify-center text-center flex-grow bg-gradient-to-b from-[#121222] to-[#0a0a14] border-t border-white/5">
-                                <span class="text-[10px] font-mono font-bold text-energi-gold uppercase tracking-widest mb-1">
+                            <!-- Narasi Momen Senter (Centered), Tegas, & Jelas -->
+                            <div class="p-2.5 flex flex-col items-center justify-center text-center bg-[#0d0d16] min-h-[58px]">
+                                <span class="text-[10px] font-mono font-black text-energi-gold uppercase tracking-wider">
                                     MOMEN ${momentNum}
                                 </span>
-                                <h4 class="text-xs md:text-sm font-semibold text-slate-100 group-hover:text-energi-gold transition-colors line-clamp-2 leading-relaxed" title="${captionText}">
+                                <p class="text-xs font-semibold text-slate-200 group-hover:text-white transition-colors line-clamp-1 mt-0.5" title="${captionText}">
                                     ${captionText}
-                                </h4>
+                                </p>
                             </div>
                         </div>
                         `;
