@@ -392,7 +392,7 @@
                 </div>
 
                 <!-- Grid Galeri Rapi & Proporsional -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4" id="gallery-container"></div>
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5" id="gallery-container"></div>
             </div>
         </section>
 
@@ -1688,38 +1688,46 @@
 
                         return `
                         <div onclick="openLightbox('${safeUrl}', '${safeCaption}', 'Momen ${momentNum}')"
-                             class="stagger-item group flex flex-col bg-[#12121e]/90 rounded-xl overflow-hidden border border-white/10 shadow-md hover:border-energi-gold/70 hover:shadow-[0_8px_25px_rgba(212,175,55,0.25)] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                             class="stagger-item group flex flex-col bg-[#0e0e18] rounded-xl overflow-hidden border border-white/10 shadow-lg hover:border-energi-gold/80 hover:shadow-[0_10px_30px_rgba(212,175,55,0.2)] transition-all duration-300 cursor-pointer"
                              style="animation-delay: ${(i+1)*0.03}s">
                             
-                            <!-- Frame Thumbnail Ringkas (Aspect Square 1:1) -->
-                            <div class="relative w-full aspect-square bg-black/60 overflow-hidden">
+                            <!-- Frame Persegi Panjang Seragam (Aspect 16:10) -->
+                            <div class="relative w-full aspect-[16/10] bg-[#05050a] flex items-center justify-center overflow-hidden">
+                                
+                                <!-- Background blur halus dari gambar agar frame terisi indah & elegan -->
+                                <img src="${item.imageUrl}" 
+                                     alt="" 
+                                     aria-hidden="true"
+                                     class="absolute inset-0 w-full h-full object-cover filter blur-md opacity-25 scale-110 pointer-events-none">
+                                
+                                <!-- Foto Utama: object-contain utuh 100% tanpa terpotong (Portrait / Landscape muat penuh) -->
                                 <img src="${item.imageUrl}" 
                                      alt="${captionText}" 
                                      loading="lazy" 
                                      decoding="async"
-                                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110">
-                                
-                                <!-- Overlay Hover Zoom Icon -->
-                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                                    <div class="w-8 h-8 rounded-full bg-energi-gold/90 text-darkbg flex items-center justify-center text-sm shadow-md transform scale-75 group-hover:scale-100 transition-transform duration-200">
-                                        <i class="ph-bold ph-magnifying-glass-plus"></i>
-                                    </div>
-                                </div>
+                                     class="relative z-10 max-w-full max-h-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105">
 
                                 <!-- Badge Nomor Momen (Pojok Kiri Atas) -->
-                                <div class="absolute top-1.5 left-1.5 bg-black/80 backdrop-blur-sm text-energi-gold border border-energi-gold/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded shadow">
+                                <div class="absolute top-2 left-2 z-20 bg-black/85 backdrop-blur-md text-energi-gold border border-energi-gold/40 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shadow">
                                     #${momentNum}
+                                </div>
+
+                                <!-- Overlay Hover Zoom Hint -->
+                                <div class="absolute inset-0 z-20 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none">
+                                    <div class="px-3 py-1 rounded-full bg-energi-gold text-darkbg text-[10px] font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5 transform scale-90 group-hover:scale-100 transition-transform duration-200">
+                                        <i class="ph-bold ph-magnifying-glass-plus"></i> Lihat Full
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Narasi Momen Rapi & Center -->
-                            <div class="p-2.5 flex flex-col items-center justify-center text-center flex-grow bg-[#0e0e18] border-t border-white/5">
-                                <span class="text-[9px] font-mono font-bold text-energi-gold uppercase tracking-wider mb-0.5">
-                                    Momen ${momentNum}
+                            <!-- Narasi Momen Rapi & Senter (Centered) -->
+                            <div class="p-3 flex flex-col items-center justify-center text-center flex-grow bg-gradient-to-b from-[#121222] to-[#0a0a14] border-t border-white/5">
+                                <span class="text-[10px] font-mono font-bold text-energi-gold uppercase tracking-widest mb-1">
+                                    MOMEN ${momentNum}
                                 </span>
-                                <p class="text-[11px] font-medium text-slate-200 group-hover:text-white transition-colors line-clamp-1 leading-snug w-full" title="${captionText}">
+                                <h4 class="text-xs md:text-sm font-semibold text-slate-100 group-hover:text-energi-gold transition-colors line-clamp-2 leading-relaxed" title="${captionText}">
                                     ${captionText}
-                                </p>
+                                </h4>
                             </div>
                         </div>
                         `;
