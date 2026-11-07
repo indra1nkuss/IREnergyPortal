@@ -133,7 +133,7 @@ export function refreshWinners() {
     displayWinners();
 }
 
-export function displayWinners(page) {
+export function displayWinners(page, shouldScroll = false) {
     if (page !== undefined) winnersPage = page;
 
     const listContainer = document.getElementById('winner-list');
@@ -141,62 +141,85 @@ export function displayWinners(page) {
     const paginationContainer = document.getElementById('pagination-container');
 
     if (!listContainer) return;
-    listContainer.innerHTML = '';
 
-    // Update year pills dan dept dropdown setiap kali di-render (data bisa baru masuk)
-    renderYearPills();
-    renderDeptSelect();
-
-    // Update stats label tahun
-    const yearLabel = document.getElementById('winners-year-label');
-    if (yearLabel) {
-        yearLabel.textContent = selectedYear === 'all' ? 'Semua Tahun' : `Tahun ${selectedYear}`;
+    // Smooth scroll ke atas daftar pemenang saat pindah halaman
+    if (shouldScroll) {
+        const targetEl = document.getElementById('pemenang');
+        if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
-    const filtered = getFilteredWinners();
+    // Smooth exit/enter list container
+    listContainer.style.opacity = '0';
+    listContainer.style.transform = 'translateY(12px)';
+    listContainer.style.transition = 'opacity 0.25s ease-out, transform 0.25s ease-out';
 
-    if (filtered.length === 0) {
-        emptyState?.classList.remove('hidden');
-        if (paginationContainer) paginationContainer.innerHTML = '';
-        return;
-    }
-    emptyState?.classList.add('hidden');
+    setTimeout(() => {
+        listContainer.innerHTML = '';
 
-    const start = (winnersPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const pageItems = filtered.slice(start, end);
+        // Update year pills dan dept dropdown setiap kali di-render (data bisa baru masuk)
+        renderYearPills();
+        renderDeptSelect();
 
-    pageItems.forEach((winner, index) => {
-        const no = start + index + 1;
-        const formatNo = String(no).padStart(2, '0');
-        const delay = index * 0.07;
-        const yearBadge = winner.year
-            ? `<span class="text-xs font-bold text-energi-gold bg-energi-gold/15 border border-energi-gold/30 px-2 py-0.5 rounded font-mono">${winner.year}</span>`
-            : '';
+        // Update stats label tahun
+        const yearLabel = document.getElementById('winners-year-label');
+        if (yearLabel) {
+            yearLabel.textContent = selectedYear === 'all' ? 'Semua Tahun' : `Tahun ${selectedYear}`;
+        }
 
-        listContainer.insertAdjacentHTML('beforeend', `
-            <div class="stagger-item group flex items-center gap-4 p-4 md:p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-energi-gold/50 hover:bg-energi-gold/5 transition-all duration-500 opacity-0 transform translate-y-8" style="animation: fadeInUpWinner 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}s">
-                <div class="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 bg-darkbg rounded-xl flex items-center justify-center font-black text-slate-300 group-hover:text-energi-gold group-hover:scale-105 transition-all border border-white/10 shadow-inner overflow-hidden relative">
-                    <div class="absolute inset-0 bg-gradient-to-br from-energi-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <span class="relative z-10 text-sm md:text-base">${formatNo}</span>
-                </div>
-                <div class="flex-grow min-w-0">
-                    <h3 class="text-base md:text-xl font-bold text-white group-hover:text-energi-gold transition-colors truncate">${winner.name}</h3>
-                    <div class="flex flex-wrap gap-2.5 mt-1.5 items-center">
-                        <span class="text-xs md:text-sm font-mono text-energi-cyan bg-energi-cyan/10 px-2.5 py-0.5 rounded-md border border-energi-cyan/25 font-semibold">NIK: ${winner.nik}</span>
-                        <span class="text-xs md:text-sm text-slate-300 font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> ${winner.dept}</span>
-                        ${yearBadge}
+        const filtered = getFilteredWinners();
+
+        if (filtered.length === 0) {
+            emptyState?.classList.remove('hidden');
+            if (paginationContainer) paginationContainer.innerHTML = '';
+            listContainer.style.opacity = '1';
+            listContainer.style.transform = 'translateY(0)';
+            return;
+        }
+        emptyState?.classList.add('hidden');
+
+        const start = (winnersPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageItems = filtered.slice(start, end);
+
+        pageItems.forEach((winner, index) => {
+            const no = start + index + 1;
+            const formatNo = String(no).padStart(2, '0');
+            const delay = index * 0.05;
+            const yearBadge = winner.year
+                ? `<span class="text-xs font-bold text-energi-gold bg-energi-gold/15 border border-energi-gold/30 px-2 py-0.5 rounded font-mono">${winner.year}</span>`
+                : '';
+
+            listContainer.insertAdjacentHTML('beforeend', `
+                <div class="stagger-item group flex items-center gap-4 p-4 md:p-5 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 hover:border-energi-gold/50 hover:bg-energi-gold/5 transition-all duration-300 opacity-0 transform translate-y-6" style="animation: fadeInUpWinner 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards ${delay}s">
+                    <div class="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 bg-darkbg rounded-xl flex items-center justify-center font-black text-slate-300 group-hover:text-energi-gold group-hover:scale-105 transition-all border border-white/10 shadow-inner overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-energi-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span class="relative z-10 text-sm md:text-base">${formatNo}</span>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h3 class="text-base md:text-xl font-bold text-white group-hover:text-energi-gold transition-colors truncate">${winner.name}</h3>
+                        <div class="flex flex-wrap gap-2.5 mt-1.5 items-center">
+                            <span class="text-xs md:text-sm font-mono text-energi-cyan bg-energi-cyan/10 px-2.5 py-0.5 rounded-md border border-energi-cyan/25 font-semibold">NIK: ${winner.nik}</span>
+                            <span class="text-xs md:text-sm text-slate-300 font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> ${winner.dept}</span>
+                            ${yearBadge}
+                        </div>
+                    </div>
+                    <div class="hidden sm:flex flex-col items-end gap-1">
+                        <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[11px] font-black uppercase tracking-wider">TERBAIK</div>
+                        <div class="text-[10px] text-slate-400 font-mono italic">Validated ✓</div>
                     </div>
                 </div>
-                <div class="hidden sm:flex flex-col items-end gap-1">
-                    <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[11px] font-black uppercase tracking-wider">TERBAIK</div>
-                    <div class="text-[10px] text-slate-400 font-mono italic">Validated ✓</div>
-                </div>
-            </div>
-        `);
-    });
+            `);
+        });
 
-    renderPagination(filtered.length);
+        renderPagination(filtered.length);
+
+        requestAnimationFrame(() => {
+            listContainer.style.opacity = '1';
+            listContainer.style.transform = 'translateY(0)';
+        });
+    }, 150);
 }
 
 // ─── Pagination ───────────────────────────────────────────────────────────────
@@ -217,13 +240,13 @@ function renderPagination(total) {
         } else if (isDisabled) {
             b.className = 'w-10 h-10 rounded-xl font-bold bg-white/5 text-slate-600 cursor-not-allowed border border-white/5';
         } else {
-            b.className = 'w-10 h-10 rounded-xl font-bold bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10 transition-all';
+            b.className = 'w-10 h-10 rounded-xl font-bold bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10 transition-all hover:scale-105';
             b.onclick = onClick;
         }
         container.appendChild(b);
     };
 
-    btn('←', () => displayWinners(winnersPage - 1), false, winnersPage === 1);
+    btn('←', () => displayWinners(winnersPage - 1, true), false, winnersPage === 1);
 
     let start = Math.max(1, winnersPage - 1);
     let end = Math.min(totalPages, start + 2);
@@ -231,8 +254,8 @@ function renderPagination(total) {
     if (winnersPage === totalPages) start = Math.max(1, totalPages - 2);
 
     for (let i = start; i <= end; i++) {
-        btn(String(i), () => displayWinners(i), i === winnersPage, false);
+        btn(String(i), () => displayWinners(i, true), i === winnersPage, false);
     }
 
-    btn('→', () => displayWinners(winnersPage + 1), false, winnersPage === totalPages);
+    btn('→', () => displayWinners(winnersPage + 1, true), false, winnersPage === totalPages);
 }
