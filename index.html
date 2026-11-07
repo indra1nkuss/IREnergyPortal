@@ -70,29 +70,36 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-4 relative">
             
             <div class="flex items-center gap-2.5">
-<svg style="width:36px;height:36px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(212,175,55,0.55));" viewBox="0 0 240 240" aria-label="Logo Portal Energi">
+<svg id="nb-logo" style="width:36px;height:36px;flex-shrink:0;overflow:visible;" viewBox="0 0 240 240" aria-label="Logo Portal Energi">
                   <defs>
-                    <radialGradient id="nb-halo" cx="50%" cy="50%" r="50%">
+                    <radialGradient id="nb-grad" cx="50%" cy="50%" r="50%">
                       <stop offset="0" stop-color="#E0A526" stop-opacity=".55"/>
                       <stop offset="1" stop-color="#E0A526" stop-opacity="0"/>
                     </radialGradient>
-                    <filter id="nb-halo-blur" x="-60%" y="-60%" width="220%" height="220%">
+                    <filter id="nb-blur" x="-60%" y="-60%" width="220%" height="220%">
                       <feGaussianBlur stdDeviation="6"/>
                     </filter>
                   </defs>
-                  <circle cx="120" cy="120" r="112" fill="url(#nb-halo)" opacity=".3"/>
-                  <circle cx="120" cy="120" r="100" fill="none" stroke="rgba(212,175,55,0.25)" stroke-width="1.2"/>
-                  <circle cx="120" cy="120" r="90" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width=".6"/>
-                  <circle cx="120" cy="120" r="100" fill="none" stroke="#D4AF37" stroke-width="2.2"
-                          pathLength="100" stroke-dasharray="78 22" transform="rotate(-90 120 120)"/>
-                  <polygon fill="#E0A526" fill-opacity=".3" filter="url(#nb-halo-blur)"
+                  <circle id="nb-halo"       cx="120" cy="120" r="112" fill="url(#nb-grad)" opacity="0"/>
+                  <circle id="nb-ring-track" cx="120" cy="120" r="100" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1.2"/>
+                  <circle id="nb-ring-inner" cx="120" cy="120" r="90"  fill="none" stroke="rgba(212,175,55,0.1)" stroke-width=".6"/>
+                  <circle id="nb-ring-arc"   cx="120" cy="120" r="100" fill="none" stroke="#D4AF37" stroke-width="2.2"
+                          pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 120 120)"/>
+                  <circle id="nb-flow"       cx="120" cy="120" r="100" fill="none" stroke="#E0A526" stroke-width="4"
+                          pathLength="100" stroke-dasharray="5 95" opacity="0" transform="rotate(-90 120 120)"/>
+                  <circle id="nb-spark"      cx="21.8" cy="101.3" r="3.5" fill="#E0A526" opacity="0"/>
+                  <polygon id="nb-bolt-glow" fill="#E0A526" opacity="0" filter="url(#nb-blur)"
                            points="130,56 92,126 118,126 108,184 150,108 124,108"/>
-                  <polygon fill="#E0A526" fill-opacity=".88" stroke="#D4AF37" stroke-width="2.2"
-                           stroke-linejoin="round" points="130,56 92,126 118,126 108,184 150,108 124,108"/>
-                  <path fill="#3F8A3A" fill-opacity=".8" stroke="#3F8A3A" stroke-width="2.2"
-                        stroke-linejoin="round" d="M138 170 C136 146 156 134 176 134 C176 158 160 174 138 170 Z"/>
-                  <line x1="141" y1="167" x2="166" y2="143" stroke="#3F8A3A" stroke-width="1.6" stroke-linecap="round"/>
-                  <circle cx="21.8" cy="101.3" r="3.5" fill="#E0A526" opacity=".9"/>
+                  <polygon id="nb-bolt"      fill="#E0A526" fill-opacity="0" stroke="#D4AF37" stroke-width="2.2"
+                           stroke-linejoin="round" pathLength="100"
+                           points="130,56 92,126 118,126 108,184 150,108 124,108"/>
+                  <g id="nb-leaf-group">
+                    <path id="nb-leaf"      fill="#3F8A3A" fill-opacity="0" stroke="#3F8A3A" stroke-width="2.2"
+                          stroke-linejoin="round" pathLength="100"
+                          d="M138 170 C136 146 156 134 176 134 C176 158 160 174 138 170 Z"/>
+                    <path id="nb-leaf-vein" fill="none" stroke="#3F8A3A" stroke-width="1.6"
+                          stroke-linecap="round" pathLength="100" d="M141 167 L166 143"/>
+                  </g>
                 </svg>
                 <div class="text-xl md:text-2xl font-800 text-white tracking-tighter leading-none">
                     Portal<span class="text-energi-gold font-serif italic font-normal ml-1">Energi</span>
@@ -789,30 +796,37 @@
     <div class="absolute inset-[-6px] rounded-full border-[1.5px] border-dashed border-energi-gold/40 animate-[spin_15s_linear_infinite]"></div>
     <div class="absolute inset-[-12px] rounded-full border border-dotted border-energi-cyan/30 animate-[spin_20s_linear_infinite_reverse]"></div>
     
-    <svg class="absolute inset-0 w-full h-full p-2 drop-shadow-[0_0_14px_rgba(212,175,55,0.8)] group-hover:scale-110 transition-transform duration-500" viewBox="0 0 240 240" aria-label="Logo Portal Energi">
-                  <defs>
-                    <radialGradient id="team-halo" cx="50%" cy="50%" r="50%">
-                      <stop offset="0" stop-color="#E0A526" stop-opacity=".55"/>
-                      <stop offset="1" stop-color="#E0A526" stop-opacity="0"/>
-                    </radialGradient>
-                    <filter id="team-halo-blur" x="-60%" y="-60%" width="220%" height="220%">
-                      <feGaussianBlur stdDeviation="6"/>
-                    </filter>
-                  </defs>
-                  <circle cx="120" cy="120" r="112" fill="url(#team-halo)" opacity=".3"/>
-                  <circle cx="120" cy="120" r="100" fill="none" stroke="rgba(212,175,55,0.25)" stroke-width="1.2"/>
-                  <circle cx="120" cy="120" r="90" fill="none" stroke="rgba(212,175,55,0.1)" stroke-width=".6"/>
-                  <circle cx="120" cy="120" r="100" fill="none" stroke="#D4AF37" stroke-width="2.2"
-                          pathLength="100" stroke-dasharray="78 22" transform="rotate(-90 120 120)"/>
-                  <polygon fill="#E0A526" fill-opacity=".3" filter="url(#team-halo-blur)"
-                           points="130,56 92,126 118,126 108,184 150,108 124,108"/>
-                  <polygon fill="#E0A526" fill-opacity=".88" stroke="#D4AF37" stroke-width="2.2"
-                           stroke-linejoin="round" points="130,56 92,126 118,126 108,184 150,108 124,108"/>
-                  <path fill="#3F8A3A" fill-opacity=".8" stroke="#3F8A3A" stroke-width="2.2"
-                        stroke-linejoin="round" d="M138 170 C136 146 156 134 176 134 C176 158 160 174 138 170 Z"/>
-                  <line x1="141" y1="167" x2="166" y2="143" stroke="#3F8A3A" stroke-width="1.6" stroke-linecap="round"/>
-                  <circle cx="21.8" cy="101.3" r="3.5" fill="#E0A526" opacity=".9"/>
-                </svg>
+    <svg id="tm-logo" class="absolute inset-0 w-full h-full" style="padding:4px;overflow:visible;" viewBox="0 0 240 240" aria-label="Logo Portal Energi">
+           <defs>
+             <radialGradient id="tm-grad" cx="50%" cy="50%" r="50%">
+               <stop offset="0" stop-color="#E0A526" stop-opacity=".6"/>
+               <stop offset="1" stop-color="#E0A526" stop-opacity="0"/>
+             </radialGradient>
+             <filter id="tm-blur" x="-60%" y="-60%" width="220%" height="220%">
+               <feGaussianBlur stdDeviation="7"/>
+             </filter>
+           </defs>
+           <circle id="tm-halo"       cx="120" cy="120" r="112" fill="url(#tm-grad)" opacity="0"/>
+           <circle id="tm-ring-track" cx="120" cy="120" r="100" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="1.5"/>
+           <circle id="tm-ring-inner" cx="120" cy="120" r="90"  fill="none" stroke="rgba(212,175,55,0.1)" stroke-width=".8"/>
+           <circle id="tm-ring-arc"   cx="120" cy="120" r="100" fill="none" stroke="#D4AF37" stroke-width="2.5"
+                   pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 120 120)"/>
+           <circle id="tm-flow"       cx="120" cy="120" r="100" fill="none" stroke="#E0A526" stroke-width="4"
+                   pathLength="100" stroke-dasharray="5 95" opacity="0" transform="rotate(-90 120 120)"/>
+           <circle id="tm-spark"      cx="21.8" cy="101.3" r="4" fill="#E0A526" opacity="0"/>
+           <polygon id="tm-bolt-glow" fill="#E0A526" opacity="0" filter="url(#tm-blur)"
+                    points="130,56 92,126 118,126 108,184 150,108 124,108"/>
+           <polygon id="tm-bolt"      fill="#E0A526" fill-opacity="0" stroke="#D4AF37" stroke-width="2.2"
+                    stroke-linejoin="round" pathLength="100"
+                    points="130,56 92,126 118,126 108,184 150,108 124,108"/>
+           <g id="tm-leaf-group">
+             <path id="tm-leaf"      fill="#3F8A3A" fill-opacity="0" stroke="#3F8A3A" stroke-width="2.2"
+                   stroke-linejoin="round" pathLength="100"
+                   d="M138 170 C136 146 156 134 176 134 C176 158 160 174 138 170 Z"/>
+             <path id="tm-leaf-vein" fill="none" stroke="#3F8A3A" stroke-width="1.6"
+                   stroke-linecap="round" pathLength="100" d="M141 167 L166 143"/>
+           </g>
+         </svg>
          
 </div>
 
@@ -2313,6 +2327,124 @@
 
     </script>
 
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ENERGY CONSERVATION LOGO ANIMATION  (GSAP)
+         Navbar: continuous lit() loops — langsung aktif
+         Team  : intro draw-on → ignite → lit() loops
+    ════════════════════════════════════════════════════════════════════ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script>
+    (function waitGSAP() {
+      if (typeof gsap === 'undefined') { setTimeout(waitGSAP, 60); return; }
+
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ─── SHARED HELPERS ─────────────────────────────────────────── */
+      function $ (id) { return document.getElementById(id); }
+
+      /* ─── NAVBAR LOGO (nb-*) — langsung lit loop ─────────────────── */
+      (function animNavbar() {
+        var el = $('nb-logo');
+        if (!el) return;
+
+        // set initial: arc drawn, bolt/leaf visible, spark visible
+        gsap.set('#nb-ring-arc',   { strokeDasharray: '78 22' });
+        gsap.set(['#nb-bolt','#nb-leaf','#nb-leaf-vein'], {
+          strokeDasharray: 100, strokeDashoffset: 0
+        });
+        gsap.set('#nb-bolt',       { fillOpacity: 0.75 });
+        gsap.set('#nb-leaf',       { fillOpacity: 0.3  });
+        gsap.set('#nb-bolt-glow',  { opacity: 0.4      });
+        gsap.set('#nb-halo',       { opacity: 0.2      });
+        gsap.set('#nb-flow',       { opacity: 1        });
+        gsap.set('#nb-spark',      { opacity: 0.7      });
+
+        if (reduce) return;
+
+        var tl = gsap.timeline();
+        // halo breathe
+        tl.to('#nb-halo', { opacity: 0.35, scale: 1.05, transformOrigin: '50% 50%',
+                            duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+        // bolt glow pulse
+          .to('#nb-bolt-glow', { opacity: 0.6, duration: 1.5, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+        // bolt fill breathe
+          .to('#nb-bolt', { fillOpacity: 0.9, duration: 1.6, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+        // flow ring sweep
+          .fromTo('#nb-flow', { strokeDashoffset: 0 },
+                              { strokeDashoffset: -100, duration: 4, repeat: -1, ease: 'none' }, 0)
+        // leaf sway
+          .to('#nb-leaf-group', { rotation: 3, svgOrigin: '138 170',
+                                  duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+        // spark twinkle
+          .to('#nb-spark', { opacity: 0.3, duration: 1, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0);
+      })();
+
+      /* ─── TEAM LOGO (tm-*) — intro draw-on → ignite → lit ─────────── */
+      (function animTeam() {
+        var el = $('tm-logo');
+        if (!el) return;
+
+        var draw = ['#tm-bolt','#tm-leaf','#tm-leaf-vein'];
+        gsap.set(draw, { strokeDasharray: 100, strokeDashoffset: 100 });
+        gsap.set('#tm-ring-arc', { strokeDasharray: '0 100' });
+
+        if (reduce) {
+          gsap.set('#tm-ring-arc', { strokeDasharray: '78 22' });
+          gsap.set(['#tm-bolt','#tm-leaf'], { fillOpacity: 0.9, strokeDashoffset: 0 });
+          gsap.set('#tm-bolt-glow', { opacity: 0.5 });
+          gsap.set('#tm-halo', { opacity: 0.3 });
+          gsap.set('#tm-flow', { opacity: 1 });
+          gsap.set('#tm-spark', { opacity: 0.8 });
+          return;
+        }
+
+        function litTeam() {
+          var loops = gsap.timeline();
+          loops
+            .to('#tm-bolt-glow', { opacity: 0.55, duration: 1.6, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+            .to('#tm-halo', { opacity: 0.3, scale: 1.06, transformOrigin: '50% 50%',
+                              duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+            .to('#tm-bolt', { fillOpacity: 0.85, duration: 1.6, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+            .fromTo('#tm-flow', { strokeDashoffset: 0 },
+                                { strokeDashoffset: -100, duration: 5, repeat: -1, ease: 'none' }, 0)
+            .to('#tm-leaf-group', { rotation: 4, svgOrigin: '138 170',
+                                   duration: 2.4, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+            .to('#tm-spark', { opacity: 0.3, duration: 1.1, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0);
+        }
+
+        function igniteTeam() {
+          var t = gsap.timeline({ onComplete: litTeam });
+          t.to('#tm-bolt-glow', { opacity: 1, duration: 0.3 }, 0)
+           .to('#tm-halo', { opacity: 0.95, scale: 1.18, transformOrigin: '50% 50%',
+                             duration: 0.3, ease: 'power2.out' }, 0)
+           .to('#tm-halo', { opacity: 0.35, scale: 1, duration: 1.2, ease: 'power2.inOut' }, 0.3)
+           .to('#tm-bolt', { keyframes: [
+              { fillOpacity: 1, duration: 0.06 }, { fillOpacity: 0.15, duration: 0.08 },
+              { fillOpacity: 1, duration: 0.06 }, { fillOpacity: 0.5,  duration: 0.1  },
+              { fillOpacity: 1, duration: 0.25 }
+            ] }, 0)
+           .to('#tm-leaf',  { fillOpacity: 0.3, duration: 1 }, 0.2)
+           .to('#tm-flow',  { opacity: 1, duration: 0.6 }, 0.4);
+        }
+
+        // Intro: draw arc → bolt → leaf → vein → spark → then ignite
+        var intro = gsap.timeline({ defaults: { ease: 'power2.out' } });
+        intro
+          .fromTo('#tm-ring-arc', { strokeDasharray: '0 100' },
+                                  { strokeDasharray: '78 22', duration: 1.6, ease: 'power3.inOut' })
+          .from(['#tm-ring-track','#tm-ring-inner'], { opacity: 0, duration: 1 }, 0)
+          .to('#tm-bolt',      { strokeDashoffset: 0, duration: 1 }, 0.5)
+          .to('#tm-leaf',      { strokeDashoffset: 0, duration: 0.9 }, 1.0)
+          .to('#tm-leaf-vein', { strokeDashoffset: 0, duration: 0.5 }, 1.5)
+          .from('#tm-spark',   { scale: 0, transformOrigin: '50% 50%',
+                                 duration: 0.5, ease: 'back.out(3)' }, 1.5)
+          .add(igniteTeam);
+      })();
+
+    })();
+    </script>
 
 </body>
 </html>
