@@ -2358,22 +2358,24 @@
 
 
     <!-- ═══════════════════════════════════════════════════════════════════
-     CANVAS SWARM CURSOR OVERLAY (Active saat intro, lalu collapse ke target)
+     CANVAS SWARM CURSOR OVERLAY & LOGO ENERGY CONSERVATION ANIMATION
 ════════════════════════════════════════════════════════════════════ -->
 <canvas id="swarm-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99999;display:none;"></canvas>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script>
 (function waitGSAP() {
-  if (typeof gsap === 'undefined') { setTimeout(waitGSAP, 60); return; }
+  if (typeof gsap === 'undefined') { setTimeout(waitGSAP, 50); return; }
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function $(id) { return document.getElementById(id); }
 
   /* -------------------------------------------------------------
-     SISTEM SWARM PARTIKEL CURSOR (Menyala, berputar ke kursor, lalu collapse ke Logo)
+     SISTEM SWARM PARTIKEL CURSOR LENGKAP DENGAN BURST CLICK
   ------------------------------------------------------------- */
-  function triggerSwarmToLogo(targetLogoId, onIgniteCallback) {
+  var activeSwarmInstance = null;
+
+  function triggerSwarmToLogo(targetLogoId, onIgniteCallback, delayBeforeCollapse) {
     if (reduce) {
       if (onIgniteCallback) onIgniteCallback();
       return;
@@ -2383,6 +2385,12 @@
       if (onIgniteCallback) onIgniteCallback();
       return;
     }
+
+    // Stop instance sebelumnya jika ada
+    if (activeSwarmInstance && activeSwarmInstance.stop) {
+      activeSwarmInstance.stop();
+    }
+
     canvas.style.display = 'block';
     var ctx = canvas.getContext('2d');
     var W = window.innerWidth, H = window.innerHeight;
@@ -2391,27 +2399,40 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     var TAU = Math.PI * 2;
-    var colors = ['#FFE2A0', '#FFB300', '#81C784', '#00E5FF'];
+    var colors = ['#FFE2A0', '#FFB300', '#FFD54F', '#81C784', '#00E5FF'];
     var parts = [];
-    var N = W < 640 ? 85 : 160;
+    var N = W < 640 ? 95 : 180;
+
     for (var i = 0; i < N; i++) {
       var edge = Math.random() * TAU;
-      var x = W / 2 + Math.cos(edge) * (W * 0.6);
-      var y = H / 2 + Math.sin(edge) * (H * 0.6);
+      var x = W / 2 + Math.cos(edge) * (W * 0.55);
+      var y = H / 2 + Math.sin(edge) * (H * 0.55);
       parts.push({
         x: x, y: y, px: x, py: y, vx: 0, vy: 0,
         a: Math.random() * TAU,
-        r: 15 + Math.pow(Math.random(), 1.6) * 120,
+        r: 18 + Math.pow(Math.random(), 1.6) * 135,
         w: (0.008 + Math.random() * 0.025) * (Math.random() < 0.5 ? -1 : 1),
-        k: 0.015 + Math.random() * 0.035,
-        s: 0.9 + Math.random() * 1.8,
+        k: 0.016 + Math.random() * 0.035,
+        s: 1.0 + Math.random() * 2.0,
         c: Math.floor(Math.random() * colors.length)
       });
     }
 
     var mx = W / 2, my = H * 0.4, cx = mx, cy = my;
     function onMove(e) { mx = e.clientX; my = e.clientY; }
+    function onBurst(e) {
+      if (sw.collapse < 0.3) {
+        onMove(e);
+        for (var j = 0; j < parts.length; j++) {
+          var ang = Math.random() * TAU, f = 7 + Math.random() * 18;
+          parts[j].vx += Math.cos(ang) * f;
+          parts[j].vy += Math.sin(ang) * f;
+        }
+      }
+    }
+
     window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerdown', onBurst, { passive: true });
 
     var running = true;
     var sw = { collapse: 0, alpha: 1 };
@@ -2425,8 +2446,11 @@
       var txDest = mx, tyDest = my;
       if (targetEl) {
         var r = targetEl.getBoundingClientRect();
-        txDest = r.left + r.width / 2;
-        tyDest = r.top + r.height / 2;
+        // Hanya arahkan jika target ada di viewport / layout aktif
+        if (r.width > 0 && r.height > 0) {
+          txDest = r.left + r.width / 2;
+          tyDest = r.top + r.height / 2;
+        }
       }
 
       cx += (mx - cx) * 0.16;
@@ -2443,13 +2467,13 @@
         var tx = ox + Math.cos(p.a) * p.r * rs;
         var ty = oy + Math.sin(p.a) * p.r * rs * 0.7;
         p.px = p.x; p.py = p.y;
-        p.vx += (tx - p.x) * p.k * (1 + c * 1.5);
-        p.vy += (ty - p.y) * p.k * (1 + c * 1.5);
+        p.vx += (tx - p.x) * p.k * (1 + c * 1.6);
+        p.vy += (ty - p.y) * p.k * (1 + c * 1.6);
         p.vx *= 0.85; p.vy *= 0.85;
         p.x += p.vx; p.y += p.vy;
 
         var sp = Math.min(Math.hypot(p.vx, p.vy) / 12, 1);
-        ctx.globalAlpha = (0.45 + sp * 0.55) * sw.alpha;
+        ctx.globalAlpha = (0.4 + sp * 0.6) * sw.alpha;
         ctx.fillStyle = colors[p.c];
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.s * (1 - c * 0.4), 0, TAU);
@@ -2460,25 +2484,39 @@
     }
     requestAnimationFrame(frame);
 
-    // Timeline swarm: aktif 2.5 dtk ikut kursor, lalu collapse cepat ke logo
-    var seq = gsap.timeline({ delay: 2.2 });
-    seq.to(sw, { collapse: 1, duration: 0.9, ease: 'power3.in' }, 0)
+    var delay = typeof delayBeforeCollapse === 'number' ? delayBeforeCollapse : 2.0;
+    var seq = gsap.timeline({ delay: delay });
+    seq.to(sw, { collapse: 1, duration: 0.95, ease: 'power3.in' }, 0)
        .add(function() {
          if (onIgniteCallback) onIgniteCallback();
-       }, '>-0.1')
+       }, '>-0.08')
        .to(sw, { alpha: 0, duration: 0.5, ease: 'power1.out' }, '>')
        .add(function() {
-         running = false;
-         window.removeEventListener('pointermove', onMove);
-         ctx.clearRect(0, 0, W, H);
-         canvas.style.display = 'none';
+         cleanup();
        });
+
+    function cleanup() {
+      running = false;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerdown', onBurst);
+      if (ctx) ctx.clearRect(0, 0, W, H);
+      canvas.style.display = 'none';
+      if (activeSwarmInstance === inst) activeSwarmInstance = null;
+    }
+
+    var inst = {
+      stop: function() {
+        seq.kill();
+        cleanup();
+      }
+    };
+    activeSwarmInstance = inst;
   }
 
   /* -------------------------------------------------------------
      HELPER SETUP ANIMASI LOGO (Draw-on, Ignite, Continuous Lit)
   ------------------------------------------------------------- */
-  function setupLogoAnimation(pfx, startWithSwarm, onTriggerCallback) {
+  function setupLogoAnimation(pfx, startWithSwarm, delaySwarm) {
     var el = $(pfx + '-logo');
     if (!el) return;
 
@@ -2490,8 +2528,8 @@
     function litLoop() {
       var loops = gsap.timeline();
       loops
-        .to('#' + pfx + '-bolt-glow', { opacity: 0.75, duration: 1.5, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
-        .to('#' + pfx + '-halo', { opacity: 0.45, scale: 1.08, transformOrigin: '50% 50%', duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+        .to('#' + pfx + '-bolt-glow', { opacity: 0.8, duration: 1.5, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
+        .to('#' + pfx + '-halo', { opacity: 0.5, scale: 1.1, transformOrigin: '50% 50%', duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
         .to('#' + pfx + '-bolt', { fillOpacity: 0.95, duration: 1.5, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
         .fromTo('#' + pfx + '-flow', { strokeDashoffset: 0 }, { strokeDashoffset: -100, duration: 4.5, repeat: -1, ease: 'none' }, 0)
         .to('#' + pfx + '-leaf-group', { rotation: 4, svgOrigin: '138 170', duration: 2.2, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0)
@@ -2501,61 +2539,84 @@
     function ignite() {
       var t = gsap.timeline({ onComplete: litLoop });
       t.to('#' + pfx + '-bolt-glow', { opacity: 1, duration: 0.3 }, 0)
-       .to('#' + pfx + '-halo', { opacity: 0.95, scale: 1.25, transformOrigin: '50% 50%', duration: 0.35, ease: 'power2.out' }, 0)
-       .to('#' + pfx + '-halo', { opacity: 0.4, scale: 1, duration: 1.1, ease: 'power2.inOut' }, 0.35)
+       .to('#' + pfx + '-halo', { opacity: 1, scale: 1.28, transformOrigin: '50% 50%', duration: 0.35, ease: 'power2.out' }, 0)
+       .to('#' + pfx + '-halo', { opacity: 0.45, scale: 1, duration: 1.1, ease: 'power2.inOut' }, 0.35)
        .to('#' + pfx + '-bolt', { keyframes: [
-          { fillOpacity: 1, duration: 0.05 }, { fillOpacity: 0.2, duration: 0.07 },
-          { fillOpacity: 1, duration: 0.05 }, { fillOpacity: 0.6, duration: 0.09 },
+          { fillOpacity: 1, duration: 0.05 }, { fillOpacity: 0.15, duration: 0.07 },
+          { fillOpacity: 1, duration: 0.05 }, { fillOpacity: 0.6,  duration: 0.09 },
           { fillOpacity: 1, duration: 0.25 }
         ] }, 0)
-       .to('#' + pfx + '-leaf', { fillOpacity: 0.85, duration: 0.8 }, 0.2)
+       .to('#' + pfx + '-leaf', { fillOpacity: 0.9, duration: 0.8 }, 0.2)
        .to('#' + pfx + '-flow', { opacity: 1, duration: 0.5 }, 0.3);
     }
 
     function runIntro() {
       var intro = gsap.timeline({ defaults: { ease: 'power2.out' } });
       intro
-        .fromTo('#' + pfx + '-ring-arc', { strokeDasharray: '0 100' }, { strokeDasharray: '78 22', duration: 1.4, ease: 'power3.inOut' })
+        .fromTo('#' + pfx + '-ring-arc', { strokeDasharray: '0 100' }, { strokeDasharray: '78 22', duration: 1.3, ease: 'power3.inOut' })
         .from(['#' + pfx + '-ring-track', '#' + pfx + '-ring-inner'], { opacity: 0, duration: 0.8 }, 0)
-        .to('#' + pfx + '-bolt', { strokeDashoffset: 0, duration: 0.9 }, 0.3)
-        .to('#' + pfx + '-leaf', { strokeDashoffset: 0, duration: 0.8 }, 0.8)
-        .to('#' + pfx + '-leaf-vein', { strokeDashoffset: 0, duration: 0.5 }, 1.2)
-        .to('#' + pfx + '-spark', { scale: 1, opacity: 1, transformOrigin: '50% 50%', duration: 0.4, ease: 'back.out(3)' }, 1.2)
+        .to('#' + pfx + '-bolt', { strokeDashoffset: 0, duration: 0.85 }, 0.25)
+        .to('#' + pfx + '-leaf', { strokeDashoffset: 0, duration: 0.75 }, 0.7)
+        .to('#' + pfx + '-leaf-vein', { strokeDashoffset: 0, duration: 0.45 }, 1.05)
+        .to('#' + pfx + '-spark', { scale: 1, opacity: 1, transformOrigin: '50% 50%', duration: 0.4, ease: 'back.out(3)' }, 1.05)
         .add(ignite);
     }
 
     if (startWithSwarm) {
       triggerSwarmToLogo(pfx + '-logo', function() {
         runIntro();
-      });
+      }, delaySwarm);
     } else {
       runIntro();
     }
   }
 
-  // 1. NAVBAR LOGO: Muncul saat halaman dibuka pertama kali dengan Swarm Cursor
-  setupLogoAnimation('nb', true);
+  // 1. NAVBAR LOGO: Muncul saat website pertama dibuka
+  setupLogoAnimation('nb', true, 2.0);
 
-  // 2. TEAM LOGO: Muncul saat tab 'tentang' dibuka dengan Swarm Cursor
+  // 2. TEAM LOGO: Muncul saat masuk tab Team ('tentang')
   var teamTriggered = false;
-  function checkTeamLogo() {
+  function triggerTeamSwarmAndLogo() {
     if (teamTriggered) return;
     var sec = $('tentang');
     if (sec && !sec.classList.contains('hidden')) {
       teamTriggered = true;
-      setupLogoAnimation('tm', true);
+      // Berikan swarm cursor saat tab Team dibuka, lalu collapse ke tm-logo
+      setupLogoAnimation('tm', true, 1.8);
     }
   }
-  // Hook ke tab switching
-  var origOpenTab = window.openTab;
-  window.openTab = function(tabId, btn) {
-    if (origOpenTab) origOpenTab(tabId, btn);
-    if (tabId === 'tentang') {
-      setTimeout(checkTeamLogo, 200);
-    }
-  };
 
-  // 3. FOOTER LOGO: Muncul saat scroll mencapai footer dengan Swarm Cursor
+  // Listener event sectionShown (event resmi dari ui.js)
+  window.addEventListener('sectionShown', function(e) {
+    if (e.detail === 'tentang') {
+      triggerTeamSwarmAndLogo();
+    }
+  });
+
+  // Fallback: Hook ke fungsi openTab dan navigasi tombol
+  function attachTeamHook() {
+    var cur = window.openTab;
+    window.openTab = function(tabId, btn) {
+      if (cur) cur(tabId, btn);
+      if (tabId === 'tentang') {
+        setTimeout(triggerTeamSwarmAndLogo, 350);
+      }
+    };
+  }
+  attachTeamHook();
+  // Patch lagi saat DOM ready untuk memastikan tidak tertimpa
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(attachTeamHook, 150);
+  });
+
+  // Tombol Team Navbar / Footer click listener langsung
+  document.querySelectorAll('button[onclick*="tentang"]').forEach(function(b) {
+    b.addEventListener('click', function() {
+      setTimeout(triggerTeamSwarmAndLogo, 350);
+    });
+  });
+
+  // 3. FOOTER LOGO: Muncul saat scroll mencapai footer
   var footerTriggered = false;
   if ('IntersectionObserver' in window) {
     var ftEl = $('ft-logo');
@@ -2565,10 +2626,10 @@
           if (entry.isIntersecting && !footerTriggered) {
             footerTriggered = true;
             obs.disconnect();
-            setupLogoAnimation('ft', true);
+            setupLogoAnimation('ft', true, 1.5);
           }
         });
-      }, { threshold: 0.2 });
+      }, { threshold: 0.15 });
       obs.observe(ftEl);
     }
   } else {
