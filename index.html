@@ -484,94 +484,211 @@
                 <!-- TABLE + CHART SIDE BY SIDE -->
                 <div class="grid lg:grid-cols-5 gap-6 reveal">
                     <!-- TABLE: Hanya tampilkan SEU (≥5%, kecuali Others) -->
-                    <div class="lg:col-span-2 bg-darkcard/85 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-2xl shadow-[0_0_40px_rgba(0,255,255,0.03)] relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-32 h-32 bg-energi-cyan/5 rounded-full blur-[60px] opacity-20"></div>
+                    <div class="lg:col-span-2 bg-darkcard/85 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-2xl shadow-[0_0_40px_rgba(0,255,255,0.03)] relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 left-0 w-32 h-32 bg-energi-cyan/5 rounded-full blur-[60px] opacity-20 pointer-events-none"></div>
                         <div class="relative z-10">
-                            <div class="flex items-center gap-3 mb-5">
-                                <div class="w-8 h-8 rounded-lg bg-energi-cyan/10 border border-energi-cyan/20 flex items-center justify-center text-sm"><i class="ph-fill ph-clipboard-text"></i></div>
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded-lg bg-energi-cyan/10 border border-energi-cyan/20 flex items-center justify-center text-sm text-energi-cyan"><i class="ph-fill ph-clipboard-text"></i></div>
                                 <div>
                                     <h3 class="text-white font-bold text-sm uppercase tracking-wider">Daftar Dept. SEU</h3>
-                                    <p class="text-[9px] text-slate-500 uppercase tracking-widest">Kontribusi ≥ 5% Tahunan</p>
+                                    <p class="text-[10px] text-slate-400">Departemen Konsumsi Signifikan (≥ 5% Tahunan)</p>
                                 </div>
                             </div>
                             <!-- SEU threshold badge -->
-                            <div class="flex items-center gap-2 mb-4 p-2 bg-energi-gold/5 border border-energi-gold/20 rounded-lg">
-                                <span class="w-3 h-3 rounded-full bg-energi-gold shrink-0"></span>
-                                <p class="text-[10px] text-slate-400">Batas SEU: <strong class="text-energi-gold">≥ 5%</strong> kontribusi energi (Others dikecualikan)</p>
+                            <div class="flex items-center gap-2 mb-4 p-2.5 bg-energi-gold/5 border border-energi-gold/20 rounded-xl">
+                                <span class="w-2.5 h-2.5 rounded-full bg-energi-gold shrink-0 shadow-[0_0_8px_rgba(212,175,55,0.8)]"></span>
+                                <p class="text-[11px] text-slate-300">Kriteria SEU: <strong class="text-energi-gold font-bold">≥ 5,00%</strong> pemakaian energi (Kategori <em>Others</em> dikecualikan)</p>
                             </div>
 
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs">
                                     <thead>
-                                        <tr class="border-b border-white/10">
-                                            <th class="pb-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold">#</th>
-                                            <th class="pb-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold">Departemen</th>
-                                            <th class="pb-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold text-right">KWh/Year</th>
-                                            <th class="pb-3 text-[9px] uppercase tracking-[0.2em] text-slate-500 font-bold text-right">%</th>
+                                        <tr class="border-b border-white/10 text-slate-400">
+                                            <th class="pb-3 px-2 text-[10px] uppercase tracking-wider font-bold">#</th>
+                                            <th class="pb-3 px-2 text-[10px] uppercase tracking-wider font-bold">Departemen</th>
+                                            <th class="pb-3 px-2 text-[10px] uppercase tracking-wider font-bold text-right">KWh/Tahun</th>
+                                            <th class="pb-3 px-2 text-[10px] uppercase tracking-wider font-bold text-right">% Share</th>
                                         </tr>
                                     </thead>
                                     <tbody id="seu-table-body">
                                         <!-- akan diisi oleh Firestore -->
                                     </tbody>
-                                    <tfoot>
-                                        <tr class="border-t border-energi-gold/30">
-                                            <td colspan="2" class="pt-4 text-white font-bold text-xs uppercase tracking-wider">Total IR</td>
-                                            <td class="pt-4 text-right text-energi-gold font-bold font-mono text-sm" id="seu-total-kwh">0</td>
-                                            <td class="pt-4 text-right"><span class="px-2 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold text-xs font-black">100%</span></td>
-                                        </tr>
+                                    <tfoot id="seu-table-foot">
+                                        <!-- Subtotal SEU & Total IR diisi oleh JS -->
                                     </tfoot>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CHART: Tampilkan SEMUA dept, tandai SEU -->
-                    <div class="lg:col-span-3 bg-darkcard/85 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-2xl shadow-[0_0_40px_rgba(212,175,55,0.03)] relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-40 h-40 bg-energi-gold/5 rounded-full blur-[60px] opacity-20"></div>
-                        <div class="relative z-10">
-                            <div class="flex items-center justify-between gap-3 mb-4">
+                    <!-- CHART: Tampilkan SEMUA dept, terurut Pareto -->
+                    <div class="lg:col-span-3 bg-darkcard/85 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-2xl shadow-[0_0_40px_rgba(212,175,55,0.03)] relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-energi-gold/5 rounded-full blur-[60px] opacity-20 pointer-events-none"></div>
+                        <div class="relative z-10 space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center text-sm"><i class="ph-fill ph-chart-bar"></i></div>
+                                    <div class="w-8 h-8 rounded-lg bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-center text-sm text-energi-gold"><i class="ph-fill ph-chart-bar"></i></div>
                                     <div>
-                                        <h3 class="text-white font-bold text-sm uppercase tracking-wider">Grafik Seluruh Departemen</h3>
-                                        <p class="text-[9px] text-slate-500 uppercase tracking-widest">KWh / Year — SEU ditandai ⚡</p>
+                                        <h3 class="text-white font-bold text-sm uppercase tracking-wider">Grafik Distribusi Energi (Terurut)</h3>
+                                        <p class="text-[10px] text-slate-400">Urutan Pareto: Beban Terbesar ke Terkecil · SEU Ditandai ⚡</p>
                                     </div>
                                 </div>
+                                <span class="self-start sm:self-auto text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-energi-gold/10 text-energi-gold border border-energi-gold/30">
+                                    Pareto Order ↓
+                                </span>
                             </div>
+
                             <!-- Legend -->
-                            <div class="flex flex-wrap gap-3 mb-4">
+                            <div class="flex flex-wrap items-center gap-3 p-2.5 rounded-xl bg-white/5 border border-white/10 text-[11px]">
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 rounded-sm bg-energi-gold"></span>
-                                    <span class="text-[10px] text-slate-400">SEU (≥ 5%)</span>
+                                    <span class="w-3 h-3 rounded-sm bg-[#D4AF37] shadow-[0_0_8px_rgba(212,175,55,0.6)]"></span>
+                                    <span class="text-slate-200 font-semibold">SEU (≥ 5%)</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 rounded-sm bg-white/20"></span>
-                                    <span class="text-[10px] text-slate-400">Non-SEU (< 5%)</span>
+                                    <span class="w-3 h-3 rounded-sm bg-[#22d3ee]/70"></span>
+                                    <span class="text-slate-400">Non-SEU (&lt; 5%)</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="w-3 h-3 rounded-sm bg-slate-600"></span>
-                                    <span class="text-[10px] text-slate-400">Others (dikecualikan)</span>
+                                    <span class="w-3 h-3 rounded-sm bg-slate-500"></span>
+                                    <span class="text-slate-400">Others (Penampung)</span>
+                                </div>
+                                <div class="ml-auto text-[10px] text-energi-gold font-mono flex items-center gap-1 font-semibold">
+                                    <i class="ph-bold ph-lightning"></i> Angka di atas bar = % total
                                 </div>
                             </div>
-                            <div class="relative">
-                                <canvas id="seuChart" class="w-full h-full" style="max-height: 320px;"></canvas>
+
+                            <div class="relative w-full" style="min-height: 320px; height: 330px;">
+                                <canvas id="seuChart" class="w-full h-full"></canvas>
                             </div>
-                            <!-- Narasi SEU di bawah chart -->
-                            <div id="seu-chart-narasi" class="mt-4 p-3 bg-energi-gold/5 border border-energi-gold/20 rounded-xl hidden">
-                                <p class="text-[10px] text-energi-gold font-bold mb-1">⚡ Narasi SEU:</p>
-                                <p class="text-[11px] text-slate-300 leading-relaxed" id="seu-chart-narasi-text"></p>
+
+                            <!-- Narasi Singkat di bawah chart -->
+                            <div id="seu-chart-narasi" class="mt-4 p-3.5 bg-energi-gold/[0.08] border border-energi-gold/25 rounded-xl">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="text-energi-gold text-sm"><i class="ph-fill ph-sparkle"></i></span>
+                                    <span class="text-xs font-bold text-energi-gold uppercase tracking-wider">Highlight Distribusi Energi</span>
+                                </div>
+                                <p class="text-xs text-slate-200 leading-relaxed font-light" id="seu-chart-narasi-text"></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- INSIGHT BOTTOM -->
-                <div class="reveal bg-gradient-to-r from-energi-cyan/5 via-energi-gold/5 to-energi-cyan/5 border border-white/10 p-6 md:p-8 rounded-2xl backdrop-blur-md">
-                    <div class="flex items-start gap-4">
-                        <div class="w-10 h-10 rounded-full bg-energi-cyan/10 border border-energi-cyan/20 flex items-center justify-center text-lg shrink-0 mt-1"><i class="ph-fill ph-lightbulb"></i></div>
-                        <div>
-                            <h4 class="text-white font-bold text-sm mb-2"><i class="ph-fill ph-lightbulb"></i> Insight SEU IR</h4>
-                            <p class="text-slate-400 text-xs md:text-sm leading-relaxed" id="seu-insight"></p>
+                <!-- ===== SEU EXECUTIVE NARRATIVE & DETAIL BREAKDOWN ===== -->
+                <div class="reveal space-y-6">
+                    <!-- NARRATIVE HIGHLIGHT BOX -->
+                    <div class="bg-darkcard/90 backdrop-blur-xl border border-energi-gold/30 p-6 md:p-8 rounded-2xl shadow-[0_0_50px_rgba(212,175,55,0.06)] relative overflow-hidden">
+                        <div class="absolute -top-24 -right-24 w-60 h-60 bg-energi-gold/10 rounded-full blur-[80px] pointer-events-none"></div>
+                        <div class="relative z-10 space-y-5">
+                            <!-- Header baris narasi -->
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-white/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-energi-gold/15 border border-energi-gold/40 flex items-center justify-center text-xl text-energi-gold shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                                        <i class="ph-fill ph-article"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white font-bold text-base md:text-lg flex items-center gap-2">
+                                            <span>Narasi Analisis Significant Energy Use (SEU)</span>
+                                            <span class="px-2 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold border border-energi-gold/30 text-[10px] font-bold font-mono">ISO 50001:2018</span>
+                                        </h3>
+                                        <p class="text-xs text-slate-400">Interpretasi data teknis, distribusi beban konsumsi, dan fokus intervensi efisiensi energi</p>
+                                    </div>
+                                </div>
+                                <!-- Badge cakupan -->
+                                <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs">
+                                    <span class="w-2 h-2 rounded-full bg-energi-gold animate-ping"></span>
+                                    <span class="text-slate-400">Total Dominasi SEU:</span>
+                                    <strong class="text-energi-gold font-mono text-sm" id="seu-narrative-coverage-badge">0%</strong>
+                                </div>
+                            </div>
+
+                            <!-- Teks Narasi Utama yang Jelas & Detail -->
+                            <div class="bg-black/25 border border-white/5 p-5 md:p-6 rounded-xl leading-relaxed text-sm md:text-base text-slate-200 font-light" id="seu-main-narrative">
+                                <!-- Diisi otomatis oleh JavaScript dengan angka & narasi detail -->
+                            </div>
+
+                            <!-- KEY NUMERICAL HIGHLIGHTS (Mini Chips) -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2" id="seu-narrative-stat-chips">
+                                <!-- Diisi otomatis oleh JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TIER CLASSIFICATION & ACTION MATRIX -->
+                    <div class="grid md:grid-cols-3 gap-5">
+                        <!-- TIER 1: KRITIS (> 20%) -->
+                        <div class="bg-darkcard/85 backdrop-blur-xl border border-red-500/30 p-5 rounded-2xl relative overflow-hidden group hover:border-red-500/50 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.8)]"></span>
+                                        <span class="text-xs font-bold text-red-400 uppercase tracking-wider">Tier 1: Beban Kritis</span>
+                                    </div>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-mono font-bold border border-red-500/30">&gt; 20% Konsumsi</span>
+                                </div>
+                                <h4 class="text-white font-bold text-sm mb-2" id="seu-tier1-title">Prioritas Audit & Monitoring Ketat</h4>
+                                <div class="space-y-2 mb-3" id="seu-tier1-content">
+                                    <!-- Diisi JS -->
+                                </div>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 text-[11px] text-slate-400 flex items-start gap-1.5 mt-2">
+                                <i class="ph-bold ph-crosshair text-red-400 text-sm shrink-0 mt-0.5"></i>
+                                <span><strong>Fokus:</strong> Audit energi mendalam, verifikasi sensor submeter harian, dan eliminasi waste operasional.</span>
+                            </div>
+                        </div>
+
+                        <!-- TIER 2: SIGNIFIKAN (10% - 20%) -->
+                        <div class="bg-darkcard/85 backdrop-blur-xl border border-energi-gold/30 p-5 rounded-2xl relative overflow-hidden group hover:border-energi-gold/50 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-energi-gold shadow-[0_0_10px_rgba(212,175,55,0.8)]"></span>
+                                        <span class="text-xs font-bold text-energi-gold uppercase tracking-wider">Tier 2: Beban Signifikan</span>
+                                    </div>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-energi-gold/20 text-energi-gold font-mono font-bold border border-energi-gold/30">10% – 20% Konsumsi</span>
+                                </div>
+                                <h4 class="text-white font-bold text-sm mb-2" id="seu-tier2-title">Optimalisasi Beban & Preventive Care</h4>
+                                <div class="space-y-2 mb-3" id="seu-tier2-content">
+                                    <!-- Diisi JS -->
+                                </div>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 text-[11px] text-slate-400 flex items-start gap-1.5 mt-2">
+                                <i class="ph-bold ph-gear text-energi-gold text-sm shrink-0 mt-0.5"></i>
+                                <span><strong>Fokus:</strong> Standardisasi setting temperatur/tekanan, pemeliharaan motor & kompresor, eliminasi idling.</span>
+                            </div>
+                        </div>
+
+                        <!-- TIER 3: MODERAT (5% - 10%) -->
+                        <div class="bg-darkcard/85 backdrop-blur-xl border border-energi-cyan/30 p-5 rounded-2xl relative overflow-hidden group hover:border-energi-cyan/50 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-energi-cyan shadow-[0_0_10px_rgba(0,255,255,0.8)]"></span>
+                                        <span class="text-xs font-bold text-energi-cyan uppercase tracking-wider">Tier 3: Beban Moderat</span>
+                                    </div>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-energi-cyan/20 text-energi-cyan font-mono font-bold border border-energi-cyan/30">5% – 10% Konsumsi</span>
+                                </div>
+                                <h4 class="text-white font-bold text-sm mb-2" id="seu-tier3-title">Disiplin Prosedur & Pengendalian</h4>
+                                <div class="space-y-2 mb-3" id="seu-tier3-content">
+                                    <!-- Diisi JS -->
+                                </div>
+                            </div>
+                            <div class="pt-3 border-t border-white/10 text-[11px] text-slate-400 flex items-start gap-1.5 mt-2">
+                                <i class="ph-bold ph-lightbulb text-energi-cyan text-sm shrink-0 mt-0.5"></i>
+                                <span><strong>Fokus:</strong> Edukasi operator, kepatuhan shut-off peralatan saat non-produksi, dan eliminasi losses.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- INSIGHT BOTTOM BOX -->
+                    <div class="bg-gradient-to-r from-energi-cyan/10 via-energi-gold/10 to-energi-cyan/10 border border-white/15 p-6 md:p-7 rounded-2xl backdrop-blur-md">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-energi-gold/20 border border-energi-gold/30 flex items-center justify-center text-xl text-energi-gold shrink-0 mt-0.5"><i class="ph-fill ph-lightbulb-filament"></i></div>
+                            <div class="space-y-1">
+                                <h4 class="text-white font-bold text-sm md:text-base flex items-center gap-2">
+                                    <span>Insight & Rekomendasi Manajerial SEU</span>
+                                </h4>
+                                <p class="text-slate-300 text-xs md:text-sm leading-relaxed" id="seu-insight"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1378,7 +1495,8 @@
         }
 
         /**
-         * renderSeuChart — Grafik seluruh departemen, warna berbeda untuk SEU vs non-SEU vs Others
+         * renderSeuChart — Grafik seluruh departemen terurut Pareto (descending KWh),
+         * data labels langsung di atas bar, warna khusus SEU vs Non-SEU vs Others.
          * @param {Array} allDepts — semua data departemen dari Firestore
          * @param {number} totalKwh — total KWh seluruh IR
          */
@@ -1392,38 +1510,100 @@
             const ctx = canvas.getContext('2d');
             const isMobile = window.innerWidth < 768;
 
-            // Hitung % tiap dept
+            const SEU_THRESHOLD = 5.0;
+
+            // 1. Hitung KWh dan % untuk tiap departemen
+            // 2. Urutkan: Terbesar ke terkecil (Pareto), Others di paling akhir
             const depts = allDepts.map(d => ({
                 ...d,
                 kwh: parseFloat(d.kwh) || 0,
                 pct: totalKwh > 0 ? ((parseFloat(d.kwh) || 0) / totalKwh * 100) : 0
-            }));
-
-            const SEU_THRESHOLD = 5.0;
+            })).sort((a, b) => {
+                const isOtherA = a.name.toLowerCase() === 'others';
+                const isOtherB = b.name.toLowerCase() === 'others';
+                if (isOtherA && !isOtherB) return 1;
+                if (!isOtherA && isOtherB) return -1;
+                return b.kwh - a.kwh;
+            });
 
             // Tentukan status tiap dept
             const isSEU = (d) => d.name.toLowerCase() !== 'others' && d.pct >= SEU_THRESHOLD;
             const isOthers = (d) => d.name.toLowerCase() === 'others';
 
-            // Warna: SEU = gold, Others = slate, Non-SEU = cyan semi-transparent
+            // Warna bar dengan gradient mewah
             const bgColors = depts.map(d => {
-                if (isOthers(d)) return 'rgba(100,116,139,0.45)';
-                if (isSEU(d)) return 'rgba(212,175,55,0.75)';
-                return 'rgba(0,255,255,0.25)';
+                if (isOthers(d)) return 'rgba(100, 116, 139, 0.45)';
+                if (isSEU(d)) {
+                    const grad = ctx.createLinearGradient(0, 0, 0, 320);
+                    grad.addColorStop(0, 'rgba(245, 208, 97, 0.95)');
+                    grad.addColorStop(1, 'rgba(212, 175, 55, 0.4)');
+                    return grad;
+                }
+                const grad = ctx.createLinearGradient(0, 0, 0, 320);
+                grad.addColorStop(0, 'rgba(34, 211, 238, 0.65)');
+                grad.addColorStop(1, 'rgba(6, 182, 212, 0.2)');
+                return grad;
             });
+
             const borderColors = depts.map(d => {
                 if (isOthers(d)) return '#64748b';
-                if (isSEU(d)) return '#D4AF37';
-                return 'rgba(0,255,255,0.5)';
+                if (isSEU(d)) return '#F5D061';
+                return '#22d3ee';
             });
-            const borderWidths = depts.map(d => isSEU(d) ? 2.5 : 1);
 
-            // Label dengan marker SEU
-            const labels = depts.map(d => {
-                if (isOthers(d)) return d.name;
-                if (isSEU(d)) return '⚡ ' + d.name;
-                return d.name;
+            const borderWidths = depts.map(d => isSEU(d) ? 2 : 1.2);
+
+            // Label sumbu X dengan nomor ranking urutan
+            const labels = depts.map((d, idx) => {
+                const isOther = isOthers(d);
+                const rankPrefix = isOther ? '' : `#${idx + 1} `;
+                if (isOther) return d.name;
+                if (isSEU(d)) return `⚡ ${rankPrefix}${d.name}`;
+                return `${rankPrefix}${d.name}`;
             });
+
+            // Inline plugin untuk menggambar nilai % langsung di atas setiap bar
+            const barValuePlugin = {
+                id: 'seuBarValues',
+                afterDatasetsDraw(chart) {
+                    const { ctx } = chart;
+                    const meta = chart.getDatasetMeta(0);
+                    if (!meta || !meta.data) return;
+
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+
+                    meta.data.forEach((bar, index) => {
+                        const d = depts[index];
+                        if (!d) return;
+
+                        const isSeuItem = isSEU(d);
+                        const isOtherItem = isOthers(d);
+
+                        const fontSize = isMobile ? 8.5 : 10;
+                        ctx.font = `${isSeuItem ? 'bold ' : '600 '}${fontSize}px Outfit, sans-serif`;
+
+                        if (isSeuItem) {
+                            ctx.fillStyle = '#F5D061';
+                        } else if (isOtherItem) {
+                            ctx.fillStyle = '#94a3b8';
+                        } else {
+                            ctx.fillStyle = '#67e8f9';
+                        }
+
+                        const pctText = `${d.pct.toFixed(1)}%`;
+                        const x = bar.x;
+                        const y = bar.y - 4;
+
+                        if (y > 10) {
+                            ctx.fillText(pctText, x, y);
+                        }
+                    });
+
+                    ctx.restore();
+                }
+            };
 
             seuChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -1435,47 +1615,26 @@
                         backgroundColor: bgColors,
                         borderColor: borderColors,
                         borderWidth: borderWidths,
-                        borderRadius: 6,
+                        borderRadius: { topLeft: 6, topRight: 6 },
                         borderSkipped: false,
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(5, 5, 8, 0.92)',
-                            titleColor: '#D4AF37',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(255,255,255,0.1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 8,
-                            callbacks: {
-                                title: (items) => {
-                                    const d = depts[items[0].dataIndex];
-                                    const label = isSEU(d) ? '⚡ SEU: ' + d.name : d.name;
-                                    return label;
-                                },
-                                label: (item) => {
-                                    const d = depts[item.dataIndex];
-                                    const val = d.kwh.toLocaleString('id-ID');
-                                    const tag = isSEU(d) ? ' ✅ SEU' : (isOthers(d) ? ' (Others)' : ' — Non-SEU');
-                                    return ` ${val} KWh  (${d.pct.toFixed(2)}%)${tag}`;
-                                }
-                            }
-                        },
-                        annotation: undefined
-                    },
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                            grace: '15%',
+                            grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
                             ticks: {
-                                color: 'rgba(255,255,255,0.3)',
+                                color: 'rgba(255,255,255,0.45)',
                                 font: { size: isMobile ? 9 : 11, family: 'Outfit' },
-                                callback: (val) => val.toLocaleString('id-ID')
+                                callback: (val) => {
+                                    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                                    if (val >= 1000) return (val / 1000).toFixed(0) + 'K';
+                                    return val.toLocaleString('id-ID');
+                                }
                             }
                         },
                         x: {
@@ -1484,78 +1643,156 @@
                                 color: (context) => {
                                     const d = depts[context.index];
                                     if (!d) return 'rgba(255,255,255,0.5)';
-                                    if (isSEU(d)) return '#D4AF37';
-                                    if (isOthers(d)) return '#64748b';
-                                    return 'rgba(255,255,255,0.4)';
+                                    if (isSEU(d)) return '#F5D061';
+                                    if (isOthers(d)) return '#94a3b8';
+                                    return '#67e8f9';
                                 },
                                 font: (context) => {
                                     const d = depts[context?.index];
                                     const isSeuItem = d && isSEU(d);
-                                    return { size: isMobile ? 8 : 10, family: 'Outfit', weight: isSeuItem ? '700' : '400' };
+                                    return { size: isMobile ? 8.5 : 10.5, family: 'Outfit', weight: isSeuItem ? '700' : '500' };
                                 },
-                                maxRotation: isMobile ? 35 : 25
+                                maxRotation: isMobile ? 45 : 30,
+                                minRotation: isMobile ? 25 : 0
                             }
                         }
                     },
-                    animation: { duration: 1200, easing: 'easeOutQuart' }
-                }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(9, 12, 20, 0.95)',
+                            titleColor: '#F5D061',
+                            titleFont: { size: 13, weight: 'bold', family: 'Outfit' },
+                            bodyColor: '#e2e8f0',
+                            bodyFont: { size: 12, family: 'Outfit' },
+                            borderColor: 'rgba(212,175,55,0.3)',
+                            borderWidth: 1.5,
+                            padding: 12,
+                            cornerRadius: 10,
+                            displayColors: false,
+                            callbacks: {
+                                title: (items) => {
+                                    const d = depts[items[0].dataIndex];
+                                    const isOther = isOthers(d);
+                                    const rankStr = isOther ? '' : `[Rank #${items[0].dataIndex + 1}] `;
+                                    const tag = isSEU(d) ? '⚡ SEU: ' : (isOther ? '📦 ' : '🔹 ');
+                                    return `${tag}${rankStr}${d.name}`;
+                                },
+                                label: (item) => {
+                                    const d = depts[item.dataIndex];
+                                    const kwhFormatted = d.kwh.toLocaleString('id-ID') + ' KWh / Tahun';
+                                    const pctFormatted = d.pct.toFixed(2) + '% dari Total Pabrik IR';
+                                    const statusTag = isSEU(d) 
+                                        ? '⚡ Status: Significant Energy Use (≥ 5%)'
+                                        : (isOthers(d) ? '📦 Status: Kategori Penampung (Dikecualikan)' : '🔹 Status: Non-SEU (< 5%)');
+                                    return [
+                                        `  📊 Konsumsi  : ${kwhFormatted}`,
+                                        `  📈 Kontribusi: ${pctFormatted}`,
+                                        `  🏷️ ${statusTag}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
+                },
+                plugins: [barValuePlugin]
             });
         }
 
         /**
-         * renderSeuTable — Hanya tampilkan departemen SEU (≥5%, kecuali Others)
-         * @param {Array} seuDepts — sudah difilter, sudah ada .pct
-         * @param {number} totalKwh — total KWh seluruh IR (untuk footer)
+         * renderSeuTable — Tampilkan departemen SEU terurut, subtotal SEU, dan total pabrik
+         * @param {Array} seuDepts — sudah difilter & disortir desc
+         * @param {number} totalKwh — total KWh seluruh IR
          */
         function renderSeuTable(seuDepts, totalKwh) {
             const body = document.getElementById('seu-table-body');
+            const foot = document.getElementById('seu-table-foot');
             if (!body) return;
             if (!seuDepts || seuDepts.length === 0) {
-                body.innerHTML = '<tr><td colspan="4" class="text-center text-slate-500 py-10 text-sm italic">Belum ada data departemen atau belum ada yang memenuhi batas SEU ≥ 5%.</td></tr>';
+                body.innerHTML = '<tr><td colspan="4" class="text-center text-slate-500 py-10 text-xs italic">Belum ada data departemen atau belum ada yang memenuhi batas SEU ≥ 5%.</td></tr>';
+                if (foot) foot.innerHTML = '';
                 return;
             }
 
             const deptIcons = ['🏭','🔧','⚙️','🏗️','🔌','💡','🌡️','🚿','🔩','🏢'];
-            const labelColors = [
-                'bg-energi-gold/20 text-energi-gold border border-energi-gold/30',
-                'bg-energi-cyan/15 text-energi-cyan border border-energi-cyan/30',
-                'bg-blue-500/15 text-blue-400 border border-blue-500/30',
-                'bg-purple-500/15 text-purple-400 border border-purple-500/30',
-                'bg-pink-500/15 text-pink-400 border border-pink-500/30',
-                'bg-orange-500/15 text-orange-400 border border-orange-500/30',
-            ];
 
             body.innerHTML = seuDepts.map((d, i) => {
                 const kwh = parseFloat(d.kwh) || 0;
                 const pct = d.pct;
-                const colorClass = labelColors[i % labelColors.length];
                 const icon = deptIcons[i % deptIcons.length];
+
+                let tierBadge = '';
+                if (pct > 20) {
+                    tierBadge = '<span class="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 text-[9px] font-bold border border-red-500/30">Tier 1</span>';
+                } else if (pct >= 10) {
+                    tierBadge = '<span class="px-1.5 py-0.5 rounded bg-energi-gold/20 text-energi-gold text-[9px] font-bold border border-energi-gold/30">Tier 2</span>';
+                } else {
+                    tierBadge = '<span class="px-1.5 py-0.5 rounded bg-energi-cyan/20 text-energi-cyan text-[9px] font-bold border border-energi-cyan/30">Tier 3</span>';
+                }
+
                 return `
-                    <tr class="border-b border-white/5 hover:bg-energi-gold/[0.03] transition-colors">
-                        <td class="py-3 text-slate-500 font-mono">${String(i+1).padStart(2,'0')}</td>
-                        <td class="py-3">
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm">${icon}</span>
+                    <tr class="border-b border-white/5 hover:bg-white/[0.04] transition-colors group">
+                        <td class="py-3 px-2 text-slate-400 font-mono text-xs font-semibold">#${i + 1}</td>
+                        <td class="py-3 px-2">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-base shrink-0">${icon}</span>
                                 <div>
-                                    <p class="text-white font-semibold text-xs">${d.name}</p>
-                                    <p class="text-[9px] text-energi-gold font-bold tracking-wider">⚡ SEU</p>
+                                    <p class="text-white font-bold text-xs group-hover:text-energi-gold transition-colors">${d.name}</p>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="text-[9px] text-energi-gold font-bold tracking-wider uppercase">⚡ SEU</span>
+                                        ${tierBadge}
+                                    </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-3 text-right text-energi-cyan font-mono text-xs">${kwh.toLocaleString('id-ID')}</td>
-                        <td class="py-3 text-right"><span class="px-2 py-0.5 rounded-full ${colorClass} text-[10px] font-bold">${pct.toFixed(2)}%</span></td>
+                        <td class="py-3 px-2 text-right text-energi-cyan font-mono text-xs md:text-sm font-bold">${kwh.toLocaleString('id-ID')}</td>
+                        <td class="py-3 px-2 text-right">
+                            <span class="px-2.5 py-1 rounded-full bg-energi-gold/15 text-energi-gold border border-energi-gold/30 text-[11px] font-mono font-bold inline-block">
+                                ${pct.toFixed(2)}%
+                            </span>
+                        </td>
                     </tr>
                 `;
             }).join('');
 
-            // Update total kwh di footer
-            const totalEl = document.getElementById('seu-total-kwh');
-            if (totalEl) totalEl.textContent = totalKwh.toLocaleString('id-ID');
+            const seuKwhSum = seuDepts.reduce((sum, d) => sum + d.kwh, 0);
+            const seuPctSum = totalKwh > 0 ? (seuKwhSum / totalKwh * 100) : 0;
+            if (foot) {
+                foot.innerHTML = `
+                    <tr class="border-t-2 border-energi-gold/40 bg-energi-gold/[0.07]">
+                        <td colspan="2" class="py-3 px-2 text-energi-gold font-bold text-xs uppercase tracking-wider">
+                            ⚡ Subtotal SEU (${seuDepts.length} Dept)
+                        </td>
+                        <td class="py-3 px-2 text-right text-energi-gold font-mono font-black text-xs md:text-sm">
+                            ${seuKwhSum.toLocaleString('id-ID')}
+                        </td>
+                        <td class="py-3 px-2 text-right">
+                            <span class="px-2 py-0.5 rounded-full bg-energi-gold/25 text-energi-gold text-xs font-black font-mono border border-energi-gold/40">
+                                ${seuPctSum.toFixed(2)}%
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="border-t border-white/10 text-slate-400">
+                        <td colspan="2" class="py-2.5 px-2 text-slate-300 font-semibold text-[11px] uppercase tracking-wider">
+                            Total Seluruh Pabrik IR
+                        </td>
+                        <td class="py-2.5 px-2 text-right text-slate-200 font-mono font-bold text-xs" id="seu-total-kwh">
+                            ${totalKwh.toLocaleString('id-ID')}
+                        </td>
+                        <td class="py-2.5 px-2 text-right">
+                            <span class="px-2 py-0.5 rounded-full bg-white/10 text-slate-300 text-[10px] font-bold font-mono">
+                                100.00%
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }
         }
 
         /**
-         * processSeuData — entry point utama
-         * Terima semua dept dari Firestore, hitung %, filter SEU, update semua UI
+         * processSeuData — Entry point utama pengolahan SEU
+         * Hitung persentase, urutkan data, perbarui cards, tabel, chart, narasi, dan tier breakdown.
          */
         function processSeuData(allDepts) {
             if (!allDepts || allDepts.length === 0) return;
@@ -1572,83 +1809,208 @@
                 pct: totalKwh > 0 ? ((parseFloat(d.kwh) || 0) / totalKwh * 100) : 0
             }));
 
-            // Filter SEU: ≥5% dan BUKAN 'others'
+            // Filter SEU: ≥5% dan BUKAN 'others' (diurutkan descending)
             const seuDepts = withPct.filter(d =>
                 d.name.toLowerCase() !== 'others' && d.pct >= SEU_THRESHOLD
             ).sort((a, b) => b.pct - a.pct);
 
+            const totalSeuKwh = seuDepts.reduce((sum, d) => sum + d.kwh, 0);
+            const seuCoverage = totalKwh > 0 ? (totalSeuKwh / totalKwh * 100) : 0;
+            const highest = seuDepts[0] || { name: '-', kwh: 0, pct: 0 };
+
             // ── Update Stat Cards ──────────────────────────────────────────────
-            document.getElementById('seu-total-machines').textContent = seuDepts.length;
+            const elTotalMachines = document.getElementById('seu-total-machines');
+            if (elTotalMachines) elTotalMachines.textContent = seuDepts.length;
+
             const headerEl = document.getElementById('seu-header-count');
             if (headerEl) headerEl.textContent = seuDepts.length + ' departemen';
 
-            document.getElementById('seu-total-energy').textContent = totalKwh.toLocaleString('id-ID');
+            const elTotalEnergy = document.getElementById('seu-total-energy');
+            if (elTotalEnergy) elTotalEnergy.textContent = totalKwh.toLocaleString('id-ID');
 
-            // Tertinggi (dari SEU saja)
-            if (seuDepts.length > 0) {
-                const highest = seuDepts[0]; // sudah di-sort desc
-                document.getElementById('seu-highest-pct').textContent = highest.pct.toFixed(2);
-                document.getElementById('seu-highest-name').textContent = highest.name;
-            }
+            const elHighestPct = document.getElementById('seu-highest-pct');
+            if (elHighestPct) elHighestPct.textContent = highest.pct.toFixed(2);
 
-            // Cakupan SEU = total % semua SEU dept terhadap keseluruhan
-            const seuCoverage = seuDepts.reduce((sum, d) => sum + d.pct, 0);
-            document.getElementById('seu-avg-pct').textContent = seuCoverage.toFixed(2);
+            const elHighestName = document.getElementById('seu-highest-name');
+            if (elHighestName) elHighestName.textContent = highest.name;
 
-            // ── Render Tabel (SEU saja) ────────────────────────────────────────
+            const elAvgPct = document.getElementById('seu-avg-pct');
+            if (elAvgPct) elAvgPct.textContent = seuCoverage.toFixed(2);
+
+            // ── Render Tabel (SEU saja, dengan subtotal & grand total) ────────
             renderSeuTable(seuDepts, totalKwh);
 
-            // ── Render Chart (semua dept) ──────────────────────────────────────
-            if (document.getElementById('seu-ir')?.classList.contains('block')) {
-                renderSeuChart(withPct, totalKwh);
-            }
+            // ── Render Chart (semua dept, terurut Pareto) ──────────────────────
+            renderSeuChart(withPct, totalKwh);
 
-            // ── Narasi SEU di bawah chart ──────────────────────────────────────
+            // ── Narasi Singkat di bawah chart ──────────────────────────────────
             const narasiBox = document.getElementById('seu-chart-narasi');
             const narasiText = document.getElementById('seu-chart-narasi-text');
-            if (narasiBox && narasiText && seuDepts.length > 0) {
-                const seuNames = seuDepts.map(d =>
-                    `<strong class="text-energi-gold">${d.name}</strong> (${d.pct.toFixed(2)}%)`
+            if (narasiText && seuDepts.length > 0) {
+                const seuListStr = seuDepts.map((d, i) =>
+                    `<strong class="text-energi-gold">#${i + 1} ${d.name}</strong> (${d.pct.toFixed(2)}%)`
                 ).join(', ');
                 narasiText.innerHTML =
-                    `Berdasarkan analisis konsumsi energi tahunan seluruh departemen IR, ` +
-                    `terdapat <strong class="text-white">${seuDepts.length} departemen</strong> yang dikategorikan sebagai ` +
-                    `<em>Significant Energy Use (SEU)</em> karena masing-masing berkontribusi ≥ 5% dari total konsumsi. ` +
-                    `Departemen tersebut adalah: ${seuNames}. ` +
-                    `Total konsumsi SEU mencakup <strong class="text-energi-cyan">${seuCoverage.toFixed(2)}%</strong> dari total ` +
-                    `<strong class="text-white">${totalKwh.toLocaleString('id-ID')} KWh</strong> per tahun. ` +
-                    `Departemen ini menjadi prioritas utama program efisiensi energi IR.`;
-                narasiBox.classList.remove('hidden');
+                    `Grafik telah diurutkan berdasarkan hukum Pareto (konsumsi energi terbesar di sebelah kiri). ` +
+                    `Terdapat <strong class="text-white">${seuDepts.length} departemen SEU</strong> (${seuListStr}) ` +
+                    `yang secara bersama-sama mengonsumsi <strong class="text-energi-gold font-mono font-bold">${totalSeuKwh.toLocaleString('id-ID')} KWh/Tahun</strong> ` +
+                    `atau <strong class="text-energi-cyan font-mono font-bold">${seuCoverage.toFixed(2)}%</strong> dari total energi pabrik. ` +
+                    `Fokus efisiensi pada kelompok ini akan memberikan rasio dampak penghematan tertinggi.`;
+                if (narasiBox) narasiBox.classList.remove('hidden');
             } else if (narasiBox) {
                 narasiBox.classList.add('hidden');
             }
 
-            // ── Insight Dinamis ────────────────────────────────────────────────
-            const veryHigh = seuDepts.filter(d => d.pct > 20);
-            const high = seuDepts.filter(d => d.pct > 10 && d.pct <= 20);
-            const mid = seuDepts.filter(d => d.pct >= 5 && d.pct <= 10);
-            const nonSeu = withPct.filter(d => d.name.toLowerCase() !== 'others' && d.pct < SEU_THRESHOLD);
+            // ── Update Badge Cakupan Narasi Utama ──────────────────────────────
+            const coverageBadge = document.getElementById('seu-narrative-coverage-badge');
+            if (coverageBadge) coverageBadge.textContent = seuCoverage.toFixed(2) + '%';
 
+            // ── Teks Narasi Utama yang Jelas & Detail ──────────────────────────
+            const mainNarrativeEl = document.getElementById('seu-main-narrative');
+            const nonSeuDepts = withPct.filter(d => d.name.toLowerCase() !== 'others' && d.pct < SEU_THRESHOLD);
+            const othersDept = withPct.find(d => d.name.toLowerCase() === 'others');
+            const nonSeuKwh = nonSeuDepts.reduce((s, d) => s + d.kwh, 0);
+            const nonSeuPct = totalKwh > 0 ? (nonSeuKwh / totalKwh * 100) : 0;
+
+            if (mainNarrativeEl && seuDepts.length > 0) {
+                mainNarrativeEl.innerHTML = `
+                    <div class="space-y-3.5">
+                        <p class="leading-relaxed">
+                            Berdasarkan audit dan evaluasi berkala konsumsi energi tahunan seluruh fasilitas pabrik IR, total pemakaian energi tercatat mencapai 
+                            <strong class="text-white font-mono font-bold text-sm md:text-base">${totalKwh.toLocaleString('id-ID')} KWh/Tahun</strong>. 
+                            Mengacu pada standar manajemen energi <strong class="text-energi-gold font-semibold">ISO 50001:2018</strong> dengan batas ambang kontribusi 
+                            <strong class="text-energi-gold font-bold">≥ 5,00%</strong> (di luar kategori penampung <em>Others</em>), teridentifikasi sebanyak 
+                            <strong class="text-energi-gold font-bold text-sm md:text-base">${seuDepts.length} departemen utama</strong> yang masuk dalam klasifikasi 
+                            <em class="text-white font-medium not-italic">Significant Energy Use (SEU)</em>.
+                        </p>
+                        <p class="leading-relaxed">
+                            Secara kumulatif, ${seuDepts.length} departemen SEU tersebut mengonsumsi 
+                            <strong class="text-energi-cyan font-mono font-bold">${totalSeuKwh.toLocaleString('id-ID')} KWh/Tahun</strong> atau mendominasi 
+                            <strong class="text-energi-gold font-mono font-black text-base md:text-lg">${seuCoverage.toFixed(2)}%</strong> dari total seluruh energi pabrik. 
+                            Kontributor energi terbesar adalah <strong class="text-white font-bold underline decoration-energi-gold/50 underline-offset-4">${highest.name}</strong> 
+                            dengan serapan sebesar <strong class="text-energi-cyan font-mono font-bold">${highest.kwh.toLocaleString('id-ID')} KWh/Tahun (${highest.pct.toFixed(2)}%)</strong>.
+                        </p>
+                        <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3 mt-2">
+                            <span class="text-energi-gold text-base mt-0.5"><i class="ph-fill ph-lightbulb"></i></span>
+                            <div class="text-xs text-slate-300 leading-relaxed">
+                                <strong class="text-white">Prinsip Pareto & Efektivitas Program:</strong> Konsentrasi energi pada ${seuDepts.length} departemen ini membuktikan berlakunya aturan 80/20. 
+                                Setiap penghematan sebesar <strong class="text-energi-cyan font-mono">1%</strong> yang berhasil dicapai pada kelompok SEU akan menghemat sekitar 
+                                <strong class="text-energi-gold font-mono font-bold">${Math.round(totalSeuKwh * 0.01).toLocaleString('id-ID')} KWh/Tahun</strong>, 
+                                setara dengan penghematan hingga <strong class="text-white font-mono">${(nonSeuKwh > 0 ? (totalSeuKwh * 0.01 / nonSeuKwh * 100).toFixed(1) : 0)}%</strong> 
+                                di seluruh departemen non-SEU sekaligus.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // ── Numerical Highlight Chips ──────────────────────────────────────
+            const chipsEl = document.getElementById('seu-narrative-stat-chips');
+            if (chipsEl) {
+                chipsEl.innerHTML = `
+                    <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center hover:border-energi-cyan/30 transition-all">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold mb-1">Total Konsumsi SEU</span>
+                        <span class="text-sm md:text-base font-bold font-mono text-energi-cyan">${totalSeuKwh.toLocaleString('id-ID')}</span>
+                        <span class="text-[9px] text-slate-500 block mt-0.5">KWh / Tahun</span>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center hover:border-energi-gold/30 transition-all">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold mb-1">Cakupan SEU</span>
+                        <span class="text-sm md:text-base font-bold font-mono text-energi-gold">${seuCoverage.toFixed(2)}%</span>
+                        <span class="text-[9px] text-slate-500 block mt-0.5">Dominasi Energi IR</span>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center hover:border-white/30 transition-all">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold mb-1">Top #1 Kontributor</span>
+                        <span class="text-xs md:text-sm font-bold text-white truncate block" title="${highest.name}">${highest.name}</span>
+                        <span class="text-[10px] font-mono text-energi-cyan block font-semibold mt-0.5">${highest.pct.toFixed(2)}%</span>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-center hover:border-slate-500/30 transition-all">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold mb-1">Non-SEU & Others</span>
+                        <span class="text-sm md:text-base font-bold font-mono text-slate-300">${(100 - seuCoverage).toFixed(2)}%</span>
+                        <span class="text-[9px] text-slate-500 block mt-0.5">${(totalKwh - totalSeuKwh).toLocaleString('id-ID')} KWh / Thn</span>
+                    </div>
+                `;
+            }
+
+            // ── Tier Classification Breakdown ──────────────────────────────────
+            const veryHigh = seuDepts.filter(d => d.pct > 20);
+            const high = seuDepts.filter(d => d.pct >= 10 && d.pct <= 20);
+            const mid = seuDepts.filter(d => d.pct >= 5 && d.pct < 10);
+
+            // Tier 1 (> 20%)
+            const tier1El = document.getElementById('seu-tier1-content');
+            if (tier1El) {
+                if (veryHigh.length > 0) {
+                    tier1El.innerHTML = veryHigh.map(d => `
+                        <div class="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <p class="text-white font-bold text-xs truncate">${d.name}</p>
+                                <p class="text-[10px] text-red-300 font-mono mt-0.5">${d.kwh.toLocaleString('id-ID')} KWh/Thn</p>
+                            </div>
+                            <span class="text-xs font-black font-mono text-red-400 px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/30 shrink-0">${d.pct.toFixed(2)}%</span>
+                        </div>
+                    `).join('');
+                } else {
+                    tier1El.innerHTML = '<p class="text-slate-500 text-xs italic py-2">Tidak ada departemen dalam Tier 1 (&gt; 20%).</p>';
+                }
+            }
+
+            // Tier 2 (10% - 20%)
+            const tier2El = document.getElementById('seu-tier2-content');
+            if (tier2El) {
+                if (high.length > 0) {
+                    tier2El.innerHTML = high.map(d => `
+                        <div class="p-2.5 rounded-xl bg-energi-gold/10 border border-energi-gold/20 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <p class="text-white font-bold text-xs truncate">${d.name}</p>
+                                <p class="text-[10px] text-energi-gold/80 font-mono mt-0.5">${d.kwh.toLocaleString('id-ID')} KWh/Thn</p>
+                            </div>
+                            <span class="text-xs font-black font-mono text-energi-gold px-2 py-0.5 rounded-md bg-energi-gold/20 border border-energi-gold/30 shrink-0">${d.pct.toFixed(2)}%</span>
+                        </div>
+                    `).join('');
+                } else {
+                    tier2El.innerHTML = '<p class="text-slate-500 text-xs italic py-2">Tidak ada departemen dalam Tier 2 (10%–20%).</p>';
+                }
+            }
+
+            // Tier 3 (5% - 10%)
+            const tier3El = document.getElementById('seu-tier3-content');
+            if (tier3El) {
+                if (mid.length > 0) {
+                    tier3El.innerHTML = mid.map(d => `
+                        <div class="p-2.5 rounded-xl bg-energi-cyan/10 border border-energi-cyan/20 flex items-center justify-between">
+                            <div class="min-w-0 pr-2">
+                                <p class="text-white font-bold text-xs truncate">${d.name}</p>
+                                <p class="text-[10px] text-cyan-300/80 font-mono mt-0.5">${d.kwh.toLocaleString('id-ID')} KWh/Thn</p>
+                            </div>
+                            <span class="text-xs font-black font-mono text-energi-cyan px-2 py-0.5 rounded-md bg-energi-cyan/20 border border-energi-cyan/30 shrink-0">${d.pct.toFixed(2)}%</span>
+                        </div>
+                    `).join('');
+                } else {
+                    tier3El.innerHTML = '<p class="text-slate-500 text-xs italic py-2">Tidak ada departemen dalam Tier 3 (5%–10%).</p>';
+                }
+            }
+
+            // ── Insight Dinamis & Manajerial ──────────────────────────────────
             let insight = '';
             if (veryHigh.length > 0) {
-                const names = veryHigh.map(d => `<strong class="text-energi-gold">${d.name}</strong>`).join(' dan ');
+                const names = veryHigh.map(d => `<strong class="text-red-400">${d.name} (${d.pct.toFixed(2)}%)</strong>`).join(' dan ');
                 const sum = veryHigh.reduce((s, d) => s + d.pct, 0);
-                insight += `${names} mendominasi konsumsi energi IR sebesar <strong class="text-white">${sum.toFixed(2)}%</strong> — ` +
-                           `menjadi prioritas utama program efisiensi dan target audit energi. `;
+                insight += `Departemen ${names} mendominasi konsumsi energi IR dengan total akumulasi <strong class="text-white font-bold">${sum.toFixed(2)}%</strong> — ` +
+                           `wajib dipasang sub-metering digital terhubung IoT dan dievaluasi efisiensinya mingguan. `;
             }
             if (high.length > 0) {
-                const names = high.map(d => `<strong class="text-energi-cyan">${d.name}</strong>`).join(', ');
+                const names = high.map(d => `<strong class="text-energi-gold">${d.name} (${d.pct.toFixed(2)}%)</strong>`).join(', ');
                 if (insight) insight += ' ';
-                insight += `${names} berada di kelompok SEU menengah (10–20%) — perlu pemantauan berkala dan program penghematan spesifik. `;
+                insight += `Kelompok ${names} berada pada Tier 2 (10%–20%) — memerlukan audit berkala terhadap kebocoran udara bertekanan, insulasi termal, dan penjadwalan beban puncak (peak hours). `;
             }
             if (mid.length > 0) {
-                const names = mid.map(d => `<strong class="text-energi-cyan">${d.name}</strong>`).join(', ');
+                const names = mid.map(d => `<strong class="text-energi-cyan">${d.name} (${d.pct.toFixed(2)}%)</strong>`).join(', ');
                 if (insight) insight += ' ';
-                insight += `${names} baru masuk kategori SEU (5–10%) — potensi efisiensi dengan intervensi terukur. `;
+                insight += `Departemen ${names} berada di ambang batas SEU (5%–10%) — fokuskan pada standard operating procedure (SOP) hemat energi dan pemeliharaan preventif. `;
             }
-            if (nonSeu.length > 0) {
+            if (nonSeuDepts.length > 0) {
                 if (insight) insight += ' ';
-                insight += `<span class="text-slate-400">${nonSeu.length} departemen lainnya berada di bawah batas SEU (&lt;5%) dan terus dipantau perkembangannya.</span>`;
+                insight += `<span class="text-slate-400">${nonSeuDepts.length} departemen non-SEU lainnya mengonsumsi ${nonSeuPct.toFixed(2)}% total energi dan tetap dipantau agar tidak melonjak ke kategori SEU.</span>`;
             }
             if (!insight) insight = 'Belum ada data departemen. Tambahkan data melalui Admin Panel.';
 
