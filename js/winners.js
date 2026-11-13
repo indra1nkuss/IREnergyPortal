@@ -206,8 +206,8 @@ export function displayWinners(page, shouldScroll = false) {
                         </div>
                     </div>
                     <div class="hidden sm:flex flex-col items-end gap-1">
-                        <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-[11px] font-black uppercase tracking-wider">TERBAIK</div>
-                        <div class="text-[10px] text-slate-400 font-mono italic">Validated ✓</div>
+                        <div class="px-3 py-1 bg-gradient-to-r from-energi-gold/20 to-transparent text-energi-gold border border-energi-gold/30 rounded-full text-xs font-black uppercase tracking-wider">TERBAIK</div>
+                        <div class="text-xs text-slate-300 font-mono font-medium flex items-center gap-1"><i class="ph-bold ph-check-circle text-emerald-400"></i> Validated</div>
                     </div>
                 </div>
             `);
